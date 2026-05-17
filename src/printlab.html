@@ -1,0 +1,128 @@
+<div class="section-header">
+    <h1>3D Print Lab</h1>
+</div>
+
+<p style="max-width:60ch;margin-bottom:.4rem;">The LSU Math 3D Print Lab is located in 373 Lockett Hall. I manage the lab and handle print requests for members of the LSU Mathematics Department.</p>
+<p style="max-width:60ch;margin-bottom:1.6rem;">The lab currently houses {printer_count} printers. Check the status board before submitting a request.</p>
+
+<p style="font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600;">Quick Links</p>
+<ul style="list-style:none;padding:0;margin-bottom:2rem;font-size:.95rem;">
+    <li><a href="#lab-status">Printer Status</a></li>
+    <li><a href="#lab-request">How to Request a Print</a></li>
+    <li><a href="#lab-gallery">Gallery</a></li>
+    <li><a href="#lab-filament">Filament Inventory</a></li>
+</ul>
+
+<!-- Printer status -->
+<div id="lab-status">
+    <h2 class="lab-section-title">Printer Status</h2>
+    <div class="printer-table">
+        {printers}
+    </div>
+</div>
+
+<!-- Request -->
+<div id="lab-request">
+    <h2 class="lab-section-title">How to Request a Print</h2>
+    <p style="max-width:60ch;">Print requests are open to members of the LSU Mathematics Department, including faculty, staff, and graduate students. To submit a request, email me at <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a> with the following:</p>
+    <ul style="max-width:58ch;padding-left:1.4rem;margin:.6rem 0 1rem;font-size:.97rem;line-height:1.75;">
+        <li>Your STL or 3MF file.</li>
+        <li>Your preferred material and color, or a note that you are flexible.</li>
+        <li>Any deadline or urgency, and any notes on quality versus speed.</li>
+    </ul>
+    <p style="max-width:60ch;">I do not guarantee turnaround times, but I will let you know if a request is not feasible. Please check the filament inventory below before specifying a material; if you need something not in stock, ask and I may be able to source it.</p>
+</div>
+
+<!-- Gallery -->
+<div id="lab-gallery">
+    <h2 class="lab-section-title">Gallery</h2>
+    <p style="max-width:56ch;margin-bottom:1.4rem;">A selection of prints from the lab.</p>
+    <div class="comics-grid">
+        {gallery}
+    </div>
+</div>
+
+<!-- Filament inventory -->
+<div id="lab-filament">
+    <h2 class="lab-section-title">Filament Inventory</h2>
+    <p style="max-width:60ch;margin-bottom:1.4rem;">Updated alongside the printer status board. Spool counts are approximate.</p>
+    {filament}
+</div>
+
+§PRINTER§
+
+<div class="printer-row printer-row--{status}">
+    <span class="printer-name">{name}</span>
+    <span class="printer-status-badge">{status_label}</span>
+    <span class="printer-note">{note}</span>
+</div>
+
+§GALLERY§
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="{src}" data-alt="{alt}" data-caption="{caption}" aria-label="View print: {caption}">
+        <img src="{src}" alt="{alt}">
+    </button>
+    <p class="comic-title">{caption}</p>
+</div>
+
+§FILAMENT§
+
+<div class="filament-group">
+    <h3 class="filament-diameter">{diameter}</h3>
+    <table class="filament-table">
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Color</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {rows}
+        </tbody>
+    </table>
+</div>
+
+§FILAMENT_ROW§
+
+<tr>
+    <td>{material}</td>
+    <td><span class="filament-swatch" style="background:{hex};" aria-hidden="true"></span>{color}</td>
+    <td class="filament-stock">{stock}{blurb}</td>
+</tr>
+
+§DATA§
+
+printer_count: 3
+
+---PRINTERS---
+
+name: Ultimaker 3
+id: um3
+status: idle
+note:
+
+name: Ultimaker 3 Extended
+id: um3e
+status: idle
+note: 
+
+name: Prusa Core One+
+id: prusa-core
+status: idle
+note:
+
+---GALLERY---
+
+prints/placeholder.jpg
+Placeholder.
+A placeholder caption
+
+---FILAMENT---
+
+2.85mm
+MATERIAL | COLOR | #2b2b2b | #SPOOLS
+
+1.75mm
+MATERIAL | COLOR | #c8a850 | #SPOOLS | comment

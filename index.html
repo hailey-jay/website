@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hailey Jay Garcia</title>
+    <link rel="icon" href="images/rose.svg" />
+    <meta name="description" content="Welcome to my website! Here, you'll find math, comics, and info about Hailey!" />
+    <link rel="alternate" type="application/rss+xml" title="Hailey Jay Garcia" href="https://math.lsu.edu/~jgarc86/rss.xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+/* ── Reset & tokens ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --pink: #f8a7b6;
+    --ink: #2c2520;
+    --muted: #6b5f58;
+    --paper: #f9f6f1;
+    --rule: #e8e0d8;
+    --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
+    --lh: 1.7;
+}
+
+/* ── Skip link ──────────────────────────────────────────────── */
+.skip-link {
+    position: absolute;
+    top: -999px;
+    left: 0;
+    background: var(--pink);
+    color: var(--ink);
+    padding: .4em 1em;
+    font-family: var(--serif);
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    line-height: var(--lh);
+    color: var(--ink);
+    background: var(--paper);
+    min-height: 100vh;
+}
+
+/* ── Layout shell ───────────────────────────────────────────── */
+.page {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: auto 1fr auto;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    gap: 0 3rem;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.sidebar {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    padding: 2.5rem 0 2rem;
+    border-right: 1px solid var(--rule);
+    padding-right: 2rem;
+}
+
+.sidebar-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    margin-bottom: .15em;
+}
+
+.sidebar-pronoun {
+    font-style: italic;
+    font-size: .92rem;
+    color: var(--muted);
+    margin-bottom: 1.1rem;
+}
+
+.sidebar hr {
+    border: none;
+    border-top: 1px solid var(--pink);
+    margin: 1rem 0;
+}
+
+.sidebar-meta {
+    font-size: .88rem;
+    line-height: 1.55;
+    color: var(--muted);
+    margin-bottom: 1.4rem;
+}
+
+.sidebar-meta strong {
+    display: block;
+    color: var(--ink);
+    font-weight: 500;
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-top: .6em;
+    margin-bottom: .1em;
+}
+
+.sidebar-meta a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--pink);
+    text-underline-offset: 2px;
+}
+
+/* Sidebar nav */
+.sidenav {
+    list-style: none;
+    margin-top: .6rem;
+}
+
+.sidenav li+li {
+    margin-top: .1rem;
+}
+
+.sidenav a {
+    display: block;
+    font-size: .95rem;
+    color: var(--ink);
+    text-decoration: none;
+    padding: .2em 0;
+    border-bottom: 1px solid transparent;
+    transition: color .15s, border-color .15s;
+}
+
+.sidenav a:hover,
+.sidenav a:focus {
+    color: var(--pink);
+    border-bottom-color: var(--pink);
+    outline: none;
+}
+
+/* ── Main content area ──────────────────────────────────────── */
+main {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 2.5rem 0 3rem;
+}
+
+/* ── Section visibility (controlled by JS) ─────────────────── */
+section {
+    display: none;
+}
+
+section.active {
+    display: block;
+}
+
+/* ── Section headings ───────────────────────────────────────── */
+.section-header {
+    display: flex;
+    align-items: baseline;
+    gap: .7em;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--pink);
+    padding-bottom: .5rem;
+}
+
+.section-header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: .01em;
+}
+
+.section-header .ornament {
+    color: var(--pink);
+    font-size: 1.1em;
+    line-height: 1;
+    /* inline SVG rose rendered via content trick below */
+}
+
+/* ── Prose ──────────────────────────────────────────────────── */
+p {
+    margin-bottom: 1rem;
+    max-width: 60ch;
+}
+
+a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--pink);
+    text-underline-offset: 3px;
+}
+
+a:hover,
+a:focus {
+    color: #c0607a;
+    outline: none;
+}
+
+/* ── "Lately" blurb ─────────────────────────────────────────── */
+.lately {
+    margin: 1.8rem 0 1.4rem;
+    padding: .9rem 1.1rem;
+    border-left: 3px solid var(--pink);
+    background: rgba(248, 167, 182, .07);
+    font-size: .96rem;
+    max-width: 58ch;
+}
+
+.lately-label {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: .3em;
+    font-weight: 500;
+}
+
+/* ── CV section ─────────────────────────────────────────────── */
+.cv-block {
+    margin-bottom: 2rem;
+}
+
+.cv-block h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: .6rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: .3rem;
+}
+
+.cv-entry {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: .1rem 1rem;
+    margin-bottom: .8rem;
+    font-size: .97rem;
+    max-width: 62ch;
+}
+
+.cv-entry .year {
+    color: var(--muted);
+    font-style: italic;
+    white-space: nowrap;
+    font-size: .9rem;
+    padding-top: .05em;
+}
+
+.cv-entry .desc {
+    color: var(--muted);
+    font-size: .9rem;
+    grid-column: 1;
+}
+
+/* ── Teaching section ───────────────────────────────────────── */
+.course {
+    margin-bottom: 1.6rem;
+    max-width: 62ch;
+}
+
+.course h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: .2em;
+}
+
+.course-meta {
+    font-size: .9rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: .4em;
+}
+
+.office-hours {
+    font-size: .92rem;
+    color: var(--muted);
+}
+
+.course-dl {
+    margin: 0;
+}
+
+.course-dl dt {
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 1.2rem;
+    margin-bottom: .3rem;
+}
+
+.course-dl dd {
+    margin-left: 0;
+    font-size: .97rem;
+    line-height: 1.65;
+}
+/* ── Comics section ─────────────────────────────────────────── */
+.comics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-top: .5rem;
+}
+
+.comic-card {
+    border: 1px solid var(--rule);
+    padding: .6rem;
+}
+
+.comic-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.comic-title {
+    font-size: .88rem;
+    color: var(--muted);
+}
+
+/* ── Links section ──────────────────────────────────────────── */
+.links-group {
+    margin-bottom: 1.8rem;
+}
+
+.links-group h2 {
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.links-group ul {
+    list-style: none;
+    padding: 0;
+}
+
+.links-group li {
+    padding: .2em 0;
+    font-size: .97rem;
+    border-bottom: 1px solid var(--rule);
+}
+
+.links-group li:last-child {
+    border-bottom: none;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer {
+    grid-column: 1 / 3;
+    border-top: 1px solid var(--rule);
+    padding: 1.4rem 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    text-align: center;
+}
+
+footer svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--pink);
+    opacity: .85;
+}
+
+footer p {
+    font-size: .82rem;
+    color: var(--muted);
+    max-width: 65ch;
+    line-height: 1.5;
+    margin: 0;
+}
+
+footer a {
+    color: var(--muted);
+    text-decoration-color: var(--rule);
+}
+
+/* ── About photo ─────────────────────────────────────────────── */
+.about-photo {
+    float: right;
+    margin: 0 0 1.2rem 1.8rem;
+    width: 148px;
+    flex-shrink: 0;
+}
+
+.about-photo img,
+.about-photo .photo-placeholder {
+    display: block;
+    width: 148px;
+    height: 185px;
+    object-fit: cover;
+    border: 1px solid var(--rule);
+}
+
+.about-photo .photo-placeholder {
+    background: var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.about-photo figcaption {
+    font-size: .78rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: .35rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+    .about-photo {
+        float: none;
+        margin: 0 0 1.4rem 0;
+        width: 100%;
+    }
+
+    .about-photo img,
+    .about-photo .photo-placeholder {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4/5;
+    }
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        padding: 0 1rem;
+    }
+
+    .sidebar {
+        grid-column: 1;
+        grid-row: 1;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        padding-right: 0;
+        padding-bottom: 1.4rem;
+    }
+
+    main {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    footer {
+        grid-column: 1;
+        grid-row: 3;
+    }
+}
+
+/* ── Comic thumbnails (replace <a> with <button>) ───────────── */
+.comic-thumb {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: zoom-in;
+    margin-bottom: .5rem;
+}
+
+.comic-thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    transition: border-color .15s;
+}
+
+.comic-thumb:hover img,
+.comic-thumb:focus img {
+    border-color: var(--pink);
+    outline: none;
+}
+
+.comic-thumb:focus {
+    outline: none;
+}
+
+/* ── Lightbox overlay ───────────────────────────────────────── */
+.lb-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(44, 37, 32, .88);
+    align-items: center;
+    justify-content: center;
+}
+
+.lb-overlay.open {
+    display: flex;
+}
+
+.lb-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: min(90vw, 720px);
+    max-height: 92vh;
+    outline: none;
+}
+
+.lb-img-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.lb-img-wrap img {
+    display: block;
+    max-width: min(76vw, 640px);
+    max-height: 72vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid rgba(248, 167, 182, .25);
+}
+
+.lb-caption {
+    margin-top: .9rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(249, 246, 241, .82);
+    text-align: center;
+    max-width: 52ch;
+    line-height: 1.55;
+}
+
+/* Prev / next buttons */
+.lb-prev,
+.lb-next {
+    background: none;
+    border: none;
+    color: rgba(249, 246, 241, .55);
+    font-family: var(--serif);
+    font-size: 1.9rem;
+    line-height: 1;
+    padding: .3rem .5rem;
+    cursor: pointer;
+    transition: color .15s;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.lb-prev:hover,
+.lb-prev:focus,
+.lb-next:hover,
+.lb-next:focus {
+    color: var(--pink);
+    outline: none;
+}
+
+/* Close button */
+.lb-close {
+    position: absolute;
+    top: -2.2rem;
+    right: 0;
+    background: none;
+    border: none;
+    color: rgba(249, 246, 241, .55);
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: .2rem .4rem;
+    transition: color .15s;
+}
+
+.lb-close:hover,
+.lb-close:focus {
+    color: var(--pink);
+    outline: none;
+}
+
+/* Counter */
+.lb-counter {
+    position: absolute;
+    top: -2.1rem;
+    left: 0;
+    font-family: var(--serif);
+    font-size: .82rem;
+    color: rgba(249, 246, 241, .4);
+    font-style: italic;
+    letter-spacing: .03em;
+}
+
+
+/* ── Blog index ─────────────────────────────────────────────── */
+.blog-list {
+    max-width: 62ch;
+}
+
+.blog-entry {
+    border-bottom: 1px solid var(--rule);
+}
+
+.blog-entry:first-child {
+    border-top: 1px solid var(--rule);
+}
+
+.blog-entry-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 1.2rem;
+    row-gap: .1rem;
+    padding: .75rem 0;
+    text-decoration: none;
+    color: var(--ink);
+}
+
+.blog-entry-link:hover .blog-entry-title,
+.blog-entry-link:focus .blog-entry-title {
+    color: #c0607a;
+}
+
+.blog-entry-link:focus {
+    outline: none;
+}
+
+.blog-entry-title {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: var(--pink);
+    text-underline-offset: 3px;
+    transition: color .15s;
+}
+
+.blog-entry-date {
+    grid-column: 2;
+    grid-row: 1;
+    font-style: italic;
+    font-size: .88rem;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: .1em;
+}
+
+.blog-entry-teaser {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    font-size: .92rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* ── Blog post ──────────────────────────────────────────────── */
+.blog-post {
+    max-width: 62ch;
+}
+
+.blog-back {
+    display: inline-block;
+    font-size: .85rem;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+    margin-bottom: 1.4rem;
+    transition: color .15s, text-decoration-color .15s;
+}
+
+.blog-back:hover,
+.blog-back:focus {
+    color: #c0607a;
+    text-decoration-color: var(--pink);
+    outline: none;
+}
+
+.blog-post-header {
+    margin-bottom: 1.6rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--pink);
+}
+
+.blog-post-title {
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.25;
+    margin-bottom: .25rem;
+}
+
+.blog-post-date {
+    font-size: .88rem;
+    font-style: italic;
+    color: var(--muted);
+    margin: 0;
+}
+
+.blog-post-body p {
+    margin-bottom: 1rem;
+}
+
+.blog-post-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Print lab section ──────────────────────────────────────── */
+.lab-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: .8rem;
+    margin-top: 2rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: .3rem;
+    max-width: 62ch;
+}
+
+#lab-status:first-of-type .lab-section-title,
+.lab-section-title:first-child {
+    margin-top: 0;
+}
+
+/* Printer table */
+.printer-table {
+    max-width: 62ch;
+    margin-bottom: 2rem;
+}
+
+.printer-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: .2rem 1rem;
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: .97rem;
+}
+
+.printer-row:first-child {
+    border-top: 1px solid var(--rule);
+}
+
+.printer-name {
+    font-weight: 500;
+}
+
+.printer-status-badge {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    font-weight: 600;
+    padding: .15em .5em;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+
+.printer-row--idle .printer-status-badge {
+    background: rgba(120, 180, 140, .15);
+    color: #4a7a5a;
+}
+
+.printer-row--printing .printer-status-badge {
+    background: rgba(248, 167, 182, .18);
+    color: #b05068;
+}
+
+.printer-row--offline .printer-status-badge {
+    background: rgba(107, 95, 88, .1);
+    color: var(--muted);
+}
+
+.printer-row--maintenance .printer-status-badge {
+    background: rgba(200, 168, 80, .15);
+    color: #8a6e20;
+}
+
+.printer-note {
+    grid-column: 1 / 4;
+    font-size: .88rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: -.1rem;
+    padding-bottom: .2rem;
+}
+
+.printer-note:empty {
+    display: none;
+}
+
+/* Filament inventory */
+.filament-group {
+    max-width: 62ch;
+    margin-bottom: 2rem;
+}
+
+.filament-diameter {
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.filament-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .95rem;
+}
+
+.filament-table th {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: left;
+    padding: .3rem .5rem .3rem 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.filament-table td {
+    padding: .4rem .5rem .4rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: middle;
+}
+
+.filament-table tr:last-child td {
+    border-bottom: none;
+}
+
+.filament-swatch {
+    display: inline-block;
+    width: .9em;
+    height: .9em;
+    border-radius: 2px;
+    border: 1px solid rgba(44, 37, 32, .15);
+    margin-right: .4em;
+    vertical-align: middle;
+    position: relative;
+    top: -.05em;
+}
+
+.filament-stock {
+    color: var(--ink);
+}
+
+.filament-blurb {
+    color: var(--muted);
+    font-style: italic;
+    font-size: .88rem;
+    margin-left: .4em;
+}
+</style>
+</head>
+
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="page">
+
+        <!--    Sidebar    -->
+        <aside class="sidebar" aria-label="Site information and navigation">
+            <p class="sidebar-name">Hailey Jay Garcia</p>
+            <p class="sidebar-pronoun">she/her/hers/Ms.</p>
+            <hr>
+            <div class="sidebar-meta">
+                <strong>Position</strong>
+                Graduate Teaching Assistant<br>Louisiana State University
+                <strong>Email</strong>
+                <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
+                <strong>Office</strong>
+                363 Lockett Hall
+                <strong>CV</strong>
+                <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
+            </div>
+            <hr>
+            <nav aria-label="Sections">
+                <ul class="sidenav">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#cv">CV</a></li>
+                    <li><a href="#teaching">Teaching</a></li>
+                    <li><a href="#printlab">3D Print Lab</a></li>
+                    <li><a href="#comics">Comics</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#links">Relevant Links</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!--    Main    -->
+        <main id="main-content">
+
+            <section id="about">
+<div class="section-header">
+    <h1>About</h1>
+</div>
+
+<figure class="about-photo">
+    <img src="images/hailey.jpg" alt="A woman in a button-down shirt and sidebag in front of a flower bush.">
+    <figcaption>Me in December&nbsp;&#8217;24.<br>&ldquo;<span id="about-splash">How did you even get here?</span>&rdquo;</figcaption>
+</figure>
+
+<p>Hello! I&#8217;m a PhD student at LSU studying mathematics. My research interests include topology and combinatorics, with a particular fondness for matroids.</p>
+
+<p>I like getting involved in my community. I currently serve as secretary and webmaster of <a href="https://www.math.lsu.edu/~awm/">LSU&#8217;s AWM chapter</a>, and as webmaster for <a href="#">LSU&#8217;s RTG</a>. I also participate in the informal geometry and topology seminar and the DTC/informal combinatorics seminar.</p>
+
+<p>I manage the department&#8217;s 3D print lab. More on that soon.</p>
+
+<div class="lately">
+    <div class="lately-label">Lately</div>
+    Working on a paper. Playing around with the websites I manage. Probably in my home office talking to my plants and reading.
+</div>
+</section>
+
+            <section id="cv">
+<div class="section-header">
+    <h1>Curriculum Vitae</h1>
+</div>
+
+<p style="font-size:.9rem;color:var(--muted);margin-bottom:1.8rem;">Last updated May 2026. Full CV available as <a href="files/cv.pdf">PDF</a>.</p>
+
+<div class="cv-block">
+    <h2>Education</h2>
+    <div class="cv-entry">
+        <span>Ph.D. Mathematics, Louisiana State University<br><span class="desc">Advisor: Christin Bibby</span></span>
+        <span class="year">Fall 2025&ndash;present</span>
+    </div>
+    <div class="cv-entry">
+        <span>B.S. Mathematics, Louisiana State University</span>
+        <span class="year">Fall 2022&ndash;Spring 2025</span>
+    </div>
+</div>
+
+<div class="cv-block">
+    <h2>Papers</h2>
+    <div class="cv-entry" style="display:block;">
+        <span>M. Fairchild, H. Garcia, J. Murphy, H. Percle. <em>Non-orientable 4-genus of torus knots.</em> Journal of Knot Theory and its Ramifications (to appear 2026+). <a href="https://doi.org/10.48550/arXiv.2405.04737">arXiv:2405.04737</a>.</span>
+    </div>
+</div>
+
+<div class="cv-block">
+    <h2>Talks</h2>
+    <div class="cv-entry">
+        <span>Noncontractive Function Systems<br><span class="desc">6th TX-LA Mathematics Undergraduate Conference</span></span>
+        <span class="year">Spring 2023</span>
+    </div>
+    <div class="cv-entry">
+        <span>On The &ldquo;Kelly Sequence&rdquo;<br><span class="desc">6th TX-LA Mathematics Undergraduate Conference</span></span>
+        <span class="year">Spring 2023</span>
+    </div>
+</div>
+
+<div class="cv-block">
+    <h2>Teaching</h2>
+    <div class="cv-entry">
+        <span>MATH 1431, Business Calculus &mdash; Lab Leader/TA, LSU<br><span class="desc">Sections 7, 11, 19</span></span>
+        <span class="year">Spring 2026</span>
+    </div>
+    <div class="cv-entry">
+        <span>MATH 1431, Business Calculus &mdash; Lab Leader/TA, LSU<br><span class="desc">Sections 7, 8, 9, 11, 25, 28</span></span>
+        <span class="year">Fall 2025</span>
+    </div>
+    <div class="cv-entry">
+        <span>Honors Calculus 1 &mdash; Primary Instructor, Arden Cahill Academy</span>
+        <span class="year">Fall 2023&ndash;Spring 2024</span>
+    </div>
+</div>
+
+<div class="cv-block">
+    <h2>Service</h2>
+    <div class="cv-entry">
+        <span>Officer, LSU AWM Student Chapter<br><span class="desc">President (Fall 2025&ndash;Spring 2026); Secretary (Spring 2026&ndash;present); Webmaster (Fall 2025&ndash;present)</span></span>
+        <span class="year">Fall 2025&ndash;present</span>
+    </div>
+    <div class="cv-entry">
+        <span>Mentor, Vertically Integrated Research Courses, LSU</span>
+        <span class="year">Fall 2025&ndash;present</span>
+    </div>
+    <div class="cv-entry">
+        <span>Webmaster, <a href="https://www.math.lsu.edu/~trm-rtg/">RTG@LSU</a></span>
+        <span class="year">Spring 2026&ndash;present</span>
+    </div>
+    <div class="cv-entry">
+        <span>Manager, LSU Math 3D Print Lab</span>
+        <span class="year">Spring 2026&ndash;present</span>
+    </div>
+</div>
+
+<div class="cv-block">
+    <h2>Awards</h2>
+    <div class="cv-entry">
+        <span>Pasquale Porcelli Graduate Student Academic Excellence Award</span>
+        <span class="year">Spring 2026</span>
+    </div>
+    <div class="cv-entry">
+        <span>Robert and Betti Giles Senior Mathematics Award</span>
+        <span class="year">Spring 2025</span>
+    </div>
+    <div class="cv-entry">
+        <span>Peg and Tom Madden Mathematics Research Scholarship</span>
+        <span class="year">Spring 2024</span>
+    </div>
+    <div class="cv-entry">
+        <span>Porcelli Junior Scholarship</span>
+        <span class="year">Spring 2023</span>
+    </div>
+</div>
+</section>
+
+            <section id="teaching">
+<div class="section-header">
+    <h1>Teaching</h1>
+</div>
+
+<p style="max-width:60ch;margin-bottom:.4rem;">On this page you can find information relevant for students taking one of my classes, including times, location, policies, and office hours.</p>
+<p style="max-width:60ch;margin-bottom:1.6rem;">For classes where I am the primary instructor, this page doubles as a course syllabus and will include homework due dates and course content.</p>
+
+<p style="font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600;">Quick Links</p>
+<ul style="list-style:none;padding:0;margin-bottom:2rem;font-size:.95rem;">
+    <li><a href="#1431">MATH 1431, Spring 2026</a></li>
+    <li><a href="#1431f25">MATH 1431, Fall 2025</a></li>
+</ul>
+
+<!-- Spring 2026 -->
+<div class="course" id="1431">
+    <h2>MATH 1431: Business Calculus, Spring 2026</h2>
+    <hr style="border:none;border-top:1px solid var(--pink);margin:.5rem 0 1.2rem;">
+
+    <dl class="course-dl">
+        <dt>Time &amp; Location</dt>
+        <dd>All sections meet in Library 232.
+            <ul style="list-style:none;padding:0;margin:.4rem 0 0;">
+                <li><strong>&sect;7:</strong> Monday 13:30&ndash;14:20</li>
+                <li><strong>&sect;11:</strong> Tuesday 09:30&ndash;10:20</li>
+                <li><strong>&sect;19:</strong> Wednesday 13:30&ndash;14:20</li>
+            </ul>
+        </dd>
+
+        <dt>Grading</dt>
+        <dd>Per lab period, a student may earn <strong>10 points</strong> total:
+            <ul style="list-style:none;padding:0;margin:.4rem 0;">
+                <li><strong>+7 points</strong> for attendance.</li>
+                <li><strong>+3 points</strong> for correct solutions to end-of-class quizzes. Partial credit given.</li>
+            </ul>
+            A student may lose points for the following:
+            <ul style="list-style:none;padding:0;margin:.4rem 0;">
+                <li><strong>&minus;0.5 points</strong> for tardiness (showing up after roll).</li>
+                <li><strong>&minus;1 point</strong> for use of a cell phone, increasing by 1 point per infraction.</li>
+            </ul>
+        </dd>
+
+        <dt>Overview</dt>
+        <dd>The first 30&ndash;40 minutes of class will be devoted to reviewing concepts from the main lecture and homework. I encourage students to come with questions, specific or otherwise. Students who feel comfortable with the material may open Pearson to work on homework; collaboration and notes are permitted, so long as the volume of conversation is reasonable. Use of generative AI for homework is prohibited.
+            <p style="margin-top:.6rem;">I enforce a strict no-phones policy. I expect all phones to be in bags, out of sight, and on silent. The required calculator for the course is affordable; graphing calculators and Desmos are also allowed.</p>
+        </dd>
+
+        <dt>Office Hours</dt>
+        <dd>Lockett 363, Monday, Wednesday, Thursday, and Friday 07:30&ndash;08:20; Tuesday 07:30&ndash;09:20.
+            <p style="margin-top:.5rem;">Office hours do not require an appointment. I also hold hours by appointment, so email me if you cannot make a posted time. I welcome everyone, but prioritize students enrolled in the sections for which the hours are designated.</p>
+        </dd>
+
+        <dt>Absence</dt>
+        <dd>I excuse absences for the following reasons:
+            <ul style="margin:.4rem 0 .4rem 1.2rem;">
+                <li>Email me day-of if you are sick, have an emergency, or there is hazardous weather. No note necessary.</li>
+                <li>Email me in advance if you have plans or appointments during class.</li>
+                <li>Email me a sick note or proof of valid excuse under <a href="https://lsu.edu/policies/ps/ps_22.pdf">LSU PS22</a>.</li>
+            </ul>
+            <p style="margin-top:.4rem;">If you miss class, it is your responsibility to inform me so you can make up missed content or quizzes. I offer retakes during office hours by appointment. In the first two cases above, retakes should be completed within 2 weeks of the absence; otherwise I deduct 30%. If you need more time, reach out to discuss.</p>
+            <p style="margin-top:.4rem;">I typically take roll within the first 5 minutes of class. It is always better to be tardy than absent.</p>
+        </dd>
+    </dl>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--rule);margin:2rem 0;">
+
+<!-- Fall 2025 -->
+<div class="course" id="1431f25">
+    <h2>MATH 1431: Business Calculus, Fall 2025</h2>
+    <hr style="border:none;border-top:1px solid var(--pink);margin:.5rem 0 1.2rem;">
+
+    <dl class="course-dl">
+        <dt>Time &amp; Location</dt>
+        <dd>All sections meet in Library 232.
+            <ul style="list-style:none;padding:0;margin:.4rem 0 0;">
+                <li><strong>&sect;7:</strong> Monday 14:30&ndash;15:20</li>
+                <li><strong>&sect;8:</strong> Tuesday 08:30&ndash;09:20</li>
+                <li><strong>&sect;9:</strong> Tuesday 09:30&ndash;10:20</li>
+                <li><strong>&sect;11:</strong> Tuesday 13:30&ndash;14:20</li>
+                <li><strong>&sect;25:</strong> Friday 10:30&ndash;11:20</li>
+                <li><strong>&sect;28:</strong> Friday 13:30&ndash;14:20</li>
+            </ul>
+        </dd>
+
+        <dt>Grading</dt>
+        <dd>Per lab period, a student may earn <strong>10 points</strong> total:
+            <ul style="list-style:none;padding:0;margin:.4rem 0;">
+                <li><strong>+9 points</strong> for attendance.</li>
+                <li><strong>+1 point</strong> for correct solutions to end-of-class quizzes. Pass/fail; the questions are intentionally easy.</li>
+            </ul>
+            A student may lose points for the following:
+            <ul style="list-style:none;padding:0;margin:.4rem 0;">
+                <li><strong>&minus;1 point</strong> for tardiness (showing up after roll).</li>
+                <li><strong>&minus;1 point</strong> for non-class-related use of a phone, increasing by 1 point per infraction.</li>
+            </ul>
+        </dd>
+
+        <dt>Office Hours</dt>
+        <dd>Lockett 363, Tuesday 15:00&ndash;15:20 and Thursday 15:00&ndash;17:00.
+            <p style="margin-top:.5rem;">Office hours do not require an appointment. I also hold hours by appointment; email me if you cannot make a posted time. I welcome everyone, but prioritize students enrolled in the sections for which the hours are designated.</p>
+            <p style="margin-top:.4rem;"><strong>Special office hours:</strong> December 11th, 08:00&ndash;12:00 (exam week).</p>
+        </dd>
+
+        <dt>Absence</dt>
+        <dd>I excuse absences for the following reasons:
+            <ul style="margin:.4rem 0 .4rem 1.2rem;">
+                <li>Email me day-of if you are sick, have an emergency, or there is hazardous weather. No note necessary.</li>
+                <li>Email me in advance if you have plans or appointments during class.</li>
+                <li>Email me a sick note or proof of valid excuse under <a href="https://lsu.edu/policies/ps/ps_22.pdf">LSU PS22</a>.</li>
+            </ul>
+            <p style="margin-top:.4rem;">If you miss class, it is your responsibility to inform me so you can make up missed content or quizzes. I offer retakes during office hours by appointment. I typically take roll within the first 5 minutes of class; it is always better to be tardy than absent.</p>
+        </dd>
+    </dl>
+</div>
+</section>
+
+            <section id="printlab">
+<div class="section-header">
+    <h1>3D Print Lab</h1>
+</div>
+
+<p style="max-width:60ch;margin-bottom:.4rem;">The LSU Math 3D Print Lab is located in 373 Lockett Hall. I manage the lab and handle print requests for members of the LSU Mathematics Department.</p>
+<p style="max-width:60ch;margin-bottom:1.6rem;">The lab currently houses 3 printers. Check the status board before submitting a request.</p>
+
+<p style="font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600;">Quick Links</p>
+<ul style="list-style:none;padding:0;margin-bottom:2rem;font-size:.95rem;">
+    <li><a href="#lab-status">Printer Status</a></li>
+    <li><a href="#lab-request">How to Request a Print</a></li>
+    <li><a href="#lab-gallery">Gallery</a></li>
+    <li><a href="#lab-filament">Filament Inventory</a></li>
+</ul>
+
+<!-- Printer status -->
+<div id="lab-status">
+    <h2 class="lab-section-title">Printer Status</h2>
+    <div class="printer-table">
+        <div class="printer-row printer-row--idle">
+    <span class="printer-name">Ultimaker 3</span>
+    <span class="printer-status-badge">Idle</span>
+    <span class="printer-note"></span>
+</div>
+        <div class="printer-row printer-row--idle">
+    <span class="printer-name">Ultimaker 3 Extended</span>
+    <span class="printer-status-badge">Idle</span>
+    <span class="printer-note"></span>
+</div>
+        <div class="printer-row printer-row--idle">
+    <span class="printer-name">Prusa Core One+</span>
+    <span class="printer-status-badge">Idle</span>
+    <span class="printer-note"></span>
+</div>
+    </div>
+</div>
+
+<!-- Request -->
+<div id="lab-request">
+    <h2 class="lab-section-title">How to Request a Print</h2>
+    <p style="max-width:60ch;">Print requests are open to members of the LSU Mathematics Department, including faculty, staff, and graduate students. To submit a request, email me at <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a> with the following:</p>
+    <ul style="max-width:58ch;padding-left:1.4rem;margin:.6rem 0 1rem;font-size:.97rem;line-height:1.75;">
+        <li>Your STL or 3MF file.</li>
+        <li>Your preferred material and color, or a note that you are flexible.</li>
+        <li>Any deadline or urgency, and any notes on quality versus speed.</li>
+    </ul>
+    <p style="max-width:60ch;">I do not guarantee turnaround times, but I will let you know if a request is not feasible. Please check the filament inventory below before specifying a material; if you need something not in stock, ask and I may be able to source it.</p>
+</div>
+
+<!-- Gallery -->
+<div id="lab-gallery">
+    <h2 class="lab-section-title">Gallery</h2>
+    <p style="max-width:56ch;margin-bottom:1.4rem;">A selection of prints from the lab.</p>
+    <div class="comics-grid">
+        <div class="comic-card">
+    <button class="comic-thumb" data-src="prints/placeholder.jpg" data-alt="Placeholder." data-caption="A placeholder caption" aria-label="View print: A placeholder caption">
+        <img src="prints/placeholder.jpg" alt="Placeholder.">
+    </button>
+    <p class="comic-title">A placeholder caption</p>
+</div>
+    </div>
+</div>
+
+<!-- Filament inventory -->
+<div id="lab-filament">
+    <h2 class="lab-section-title">Filament Inventory</h2>
+    <p style="max-width:60ch;margin-bottom:1.4rem;">Updated alongside the printer status board. Spool counts are approximate.</p>
+    <div class="filament-group">
+    <h3 class="filament-diameter">2.85mm</h3>
+    <table class="filament-table">
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Color</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+    <td>MATERIAL</td>
+    <td><span class="filament-swatch" style="background:#2b2b2b;" aria-hidden="true"></span>COLOR</td>
+    <td class="filament-stock">#SPOOLS spools</td>
+</tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="filament-group">
+    <h3 class="filament-diameter">1.75mm</h3>
+    <table class="filament-table">
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Color</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+    <td>MATERIAL</td>
+    <td><span class="filament-swatch" style="background:#c8a850;" aria-hidden="true"></span>COLOR</td>
+    <td class="filament-stock">#SPOOLS spools<span class="filament-blurb">(comment)</span></td>
+</tr>
+        </tbody>
+    </table>
+</div>
+</div>
+</section>
+
+            <section id="comics">
+<div class="section-header">
+    <h1>Comics</h1>
+</div>
+
+<p style="max-width:56ch;margin-bottom:1.4rem;">A selection of comics I have drawn. Subject matter varies. Clearly inspired by <a href="https://xkcd.com/">xkcd</a>. All humor is derivative, but mine is especially so.</p>
+
+<div class="comics-grid">
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/officehours.jpg" data-alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."" data-caption="I like to take inspiration from the Catholic Church's calendar for my office hours." aria-label="View comic: I like to take inspiration from the Catholic Church's calendar for my office hours.">
+        <img src="comics/officehours.jpg" alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."">
+    </button>
+    <p class="comic-title">I like to take inspiration from the Catholic Church's calendar for my office hours.</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/dinosona.jpg" data-alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'." data-caption="The Mesozoic was far weirder than people give it credit for." aria-label="View comic: The Mesozoic was far weirder than people give it credit for.">
+        <img src="comics/dinosona.jpg" alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'.">
+    </button>
+    <p class="comic-title">The Mesozoic was far weirder than people give it credit for.</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/borkosplingo.jpg" data-alt="Two mathematicians discuss applying the Borko-Splingo Theorem." data-caption="According to my partner, this is how mathematicians speak." aria-label="View comic: According to my partner, this is how mathematicians speak.">
+        <img src="comics/borkosplingo.jpg" alt="Two mathematicians discuss applying the Borko-Splingo Theorem.">
+    </button>
+    <p class="comic-title">According to my partner, this is how mathematicians speak.</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/bashrc.jpg" data-alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"" data-caption="My friends should NOT give me access to their devices." aria-label="View comic: My friends should NOT give me access to their devices.">
+        <img src="comics/bashrc.jpg" alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"">
+    </button>
+    <p class="comic-title">My friends should NOT give me access to their devices.</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/dne.jpg" data-alt="A whiteboard with a flower in the corner and the caption DNE." data-caption="Sometimes we need the little things." aria-label="View comic: Sometimes we need the little things.">
+        <img src="comics/dne.jpg" alt="A whiteboard with a flower in the corner and the caption DNE.">
+    </button>
+    <p class="comic-title">Sometimes we need the little things.</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/inband.jpg" data-alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud." data-caption="Correcting my friends' gender in-band since 2004!" aria-label="View comic: Correcting my friends' gender in-band since 2004!">
+        <img src="comics/inband.jpg" alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud.">
+    </button>
+    <p class="comic-title">Correcting my friends' gender in-band since 2004!</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/compactsets.jpg" data-alt="A hydraulic press squishing an empty set." data-caption="These hydraulic press channels are getting out of hand!" aria-label="View comic: These hydraulic press channels are getting out of hand!">
+        <img src="comics/compactsets.jpg" alt="A hydraulic press squishing an empty set.">
+    </button>
+    <p class="comic-title">These hydraulic press channels are getting out of hand!</p>
+</div>
+
+<div class="comic-card">
+    <button class="comic-thumb" data-src="comics/jpeggatewaydrug.jpg" data-alt="JPEG: Gateway drug?" data-caption="Don't look at the file extension..." aria-label="View comic: Don't look at the file extension...">
+        <img src="comics/jpeggatewaydrug.jpg" alt="JPEG: Gateway drug?">
+    </button>
+    <p class="comic-title">Don't look at the file extension...</p>
+</div>
+</div>
+
+
+</section>
+
+            <section id="blog">
+<div class="section-header">
+    <h1>Blog</h1>
+</div>
+
+<div id="blog-index">
+    <p style="max-width:60ch;margin-bottom:1.6rem;">Occasional writing on math, teaching, and whatever else is on my mind. Available as an <a href="rss.xml" class="rss-link" aria-label="RSS feed">
+    <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="5" cy="19" r="2"/>
+        <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9"/>
+    </svg>
+    RSS feed</a>.</p>
+    <div class="blog-list">
+        <div class="blog-entry">
+    <a href="#blog-new-website" class="blog-entry-link">
+        <span class="blog-entry-title">New website design!?</span>
+        <span class="blog-entry-date">May 2026</span>
+        <span class="blog-entry-teaser">New packaging, same great flavor.</span>
+    </a>
+</div>
+    </div>
+</div>
+
+<div class="blog-post" id="blog-new-website" data-blog-entry="true">
+    <a href="#blog" class="blog-back">&larr; All posts</a>
+    <div class="blog-post-header">
+        <h2 class="blog-post-title">New website design!?</h2>
+        <p class="blog-post-date">May 2026</p>
+    </div>
+    <div class="blog-post-body">
+        <p>Hey yall!</p>
+
+<p>As you&#8217;ve noticed (presumably; you are on a new page, after all), I&#8217;ve updated this website considerably. This shouldn&#8217;t come as a great shock to anyone. While I like the retro, deeply personal design I was using, it wasn&#8217;t the most efficient to update. A clean design, prioritizing simplicity and modularity, was the solution.</p>
+
+<p>There are, for now, three new sections. The <a href="#blog">blog</a> section is, as you&#8217;ve been able to discover, a place for blogs and updates. I&#8217;m excited to put stories, information, and the occasional math blurb here. For all of the two-and-a-half people that read this, I&#8217;m sure you&#8217;re over the moon.</p>
+
+<p>The <a href="#printlab">3D print lab homepage</a> is the much-anticipated information and landing tab for the covert activities of Lockett 373. On that tab, you can find information about the lab, <a href="#lab-request">how to request a print</a>, a <a href="#lab-gallery">gallery of past prints</a>, and a current rough view at our <a href="#lab-filament">filament inventory</a>. Depending on when you&#8217;re reading this, there might still be placeholder content on the tab. I&#8217;m working very hard (probably) to fix this.</p>
+
+<p>The last new tab is the <a href="#links">relevant links tab</a>. It&#8217;s probably the least special and it just lists the links that used to be scattered around the page.</p>
+
+<p>However, what&#8217;s new is not all that&#8217;s coming. I&#8217;ll be organizing LSU&#8217;s DTC seminar in the 2026-2027 academic year. Information on that will eventually have its own tab here. I also may or may not be working on some fun, secret projects. Shh!</p>
+
+<p>As a final note, I want to extend my heartfelt congratulations to all of my friends who successfully defended this semester. I will particularly mention my friend Kiri Cahill. Her resilience, kindness, and Tikz ability are constant sources of inspiration and respect for me. Additionally, she managed the 3D print lab with me this past year. Her and her husband Kade have been beyond critical in getting the lab to where it is today.</p>
+
+<p>Best,<br>Hailey</p>
+    </div>
+</div>
+
+
+</section>
+
+            <section id="links">
+<div class="section-header">
+    <h1>Relevant Links</h1>
+</div>
+
+<div class="links-group">
+    <h2>LSU</h2>
+    <ul>
+        <li><a href="https://www.math.lsu.edu/~awm/">LSU AWM Chapter</a></li>
+        <li><a href="https://www.math.lsu.edu/~trm-rtg/">LSU Research and Training Group (RTG)</a></li>
+        <li><a href="https://www.math.lsu.edu/">LSU Mathematics Department</a></li>
+    </ul>
+</div>
+
+<div class="links-group">
+    <h2>Resources</h2>
+    <ul>
+        <li><a href="https://arxiv.org">arXiv</a></li>
+        <li><a href="https://mathscinet.ams.org">MathSciNet</a></li>
+        <li><a href="https://mathoverflow.net">MathOverflow</a></li>
+    </ul>
+</div>
+
+<div class="links-group">
+    <h2>Fun</h2>
+    <ul>
+        <li><a href="rss.xml" class="rss-link" aria-label="RSS feed">
+    <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="5" cy="19" r="2"/>
+        <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9"/>
+    </svg>
+    Personal RSS feed</a></li>
+    </ul>
+</div>
+</section>
+
+        </main>
+
+        <!--    Footer    -->
+        <footer>
+            <!-- Rose SVG ornament -->
+            <img src="images/rose.svg" width=40px>
+
+            <p>Copyleft 2025&ndash;2026 Hailey Garcia. All wrongs reserved.</p>
+            <p>The statements and opinions on these pages are those of Hailey Garcia only, not of Louisiana State University or the LSU Board of Supervisors.</p>
+            <p><a href="https://www.lsu.edu/accessibility">Accessibility</a> &middot; <a href="https://www.lsu.edu/privacy/">Privacy</a> &middot; <a href="mailto:jgarc86@lsu.edu?subject=jgarc86%20Website%20Feedback">Feedback</a></p>
+        </footer>
+
+    </div><!-- /.page -->
+    <script>
+// ── Section registry ─────────────────────────────────────────
+const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links'];
+
+const subAnchors = {
+  '1431': 'teaching',
+  '1431f25': 'teaching',
+  'lab-status': 'printlab',
+  'lab-request': 'printlab',
+  'lab-gallery': 'printlab',
+  'lab-filament': 'printlab'
+};
+
+// ── Navigation ───────────────────────────────────────────────
+function showSection(id) {
+  const parentId = subAnchors[id] || (sections.includes(id) ? id : 'about');
+  sections.forEach(function (s) {
+    document.getElementById(s).classList.toggle('active', s === parentId);
+  });
+}
+
+function navigate(hash) {
+  if (!hash) hash = 'about';
+  showSection(hash);
+  history.replaceState(null, '', '#' + hash);
+
+  if (subAnchors[hash] === 'blog') {
+    document.getElementById('blog-index').style.display = 'none';
+    document.querySelectorAll('.blog-post').forEach(function (el) {
+      el.style.display = el.id === hash ? '' : 'none';
+    });
+    window.scrollTo({ top: 0 });
+  } else if (hash === 'blog') {
+    document.getElementById('blog-index').style.display = '';
+    document.querySelectorAll('.blog-post').forEach(function (el) {
+      el.style.display = 'none';
+    });
+    window.scrollTo({ top: 0 });
+  } else if (subAnchors[hash]) {
+    const target = document.getElementById(hash);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    window.scrollTo({ top: 0 });
+  }
+}
+
+document.addEventListener('click', function (e) {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const url = new URL(a.href, location.href);
+  if (url.pathname !== location.pathname) return;
+  const hash = url.hash.slice(1);
+  if (!hash) return;
+  e.preventDefault();
+  navigate(hash);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-blog-entry]').forEach(function (el) {
+    subAnchors[el.id] = 'blog';
+  });
+  // Initialise blog visibility before first navigate
+  var blogIndex = document.getElementById('blog-index');
+  if (blogIndex) blogIndex.style.display = '';
+  document.querySelectorAll('.blog-post').forEach(function (el) {
+    el.style.display = 'none';
+  });
+  navigate(location.hash.slice(1));
+});
+
+// ── Comic lightbox ───────────────────────────────────────────
+(function () {
+  const overlay = document.createElement('div');
+  overlay.className = 'lb-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Comic viewer');
+  overlay.innerHTML = `
+    <div class="lb-dialog" tabindex="-1">
+      <span class="lb-counter" aria-live="polite"></span>
+      <button class="lb-close" aria-label="Close">&times;</button>
+      <div class="lb-img-wrap">
+        <button class="lb-prev" aria-label="Previous comic">&#8592;</button>
+        <img src="" alt="">
+        <button class="lb-next" aria-label="Next comic">&#8594;</button>
+      </div>
+      <p class="lb-caption"></p>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const dialog = overlay.querySelector('.lb-dialog');
+  const img = overlay.querySelector('img');
+  const caption = overlay.querySelector('.lb-caption');
+  const counter = overlay.querySelector('.lb-counter');
+  const btnClose = overlay.querySelector('.lb-close');
+  const btnPrev = overlay.querySelector('.lb-prev');
+  const btnNext = overlay.querySelector('.lb-next');
+
+  let comics = [];
+  let current = 0;
+
+  function collectComics() {
+    comics = Array.from(document.querySelectorAll('.comic-thumb'));
+  }
+
+  function show(index) {
+    const btn = comics[index];
+    img.src = btn.dataset.src;
+    img.alt = btn.dataset.alt;
+    caption.textContent = btn.dataset.caption;
+    counter.textContent = (index + 1) + ' / ' + comics.length;
+    btnPrev.style.visibility = index === 0 ? 'hidden' : '';
+    btnNext.style.visibility = index === comics.length - 1 ? 'hidden' : '';
+    current = index;
+  }
+
+  function open(index) {
+    collectComics();
+    show(index);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    dialog.focus();
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (comics[current]) comics[current].focus();
+  }
+
+  document.addEventListener('click', function (e) {
+    const thumb = e.target.closest('.comic-thumb');
+    if (!thumb) return;
+    collectComics();
+    open(comics.indexOf(thumb));
+  });
+
+  btnClose.addEventListener('click', close);
+  btnPrev.addEventListener('click', function () { if (current > 0) show(current - 1); });
+  btnNext.addEventListener('click', function () { if (current < comics.length - 1) show(current + 1); });
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) close();
+  });
+
+  overlay.addEventListener('keydown', function (e) {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape') { close(); return; }
+    if (e.key === 'ArrowLeft' && current > 0) { show(current - 1); return; }
+    if (e.key === 'ArrowRight' && current < comics.length - 1) { show(current + 1); return; }
+    if (e.key === 'Tab') {
+      const focusable = Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+})();
+
+const aboutQuotes = [
+  "Try the chocolate chip cookies!", "No mitsakes -- but undo is C-/ just in case.", "Caution: Hearing protection required!", "THE SNAIL!", "How... old is that onion?", "Aaaand that's a nat 1. Sorry.", "The lesser of two weevils!", "Daemonic!", "You have to have some body positivity when you're making graphs.", "Sparkle? You're the whole tub of glitter, baby!", "Bing bong? I don't know.", "Copyleft womanhood!", "Save the pandas!", "Renee Descartes, my mortal enemy!", "Heat from fire, fire from heat!", "Shut up and let me see your jazz hands!", "Coins, evil.", "LOUD INCORRECT BUZZER.", "I'm out of spell slots.", "Jet fuel ice tea, supersonic, lightspeed!!", "Take that kerosene and put it in my coffee!", "Gear up and blast off!", "Hyneri lanla!", "The Lockett monster of Bore Pit B!", "Succumbing to the bone broth madness...", "Lay back and dive!"
+];
+
+document.addEventListener('DOMContentLoaded', function () {
+  const el = document.getElementById('about-splash');
+  if (el) el.textContent = aboutQuotes[Math.floor(Math.random() * aboutQuotes.length)];
+});
+</script>
+</body>
+
+</html>
