@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>Hailey Jay Garcia</title>
+        <link>https://math.lsu.edu/~jgarc86/</link>
+        <description>Math, teaching, and whatever else is on my mind.</description>
+        <language>en-us</language>
+        <atom:link href="https://math.lsu.edu/~jgarc86/rss.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+        <title>New website design!?</title>
+        <link>https://math.lsu.edu/~jgarc86/#blog-new-website</link>
+        <guid isPermaLink="true">https://math.lsu.edu/~jgarc86/#blog-new-website</guid>
+        <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
+        <description>New packaging, same great flavor.</description>
+        <content:encoded><![CDATA[<p>Hey yall!</p>
+
+<p>As you&#8217;ve noticed (presumably; you are on a new page, after all), I&#8217;ve updated this website considerably. This shouldn&#8217;t come as a great shock to anyone. While I like the retro, deeply personal design I was using, it wasn&#8217;t the most efficient to update. A clean design, prioritizing simplicity and modularity, was the solution.</p>
+
+<p>There are, for now, three new sections. The <a href="#blog">blog</a> section is, as you&#8217;ve been able to discover, a place for blogs and updates. I&#8217;m excited to put stories, information, and the occasional math blurb here. For all of the two-and-a-half people that read this, I&#8217;m sure you&#8217;re over the moon.</p>
+
+<p>The <a href="#printlab">3D print lab homepage</a> is the much-anticipated information and landing tab for the covert activities of Lockett 373. On that tab, you can find information about the lab, <a href="#lab-request">how to request a print</a>, a <a href="#lab-gallery">gallery of past prints</a>, and a current rough view at our <a href="#lab-filament">filament inventory</a>. Depending on when you&#8217;re reading this, there might still be placeholder content on the tab. I&#8217;m working very hard (probably) to fix this.</p>
+
+<p>The last new tab is the <a href="#links">relevant links tab</a>. It&#8217;s probably the least special and it just lists the links that used to be scattered around the page.</p>
+
+<p>However, what&#8217;s new is not all that&#8217;s coming. I&#8217;ll be organizing LSU&#8217;s DTC seminar in the 2026-2027 academic year. Information on that will eventually have its own tab here. I also may or may not be working on some fun, secret projects. Shh!</p>
+
+<p>As a final note, I want to extend my heartfelt congratulations to all of my friends who successfully defended this semester. I will particularly mention my friend Kiri Cahill. Her resilience, kindness, and Tikz ability are constant sources of inspiration and respect for me. Additionally, she managed the 3D print lab with me this past year. Her and her husband Kade have been beyond critical in getting the lab to where it is today.</p>
+
+<p>Best,<br>Hailey</p>]]></content:encoded>
+    </item>
+    </channel>
+</rss>
