@@ -19,9 +19,10 @@ function showSection(id) {
 }
 
 function navigate(hash) {
+  var bare = !hash;
   if (!hash) hash = 'about';
   showSection(hash);
-  history.replaceState(null, '', '#' + hash);
+  if (!bare) history.replaceState(null, '', '#' + hash);
 
   if (subAnchors[hash] === 'blog') {
     document.getElementById('blog-index').style.display = 'none';

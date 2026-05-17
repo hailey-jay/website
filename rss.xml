@@ -2,15 +2,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>Hailey Jay Garcia</title>
-        <link>https://math.lsu.edu/~jgarc86/</link>
+        <link>https://haileyjay.net/</link>
         <description>Math, teaching, and whatever else is on my mind.</description>
         <language>en-us</language>
-        <atom:link href="https://math.lsu.edu/~jgarc86/rss.xml" rel="self" type="application/rss+xml"/>
+        <atom:link href="https://haileyjay.net/rss.xml" rel="self" type="application/rss+xml"/>
 
     <item>
         <title>New website design!?</title>
-        <link>https://math.lsu.edu/~jgarc86/#blog-new-website</link>
-        <guid isPermaLink="true">https://math.lsu.edu/~jgarc86/#blog-new-website</guid>
+        <link>https://haileyjay.net/#blog-new-website</link>
+        <guid isPermaLink="true">https://haileyjay.net/#blog-new-website</guid>
         <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
         <description>New packaging, same great flavor.</description>
         <content:encoded><![CDATA[<p>Hey yall!</p>

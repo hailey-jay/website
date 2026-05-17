@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import datetime, timezone
 
-BASE_URL = "https://math.lsu.edu/~jgarc86"
+BASE_URL = "https://haileyjay.net"
 
 tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
 src = Path("src")
