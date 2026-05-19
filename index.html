@@ -448,7 +448,20 @@ footer a {
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
+
+.phone-only {
+    display: none;
+}
+
 @media (max-width: 640px) {
+    .phone-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+
     .page {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto;
@@ -910,8 +923,8 @@ footer a {
         <aside class="sidebar" aria-label="Site information and navigation">
             <p class="sidebar-name">Hailey Jay Garcia</p>
             <p class="sidebar-pronoun">she/her/hers/Ms.</p>
-            <hr>
-            <div class="sidebar-meta">
+            <hr class="desktop-only">
+            <div class="sidebar-meta desktop-only">
                 <strong>Position</strong>
                 Graduate Teaching Assistant<br>Louisiana State University
                 <strong>Email</strong>
@@ -947,6 +960,17 @@ footer a {
     <img src="images/hailey.jpg" alt="A woman in a button-down shirt and sidebag in front of a flower bush.">
     <figcaption>Me in December&nbsp;&#8217;24.<br>&ldquo;<span id="about-splash">How did you even get here?</span>&rdquo;</figcaption>
 </figure>
+
+<div class="sidebar-meta phone-only">
+                <strong>Position</strong>
+                Graduate Teaching Assistant<br>Louisiana State University
+                <strong>Email</strong>
+                <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
+                <strong>Office</strong>
+                363 Lockett Hall
+                <strong>CV</strong>
+                <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
+            </div>
 
 <p>Hello! I&#8217;m a PhD student at LSU studying mathematics. My research interests include topology and combinatorics, with a particular fondness for matroids.</p>
 
