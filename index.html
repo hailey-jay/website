@@ -8,909 +8,9 @@
     <link rel="icon" href="images/rose.svg" />
     <meta name="description" content="Welcome to my website! Here, you'll find math, comics, and info about Hailey!" />
     <link rel="alternate" type="application/rss+xml" title="Hailey Jay Garcia" href="https://math.lsu.edu/~jgarc86/rss.xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-    <style>
-/* ── Reset & tokens ─────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --pink: #f8a7b6;
-    --ink: #2c2520;
-    --muted: #6b5f58;
-    --paper: #f9f6f1;
-    --rule: #e8e0d8;
-    --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
-    --lh: 1.7;
-}
-
-/* ── Skip link ──────────────────────────────────────────────── */
-.skip-link {
-    position: absolute;
-    top: -999px;
-    left: 0;
-    background: var(--pink);
-    color: var(--ink);
-    padding: .4em 1em;
-    font-family: var(--serif);
-    z-index: 100;
-}
-
-.skip-link:focus {
-    top: 0;
-}
-
-/* ── Base ───────────────────────────────────────────────────── */
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: var(--serif);
-    font-size: 1.1rem;
-    line-height: var(--lh);
-    color: var(--ink);
-    background: var(--paper);
-    min-height: 100vh;
-}
-
-/* ── Layout shell ───────────────────────────────────────────── */
-.page {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    grid-template-rows: auto 1fr auto;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    gap: 0 3rem;
-}
-
-/* ── Sidebar ────────────────────────────────────────────────── */
-.sidebar {
-    grid-column: 1;
-    grid-row: 1 / 3;
-    padding: 2.5rem 0 2rem;
-    border-right: 1px solid var(--rule);
-    padding-right: 2rem;
-}
-
-.sidebar-name {
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: .01em;
-    margin-bottom: .15em;
-}
-
-.sidebar-pronoun {
-    font-style: italic;
-    font-size: .92rem;
-    color: var(--muted);
-    margin-bottom: 1.1rem;
-}
-
-.sidebar hr {
-    border: none;
-    border-top: 1px solid var(--pink);
-    margin: 1rem 0;
-}
-
-.sidebar-meta {
-    font-size: .88rem;
-    line-height: 1.55;
-    color: var(--muted);
-    margin-bottom: 1.4rem;
-}
-
-.sidebar-meta strong {
-    display: block;
-    color: var(--ink);
-    font-weight: 500;
-    font-size: .85rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-top: .6em;
-    margin-bottom: .1em;
-}
-
-.sidebar-meta a {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-color: var(--pink);
-    text-underline-offset: 2px;
-}
-
-/* Sidebar nav */
-.sidenav {
-    list-style: none;
-    margin-top: .6rem;
-}
-
-.sidenav li+li {
-    margin-top: .1rem;
-}
-
-.sidenav a {
-    display: block;
-    font-size: .95rem;
-    color: var(--ink);
-    text-decoration: none;
-    padding: .2em 0;
-    border-bottom: 1px solid transparent;
-    transition: color .15s, border-color .15s;
-}
-
-.sidenav a:hover,
-.sidenav a:focus {
-    color: var(--pink);
-    border-bottom-color: var(--pink);
-    outline: none;
-}
-
-/* ── Main content area ──────────────────────────────────────── */
-main {
-    grid-column: 2;
-    grid-row: 1;
-    padding: 2.5rem 0 3rem;
-}
-
-/* ── Section visibility (controlled by JS) ─────────────────── */
-section {
-    display: none;
-}
-
-section.active {
-    display: block;
-}
-
-/* ── Section headings ───────────────────────────────────────── */
-.section-header {
-    display: flex;
-    align-items: baseline;
-    gap: .7em;
-    margin-bottom: 1.4rem;
-    border-bottom: 1px solid var(--pink);
-    padding-bottom: .5rem;
-}
-
-.section-header h1 {
-    font-size: 1.5rem;
-    font-weight: 500;
-    letter-spacing: .01em;
-}
-
-.section-header .ornament {
-    color: var(--pink);
-    font-size: 1.1em;
-    line-height: 1;
-    /* inline SVG rose rendered via content trick below */
-}
-
-/* ── Prose ──────────────────────────────────────────────────── */
-p {
-    margin-bottom: 1rem;
-    max-width: 60ch;
-}
-
-a {
-    color: var(--ink);
-    text-decoration: underline;
-    text-decoration-color: var(--pink);
-    text-underline-offset: 3px;
-}
-
-a:hover,
-a:focus {
-    color: #c0607a;
-    outline: none;
-}
-
-/* ── "Lately" blurb ─────────────────────────────────────────── */
-.lately {
-    margin: 1.8rem 0 1.4rem;
-    padding: .9rem 1.1rem;
-    border-left: 3px solid var(--pink);
-    background: rgba(248, 167, 182, .07);
-    font-size: .96rem;
-    max-width: 58ch;
-}
-
-.lately-label {
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--muted);
-    margin-bottom: .3em;
-    font-weight: 500;
-}
-
-/* ── CV section ─────────────────────────────────────────────── */
-.cv-block {
-    margin-bottom: 2rem;
-}
-
-.cv-block h2 {
-    font-size: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--muted);
-    margin-bottom: .6rem;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: .3rem;
-}
-
-.cv-entry {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: .1rem 1rem;
-    margin-bottom: .8rem;
-    font-size: .97rem;
-    max-width: 62ch;
-}
-
-.cv-entry .year {
-    color: var(--muted);
-    font-style: italic;
-    white-space: nowrap;
-    font-size: .9rem;
-    padding-top: .05em;
-}
-
-.cv-entry .desc {
-    color: var(--muted);
-    font-size: .9rem;
-    grid-column: 1;
-}
-
-/* ── Teaching section ───────────────────────────────────────── */
-.course {
-    margin-bottom: 1.6rem;
-    max-width: 62ch;
-}
-
-.course h2 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: .2em;
-}
-
-.course-meta {
-    font-size: .9rem;
-    color: var(--muted);
-    font-style: italic;
-    margin-bottom: .4em;
-}
-
-.office-hours {
-    font-size: .92rem;
-    color: var(--muted);
-}
-
-.course-dl {
-    margin: 0;
-}
-
-.course-dl dt {
-    font-size: .82rem;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    font-weight: 600;
-    color: var(--muted);
-    margin-top: 1.2rem;
-    margin-bottom: .3rem;
-}
-
-.course-dl dd {
-    margin-left: 0;
-    font-size: .97rem;
-    line-height: 1.65;
-}
-/* ── Comics section ─────────────────────────────────────────── */
-.comics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.2rem;
-    margin-top: .5rem;
-}
-
-.comic-card {
-    border: 1px solid var(--rule);
-    padding: .6rem;
-}
-
-.comic-card img {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin-bottom: .5rem;
-}
-
-.comic-title {
-    font-size: .88rem;
-    color: var(--muted);
-}
-
-/* ── Links section ──────────────────────────────────────────── */
-.links-group {
-    margin-bottom: 1.8rem;
-}
-
-.links-group h2 {
-    font-size: .85rem;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--muted);
-    font-weight: 600;
-    margin-bottom: .5rem;
-}
-
-.links-group ul {
-    list-style: none;
-    padding: 0;
-}
-
-.links-group li {
-    padding: .2em 0;
-    font-size: .97rem;
-    border-bottom: 1px solid var(--rule);
-}
-
-.links-group li:last-child {
-    border-bottom: none;
-}
-
-/* ── Footer ─────────────────────────────────────────────────── */
-footer {
-    grid-column: 1 / 3;
-    border-top: 1px solid var(--rule);
-    padding: 1.4rem 0 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .5rem;
-    text-align: center;
-}
-
-footer svg {
-    width: 28px;
-    height: 28px;
-    fill: var(--pink);
-    opacity: .85;
-}
-
-footer p {
-    font-size: .82rem;
-    color: var(--muted);
-    max-width: 65ch;
-    line-height: 1.5;
-    margin: 0;
-}
-
-footer a {
-    color: var(--muted);
-    text-decoration-color: var(--rule);
-}
-
-/* ── About photo ─────────────────────────────────────────────── */
-.about-photo {
-    float: right;
-    margin: 0 0 1.2rem 1.8rem;
-    width: 148px;
-    flex-shrink: 0;
-}
-
-.about-photo img,
-.about-photo .photo-placeholder {
-    display: block;
-    width: 148px;
-    height: 185px;
-    object-fit: cover;
-    border: 1px solid var(--rule);
-}
-
-.about-photo .photo-placeholder {
-    background: var(--rule);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .8rem;
-    color: var(--muted);
-    font-style: italic;
-}
-
-.about-photo figcaption {
-    font-size: .78rem;
-    color: var(--muted);
-    font-style: italic;
-    margin-top: .35rem;
-    line-height: 1.4;
-}
-
-@media (max-width: 480px) {
-    .about-photo {
-        float: none;
-        margin: 0 0 1.4rem 0;
-        width: 100%;
-    }
-
-    .about-photo img,
-    .about-photo .photo-placeholder {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 4/5;
-    }
-}
-
-/* ── Responsive ─────────────────────────────────────────────── */
-
-.phone-only {
-    display: none;
-}
-
-@media (max-width: 640px) {
-    .phone-only {
-        display: block;
-    }
-
-    .desktop-only {
-        display: none;
-    }
-
-    .page {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        padding: 0 1rem;
-    }
-
-    .sidebar {
-        grid-column: 1;
-        grid-row: 1;
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-        padding-right: 0;
-        padding-bottom: 1.4rem;
-    }
-
-    main {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    footer {
-        grid-column: 1;
-        grid-row: 3;
-    }
-}
-
-/* ── Comic thumbnails (replace <a> with <button>) ───────────── */
-.comic-thumb {
-    display: block;
-    width: 100%;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: zoom-in;
-    margin-bottom: .5rem;
-}
-
-.comic-thumb img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--rule);
-    transition: border-color .15s;
-}
-
-.comic-thumb:hover img,
-.comic-thumb:focus img {
-    border-color: var(--pink);
-    outline: none;
-}
-
-.comic-thumb:focus {
-    outline: none;
-}
-
-/* ── Lightbox overlay ───────────────────────────────────────── */
-.lb-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(44, 37, 32, .88);
-    align-items: center;
-    justify-content: center;
-}
-
-.lb-overlay.open {
-    display: flex;
-}
-
-.lb-dialog {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: min(90vw, 720px);
-    max-height: 92vh;
-    outline: none;
-}
-
-.lb-img-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.lb-img-wrap img {
-    display: block;
-    max-width: min(76vw, 640px);
-    max-height: 72vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border: 1px solid rgba(248, 167, 182, .25);
-}
-
-.lb-caption {
-    margin-top: .9rem;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 1rem;
-    color: rgba(249, 246, 241, .82);
-    text-align: center;
-    max-width: 52ch;
-    line-height: 1.55;
-}
-
-/* Prev / next buttons */
-.lb-prev,
-.lb-next {
-    background: none;
-    border: none;
-    color: rgba(249, 246, 241, .55);
-    font-family: var(--serif);
-    font-size: 1.9rem;
-    line-height: 1;
-    padding: .3rem .5rem;
-    cursor: pointer;
-    transition: color .15s;
-    flex-shrink: 0;
-    user-select: none;
-}
-
-.lb-prev:hover,
-.lb-prev:focus,
-.lb-next:hover,
-.lb-next:focus {
-    color: var(--pink);
-    outline: none;
-}
-
-/* Close button */
-.lb-close {
-    position: absolute;
-    top: -2.2rem;
-    right: 0;
-    background: none;
-    border: none;
-    color: rgba(249, 246, 241, .55);
-    font-family: var(--serif);
-    font-size: 1.4rem;
-    line-height: 1;
-    cursor: pointer;
-    padding: .2rem .4rem;
-    transition: color .15s;
-}
-
-.lb-close:hover,
-.lb-close:focus {
-    color: var(--pink);
-    outline: none;
-}
-
-/* Counter */
-.lb-counter {
-    position: absolute;
-    top: -2.1rem;
-    left: 0;
-    font-family: var(--serif);
-    font-size: .82rem;
-    color: rgba(249, 246, 241, .4);
-    font-style: italic;
-    letter-spacing: .03em;
-}
-
-
-/* ── Blog index ─────────────────────────────────────────────── */
-.blog-list {
-    max-width: 62ch;
-}
-
-.blog-entry {
-    border-bottom: 1px solid var(--rule);
-}
-
-.blog-entry:first-child {
-    border-top: 1px solid var(--rule);
-}
-
-.blog-entry-link {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    column-gap: 1.2rem;
-    row-gap: .1rem;
-    padding: .75rem 0;
-    text-decoration: none;
-    color: var(--ink);
-}
-
-.blog-entry-link:hover .blog-entry-title,
-.blog-entry-link:focus .blog-entry-title {
-    color: #c0607a;
-}
-
-.blog-entry-link:focus {
-    outline: none;
-}
-
-.blog-entry-title {
-    grid-column: 1;
-    grid-row: 1;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-color: var(--pink);
-    text-underline-offset: 3px;
-    transition: color .15s;
-}
-
-.blog-entry-date {
-    grid-column: 2;
-    grid-row: 1;
-    font-style: italic;
-    font-size: .88rem;
-    color: var(--muted);
-    white-space: nowrap;
-    padding-top: .1em;
-}
-
-.blog-entry-teaser {
-    grid-column: 1 / 3;
-    grid-row: 2;
-    font-size: .92rem;
-    color: var(--muted);
-    font-style: italic;
-}
-
-/* ── Blog post ──────────────────────────────────────────────── */
-.blog-post {
-    max-width: 62ch;
-}
-
-.blog-back {
-    display: inline-block;
-    font-size: .85rem;
-    color: var(--muted);
-    text-decoration: underline;
-    text-decoration-color: var(--rule);
-    text-underline-offset: 3px;
-    margin-bottom: 1.4rem;
-    transition: color .15s, text-decoration-color .15s;
-}
-
-.blog-back:hover,
-.blog-back:focus {
-    color: #c0607a;
-    text-decoration-color: var(--pink);
-    outline: none;
-}
-
-.blog-post-header {
-    margin-bottom: 1.6rem;
-    padding-bottom: .6rem;
-    border-bottom: 1px solid var(--pink);
-}
-
-.blog-post-title {
-    font-size: 1.4rem;
-    font-weight: 500;
-    line-height: 1.25;
-    margin-bottom: .25rem;
-}
-
-.blog-post-date {
-    font-size: .88rem;
-    font-style: italic;
-    color: var(--muted);
-    margin: 0;
-}
-
-.blog-post-body p {
-    margin-bottom: 1rem;
-}
-
-.blog-post-body p:last-child {
-    margin-bottom: 0;
-}
-
-/* ── Print lab section ──────────────────────────────────────── */
-.lab-section-title {
-    font-size: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--muted);
-    margin-bottom: .8rem;
-    margin-top: 2rem;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: .3rem;
-    max-width: 62ch;
-}
-
-#lab-status:first-of-type .lab-section-title,
-.lab-section-title:first-child {
-    margin-top: 0;
-}
-
-/* Printer table */
-.printer-table {
-    max-width: 62ch;
-    margin-bottom: 2rem;
-}
-
-.printer-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: baseline;
-    gap: .2rem 1rem;
-    padding: .55rem 0;
-    border-bottom: 1px solid var(--rule);
-    font-size: .97rem;
-}
-
-.printer-row:first-child {
-    border-top: 1px solid var(--rule);
-}
-
-.printer-name {
-    font-weight: 500;
-}
-
-.printer-status-badge {
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    font-weight: 600;
-    padding: .15em .5em;
-    border-radius: 2px;
-    white-space: nowrap;
-}
-
-.printer-row--idle .printer-status-badge {
-    background: rgba(120, 180, 140, .15);
-    color: #4a7a5a;
-}
-
-.printer-row--printing .printer-status-badge {
-    background: rgba(248, 167, 182, .18);
-    color: #b05068;
-}
-
-.printer-row--offline .printer-status-badge {
-    background: rgba(107, 95, 88, .1);
-    color: var(--muted);
-}
-
-.printer-row--maintenance .printer-status-badge {
-    background: rgba(200, 168, 80, .15);
-    color: #8a6e20;
-}
-
-.printer-note {
-    grid-column: 1 / 4;
-    font-size: .88rem;
-    color: var(--muted);
-    font-style: italic;
-    margin-top: -.1rem;
-    padding-bottom: .2rem;
-}
-
-.printer-note:empty {
-    display: none;
-}
-
-/* Filament inventory */
-.filament-group {
-    max-width: 62ch;
-    margin-bottom: 2rem;
-}
-
-.filament-diameter {
-    font-size: .85rem;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    color: var(--muted);
-    font-weight: 600;
-    margin-bottom: .5rem;
-}
-
-.filament-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .95rem;
-}
-
-.filament-table th {
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 600;
-    color: var(--muted);
-    text-align: left;
-    padding: .3rem .5rem .3rem 0;
-    border-bottom: 1px solid var(--rule);
-}
-
-.filament-table td {
-    padding: .4rem .5rem .4rem 0;
-    border-bottom: 1px solid var(--rule);
-    vertical-align: middle;
-}
-
-.filament-table tr:last-child td {
-    border-bottom: none;
-}
-
-.filament-swatch {
-    display: inline-block;
-    width: .9em;
-    height: .9em;
-    border-radius: 2px;
-    border: 1px solid rgba(44, 37, 32, .15);
-    margin-right: .4em;
-    vertical-align: middle;
-    position: relative;
-    top: -.05em;
-}
-
-.filament-stock {
-    color: var(--ink);
-}
-
-.filament-blurb {
-    color: var(--muted);
-    font-style: italic;
-    font-size: .88rem;
-    margin-left: .4em;
-}
-
-.rss-link {
-    display: inline-flex;
-    align-items: center;
-    gap: .3em;
-}
-
-.rss-icon {
-    width: .95em;
-    height: .95em;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    flex-shrink: 0;
-    position: relative;
-    top: -.05em;
-}
-</style>
+    <link rel="preload" href="fonts/eb-garamond-v32-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/eb-garamond-v32-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+    <style>@font-face{font-display:swap;font-family:'EB Garamond';font-style:normal;font-weight:400;src:url('fonts/eb-garamond-v32-latin-regular.woff2') format('woff2')}@font-face{font-display:swap;font-family:'EB Garamond';font-style:italic;font-weight:400;src:url('fonts/eb-garamond-v32-latin-italic.woff2') format('woff2')}@font-face{font-display:swap;font-family:'EB Garamond';font-style:normal;font-weight:500;src:url('fonts/eb-garamond-v32-latin-500.woff2') format('woff2')}@font-face{font-display:swap;font-family:'EB Garamond';font-style:italic;font-weight:500;src:url('fonts/eb-garamond-v32-latin-500italic.woff2') format('woff2')}@font-face{font-display:swap;font-family:'EB Garamond';font-style:normal;font-weight:600;src:url('fonts/eb-garamond-v32-latin-600.woff2') format('woff2')}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--pink:#f8a7b6;--ink:#2c2520;--muted:#6b5f58;--paper:#f9f6f1;--rule:#e8e0d8;--serif:'EB Garamond',Georgia,'Times New Roman',serif;--lh:1.7}.skip-link{position:absolute;top:-999px;left:0;background:var(--pink);color:var(--ink);padding:.4em 1em;font-family:var(--serif);z-index:100}.skip-link:focus{top:0}html{scroll-behavior:smooth}body{font-family:var(--serif);font-size:1.1rem;line-height:var(--lh);color:var(--ink);background:var(--paper);min-height:100vh}.page{display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto 1fr auto;max-width:900px;margin:0 auto;padding:0 1.5rem;gap:0 3rem}.sidebar{grid-column:1;grid-row:1 / 3;padding:2.5rem 0 2rem;border-right:1px solid var(--rule);padding-right:2rem}.sidebar-name,.about-name{font-size:1.15rem;font-weight:600;letter-spacing:.01em;margin-bottom:.15em}.about-name{font-size:1rem}.about-pronoun{font-style:italic;font-size:.92rem;color:var(--muted);font-weight:400}.sidebar hr,hr.pink{border:none;border-top:1px solid var(--pink);margin:1rem 0}.sidebar-meta,.about-meta{font-size:.88rem;line-height:1.55;color:var(--muted);margin-bottom:1.4rem}.sidebar-meta{color:var(--ink)}.about-meta strong{display:block;color:var(--ink);font-weight:500;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;margin-top:.6em;margin-bottom:.1em}.about-meta a{color:inherit;text-decoration:underline;text-decoration-color:var(--pink);text-underline-offset:2px}.sidenav{list-style:none;margin-top:.6rem}.sidenav li+li{margin-top:.1rem}.sidenav a{display:block;font-size:.95rem;color:var(--ink);text-decoration:none;padding:.2em 0;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}.sidenav a:hover,.sidenav a:focus{color:var(--pink);border-bottom-color:var(--pink);outline:none}main{grid-column:2;grid-row:1;padding:2.5rem 0 3rem}section{display:none}section.active{display:block}.section-header{display:flex;align-items:baseline;gap:.7em;margin-bottom:1.4rem;border-bottom:1px solid var(--pink);padding-bottom:.5rem}.section-header h1{font-size:1.5rem;font-weight:500;letter-spacing:.01em}.section-header .ornament{color:var(--pink);font-size:1.1em;line-height:1}p{margin-bottom:1rem;max-width:60ch}a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--pink);text-underline-offset:3px}a:hover,a:focus{color:#c0607a;outline:none}.lately{margin:1.8rem 0 1.4rem;padding:.9rem 1.1rem;border-left:3px solid var(--pink);background:rgba(248,167,182,.07);font-size:.96rem;max-width:58ch}.lately-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3em;font-weight:500}.cv-block{margin-bottom:2rem}.cv-block h2{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem}.cv-entry{display:grid;grid-template-columns:1fr auto;gap:.1rem 1rem;margin-bottom:.8rem;font-size:.97rem;max-width:62ch}.cv-entry .year{color:var(--muted);font-style:italic;white-space:nowrap;font-size:.9rem;padding-top:.05em}.cv-entry .desc{color:var(--muted);font-size:.9rem;grid-column:1}.course{margin-bottom:1.6rem;max-width:62ch}.course h2{font-size:1.1rem;font-weight:600;margin-bottom:.2em}.course-meta{font-size:.9rem;color:var(--muted);font-style:italic;margin-bottom:.4em}.office-hours{font-size:.92rem;color:var(--muted)}.course-dl{margin:0}.course-dl dt{font-size:.82rem;text-transform:uppercase;letter-spacing:.09em;font-weight:600;color:var(--muted);margin-top:1.2rem;margin-bottom:.3rem}.course-dl dd{margin-left:0;font-size:.97rem;line-height:1.65}.comics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.2rem;margin-top:.5rem}.comic-card{border:1px solid var(--rule);padding:.6rem}.comic-card img{width:100%;height:auto;display:block;margin-bottom:.5rem}.comic-title{font-size:.88rem;color:var(--muted)}.links-group{margin-bottom:1.8rem}.links-group h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;margin-bottom:.5rem}.links-group ul{list-style:none;padding:0}.links-group li{padding:.2em 0;font-size:.97rem;border-bottom:1px solid var(--rule)}.links-group li:last-child{border-bottom:none}footer{grid-column:1 / 3;border-top:1px solid var(--rule);padding:1.4rem 0 2rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;text-align:center}footer svg{width:28px;height:28px;fill:var(--pink);opacity:.85}footer p{font-size:.82rem;color:var(--muted);max-width:65ch;line-height:1.5;margin:0}footer a{color:var(--muted);text-decoration-color:var(--rule)}.about-photo{float:right;margin:0 0 1.2rem 1.8rem;width:148px;flex-shrink:0}.about-photo img,.about-photo .photo-placeholder{display:block;width:148px;height:185px;object-fit:cover;border:1px solid var(--rule)}.about-photo .photo-placeholder{background:var(--rule);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--muted);font-style:italic}.about-photo figcaption{font-size:.78rem;color:var(--muted);font-style:italic;margin-top:.35rem;line-height:1.4}@media (max-width:480px){.about-photo{float:none;margin:0 0 1.4rem 0;width:100%}.about-photo img,.about-photo .photo-placeholder{width:100%;height:auto;aspect-ratio:4/5}}.phone-only{display:none}@media (max-width:640px){.phone-only{display:block}.desktop-only{display:none}.page{grid-template-columns:1fr;grid-template-rows:auto auto auto;padding:0 1rem}.sidebar{grid-column:1;grid-row:1;border-right:none;border-bottom:1px solid var(--rule);padding-right:0;padding-bottom:1.4rem}main{grid-column:1;grid-row:2}footer{grid-column:1;grid-row:3}}.comic-thumb{display:block;width:100%;background:none;border:none;padding:0;cursor:zoom-in;margin-bottom:.5rem}.comic-thumb img{display:block;width:100%;height:auto;border:1px solid var(--rule);transition:border-color .15s}.comic-thumb:hover img,.comic-thumb:focus img{border-color:var(--pink);outline:none}.comic-thumb:focus{outline:none}.lb-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,37,32,.88);align-items:center;justify-content:center}.lb-overlay.open{display:flex}.lb-dialog{position:relative;display:flex;flex-direction:column;align-items:center;max-width:min(90vw,720px);max-height:92vh;outline:none}.lb-img-wrap{position:relative;display:flex;align-items:center;gap:1rem}.lb-img-wrap img{display:block;max-width:min(76vw,640px);max-height:72vh;width:auto;height:auto;object-fit:contain;border:1px solid rgba(248,167,182,.25)}.lb-caption{margin-top:.9rem;font-family:var(--serif);font-style:italic;font-size:1rem;color:rgba(249,246,241,.82);text-align:center;max-width:52ch;line-height:1.55}.lb-prev,.lb-next{background:none;border:none;color:rgba(249,246,241,.55);font-family:var(--serif);font-size:1.9rem;line-height:1;padding:.3rem .5rem;cursor:pointer;transition:color .15s;flex-shrink:0;user-select:none}.lb-prev:hover,.lb-prev:focus,.lb-next:hover,.lb-next:focus{color:var(--pink);outline:none}.lb-close{position:absolute;top:-2.2rem;right:0;background:none;border:none;color:rgba(249,246,241,.55);font-family:var(--serif);font-size:1.4rem;line-height:1;cursor:pointer;padding:.2rem .4rem;transition:color .15s}.lb-close:hover,.lb-close:focus{color:var(--pink);outline:none}.lb-counter{position:absolute;top:-2.1rem;left:0;font-family:var(--serif);font-size:.82rem;color:rgba(249,246,241,.4);font-style:italic;letter-spacing:.03em}.blog-list{max-width:62ch}.blog-entry{border-bottom:1px solid var(--rule)}.blog-entry:first-child{border-top:1px solid var(--rule)}.blog-entry-link{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:1.2rem;row-gap:.1rem;padding:.75rem 0;text-decoration:none;color:var(--ink)}.blog-entry-link:hover .blog-entry-title,.blog-entry-link:focus .blog-entry-title{color:#c0607a}.blog-entry-link:focus{outline:none}.blog-entry-title{grid-column:1;grid-row:1;font-size:1rem;font-weight:500;text-decoration:underline;text-decoration-color:var(--pink);text-underline-offset:3px;transition:color .15s}.blog-entry-date{grid-column:2;grid-row:1;font-style:italic;font-size:.88rem;color:var(--muted);white-space:nowrap;padding-top:.1em}.blog-entry-teaser{grid-column:1 / 3;grid-row:2;font-size:.92rem;color:var(--muted);font-style:italic}.blog-post{max-width:62ch}.blog-back{display:inline-block;font-size:.85rem;color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px;margin-bottom:1.4rem;transition:color .15s,text-decoration-color .15s}.blog-back:hover,.blog-back:focus{color:#c0607a;text-decoration-color:var(--pink);outline:none}.blog-post-header{margin-bottom:1.6rem;padding-bottom:.6rem;border-bottom:1px solid var(--pink)}.blog-post-title{font-size:1.4rem;font-weight:500;line-height:1.25;margin-bottom:.25rem}.blog-post-date{font-size:.88rem;font-style:italic;color:var(--muted);margin:0}.blog-post-body p{margin-bottom:1rem}.blog-post-body p:last-child{margin-bottom:0}.lab-section-title{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.8rem;margin-top:2rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;max-width:62ch}#lab-status:first-of-type .lab-section-title,.lab-section-title:first-child{margin-top:0}.printer-table{max-width:62ch;margin-bottom:2rem}.printer-row{display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:.2rem 1rem;padding:.55rem 0;border-bottom:1px solid var(--rule);font-size:.97rem}.printer-row:first-child{border-top:1px solid var(--rule)}.printer-name{font-weight:500}.printer-status-badge{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600;padding:.15em .5em;border-radius:2px;white-space:nowrap}.printer-row--idle .printer-status-badge{background:rgba(120,180,140,.15);color:#4a7a5a}.printer-row--printing .printer-status-badge{background:rgba(248,167,182,.18);color:#b05068}.printer-row--offline .printer-status-badge{background:rgba(107,95,88,.1);color:var(--muted)}.printer-row--maintenance .printer-status-badge{background:rgba(200,168,80,.15);color:#8a6e20}.printer-note{grid-column:1 / 4;font-size:.88rem;color:var(--muted);font-style:italic;margin-top:-.1rem;padding-bottom:.2rem}.printer-note:empty{display:none}.filament-group{max-width:62ch;margin-bottom:2rem}.filament-diameter{font-size:.85rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600;margin-bottom:.5rem}.filament-table{width:100%;border-collapse:collapse;font-size:.95rem}.filament-table th{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted);text-align:left;padding:.3rem .5rem .3rem 0;border-bottom:1px solid var(--rule)}.filament-table td{padding:.4rem .5rem .4rem 0;border-bottom:1px solid var(--rule);vertical-align:middle}.filament-table tr:last-child td{border-bottom:none}.filament-swatch{display:inline-block;width:.9em;height:.9em;border-radius:2px;border:1px solid rgba(44,37,32,.15);margin-right:.4em;vertical-align:middle;position:relative;top:-.05em}.filament-stock{color:var(--ink)}.filament-blurb{color:var(--muted);font-style:italic;font-size:.88rem;margin-left:.4em}.rss-link{display:inline-flex;align-items:center;gap:.3em}.rss-icon{width:.95em;height:.95em;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;flex-shrink:0;position:relative;top:-.05em}</style>
 </head>
 
 <body>
@@ -922,18 +22,6 @@ footer a {
         <!--    Sidebar    -->
         <aside class="sidebar" aria-label="Site information and navigation">
             <p class="sidebar-name">Hailey Jay Garcia</p>
-            <p class="sidebar-pronoun">she/her/hers/Ms.</p>
-            <hr class="desktop-only">
-            <div class="sidebar-meta desktop-only">
-                <strong>Position</strong>
-                Graduate Teaching Assistant<br>Louisiana State University
-                <strong>Email</strong>
-                <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
-                <strong>Office</strong>
-                363 Lockett Hall
-                <strong>CV</strong>
-                <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
-            </div>
             <hr>
             <nav aria-label="Sections">
                 <ul class="sidenav">
@@ -943,34 +31,57 @@ footer a {
                     <li><a href="#printlab">3D Print Lab</a></li>
                     <li><a href="#comics">Comics</a></li>
                     <li><a href="#blog">Blog</a></li>
-                    <li><a href="#links">Relevant Links</a></li>
+                    <li class="phone-only"><a href="#links">Relevant Links</a></li>
                 </ul>
+                <div class="desktop-only" aria-label="Other Links">
+                    <hr>
+                    <strong class="sidebar-meta">LSU</strong>
+                    <ul class="sidenav">
+                        <li><a href="https://www.math.lsu.edu/">Math Department</a></li>
+                        <li><a href="https://www.math.lsu.edu/~awm/">AWM Chapter</a></li>
+                        <li><a href="https://www.math.lsu.edu/~trm-rtg/">Research &amp; Training Group</a></li>
+                    </ul>
+                    <hr>
+                    <strong class="sidebar-meta">Personal</strong>
+                    <ul class="sidenav">
+                        <li><a href="rss.xml" class="rss-link" aria-label="RSS feed">
+                                <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="5" cy="19" r="2" />
+                                    <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9" />
+                                </svg>
+                                Blog RSS</a></li>
+                    </ul>
+                </div>
             </nav>
         </aside>
 
         <!--    Main    -->
         <main id="main-content">
 
-            <section id="about">
+            <section id="about" class="active">
 <div class="section-header">
     <h1>About</h1>
 </div>
 
 <figure class="about-photo">
-    <img src="images/hailey.jpg" alt="A woman in a button-down shirt and sidebag in front of a flower bush.">
+    <img src="images/hailey.jpg" srcset="images/hailey-300.webp 300w, images/hailey.webp 800w" sizes="(max-width: 480px) 100vw, 148px" width="148" height="185" alt="A woman in a button-down shirt and sidebag in front of a flower bush.">
     <figcaption>Me in December&nbsp;&#8217;24.<br>&ldquo;<span id="about-splash">How did you even get here?</span>&rdquo;</figcaption>
 </figure>
 
-<div class="sidebar-meta phone-only">
-                <strong>Position</strong>
-                Graduate Teaching Assistant<br>Louisiana State University
-                <strong>Email</strong>
-                <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
-                <strong>Office</strong>
-                363 Lockett Hall
-                <strong>CV</strong>
-                <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
-            </div>
+<p class="about-name">Hailey Jay Garcia <span class="about-pronoun">(she/her)</span></p>
+
+<div class="about-meta">
+    <strong>Position</strong>
+    Graduate Assistant, LSU
+    <strong>Email</strong>
+    <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
+    <strong>Office</strong>
+    363 Lockett Hall
+    <strong>CV</strong>
+    <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
+</div>
+<hr class="pink">
+
 
 <p>Hello! I&#8217;m a PhD student at LSU studying mathematics. My research interests include topology and combinatorics, with a particular fondness for matroids.</p>
 
@@ -1314,58 +425,66 @@ footer a {
 <p style="max-width:56ch;margin-bottom:1.4rem;">A selection of comics I have drawn. Subject matter varies. Clearly inspired by <a href="https://xkcd.com/">xkcd</a>. All humor is derivative, but mine is especially so.</p>
 
 <div class="comics-grid">
-<div class="comic-card">
-    <button class="comic-thumb" data-src="comics/officehours.jpg" data-alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."" data-caption="I like to take inspiration from the Catholic Church's calendar for my office hours." aria-label="View comic: I like to take inspiration from the Catholic Church's calendar for my office hours.">
-        <img src="comics/officehours.jpg" alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."">
+    <div class="comic-card">
+    <button class="comic-thumb" data-src="comics/officehours.webp" data-alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."" data-caption="I like to take inspiration from the Catholic Church's calendar for my office hours." aria-label="View comic: I like to take inspiration from the Catholic Church's calendar for my office hours.">
+
+            <img src="comics/officehours.webp" alt="An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."" width="1294" height="1066">
     </button>
     <p class="comic-title">I like to take inspiration from the Catholic Church's calendar for my office hours.</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/dinosona.jpg" data-alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'." data-caption="The Mesozoic was far weirder than people give it credit for." aria-label="View comic: The Mesozoic was far weirder than people give it credit for.">
-        <img src="comics/dinosona.jpg" alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'.">
+    <button class="comic-thumb" data-src="comics/dinosona.webp" data-alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'." data-caption="The Mesozoic was far weirder than people give it credit for." aria-label="View comic: The Mesozoic was far weirder than people give it credit for.">
+
+            <img src="comics/dinosona.webp" alt="A dinosaur wearing a bunny ears headband while saying 'Rawr'." width="1917" height="1352">
     </button>
     <p class="comic-title">The Mesozoic was far weirder than people give it credit for.</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/borkosplingo.jpg" data-alt="Two mathematicians discuss applying the Borko-Splingo Theorem." data-caption="According to my partner, this is how mathematicians speak." aria-label="View comic: According to my partner, this is how mathematicians speak.">
-        <img src="comics/borkosplingo.jpg" alt="Two mathematicians discuss applying the Borko-Splingo Theorem.">
+    <button class="comic-thumb" data-src="comics/borkosplingo.webp" data-alt="Two mathematicians discuss applying the Borko-Splingo Theorem." data-caption="According to my partner, this is how mathematicians speak." aria-label="View comic: According to my partner, this is how mathematicians speak.">
+
+            <img src="comics/borkosplingo.webp" alt="Two mathematicians discuss applying the Borko-Splingo Theorem." width="1500" height="2000">
     </button>
     <p class="comic-title">According to my partner, this is how mathematicians speak.</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/bashrc.jpg" data-alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"" data-caption="My friends should NOT give me access to their devices." aria-label="View comic: My friends should NOT give me access to their devices.">
-        <img src="comics/bashrc.jpg" alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"">
+    <button class="comic-thumb" data-src="comics/bashrc.webp" data-alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"" data-caption="My friends should NOT give me access to their devices." aria-label="View comic: My friends should NOT give me access to their devices.">
+
+            <img src="comics/bashrc.webp" alt="A .bashrc file containing the line "PS1=sudo: please enter your password:"" width="2104" height="437">
     </button>
     <p class="comic-title">My friends should NOT give me access to their devices.</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/dne.jpg" data-alt="A whiteboard with a flower in the corner and the caption DNE." data-caption="Sometimes we need the little things." aria-label="View comic: Sometimes we need the little things.">
-        <img src="comics/dne.jpg" alt="A whiteboard with a flower in the corner and the caption DNE.">
+    <button class="comic-thumb" data-src="comics/dne.webp" data-alt="A whiteboard with a flower in the corner and the caption DNE." data-caption="Sometimes we need the little things." aria-label="View comic: Sometimes we need the little things.">
+
+            <img src="comics/dne.webp" alt="A whiteboard with a flower in the corner and the caption DNE." width="1571" height="760">
     </button>
     <p class="comic-title">Sometimes we need the little things.</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/inband.jpg" data-alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud." data-caption="Correcting my friends' gender in-band since 2004!" aria-label="View comic: Correcting my friends' gender in-band since 2004!">
-        <img src="comics/inband.jpg" alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud.">
+    <button class="comic-thumb" data-src="comics/inband.webp" data-alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud." data-caption="Correcting my friends' gender in-band since 2004!" aria-label="View comic: Correcting my friends' gender in-band since 2004!">
+
+            <img src="comics/inband.webp" alt="A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud." width="1728" height="1385">
     </button>
     <p class="comic-title">Correcting my friends' gender in-band since 2004!</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/compactsets.jpg" data-alt="A hydraulic press squishing an empty set." data-caption="These hydraulic press channels are getting out of hand!" aria-label="View comic: These hydraulic press channels are getting out of hand!">
-        <img src="comics/compactsets.jpg" alt="A hydraulic press squishing an empty set.">
+    <button class="comic-thumb" data-src="comics/compactsets.webp" data-alt="A hydraulic press squishing an empty set." data-caption="These hydraulic press channels are getting out of hand!" aria-label="View comic: These hydraulic press channels are getting out of hand!">
+
+            <img src="comics/compactsets.webp" alt="A hydraulic press squishing an empty set." width="1500" height="2000">
     </button>
     <p class="comic-title">These hydraulic press channels are getting out of hand!</p>
 </div>
 
 <div class="comic-card">
-    <button class="comic-thumb" data-src="comics/jpeggatewaydrug.jpg" data-alt="JPEG: Gateway drug?" data-caption="Don't look at the file extension..." aria-label="View comic: Don't look at the file extension...">
-        <img src="comics/jpeggatewaydrug.jpg" alt="JPEG: Gateway drug?">
+    <button class="comic-thumb" data-src="comics/jpeggatewaydrug.webp" data-alt="JPEG: Gateway drug?" data-caption="Don't look at the file extension..." aria-label="View comic: Don't look at the file extension...">
+
+            <img src="comics/jpeggatewaydrug.webp" alt="JPEG: Gateway drug?" width="1588" height="1146">
     </button>
     <p class="comic-title">Don't look at the file extension...</p>
 </div>
@@ -1466,7 +585,7 @@ footer a {
         <!--    Footer    -->
         <footer>
             <!-- Rose SVG ornament -->
-            <img src="images/rose.svg" width=40px>
+            <img src="images/rose.svg" width=40px height="63px" alt="">
 
             <p>Copyleft 2025&ndash;2026 Hailey Garcia. All wrongs reserved.</p>
             <p>The statements and opinions on these pages are those of Hailey Garcia only, not of Louisiana State University or the LSU Board of Supervisors.</p>
@@ -1474,85 +593,9 @@ footer a {
         </footer>
 
     </div><!-- /.page -->
-    <script>
-// ── Section registry ─────────────────────────────────────────
-const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links'];
-
-const subAnchors = {
-  '1431': 'teaching',
-  '1431f25': 'teaching',
-  'lab-status': 'printlab',
-  'lab-request': 'printlab',
-  'lab-gallery': 'printlab',
-  'lab-filament': 'printlab'
-};
-
-// ── Navigation ───────────────────────────────────────────────
-function showSection(id) {
-  const parentId = subAnchors[id] || (sections.includes(id) ? id : 'about');
-  sections.forEach(function (s) {
-    document.getElementById(s).classList.toggle('active', s === parentId);
-  });
-}
-
-function navigate(hash) {
-  var bare = !hash;
-  if (!hash) hash = 'about';
-  showSection(hash);
-  if (!bare) history.replaceState(null, '', '#' + hash);
-
-  if (subAnchors[hash] === 'blog') {
-    document.getElementById('blog-index').style.display = 'none';
-    document.querySelectorAll('.blog-post').forEach(function (el) {
-      el.style.display = el.id === hash ? '' : 'none';
-    });
-    window.scrollTo({ top: 0 });
-  } else if (hash === 'blog') {
-    document.getElementById('blog-index').style.display = '';
-    document.querySelectorAll('.blog-post').forEach(function (el) {
-      el.style.display = 'none';
-    });
-    window.scrollTo({ top: 0 });
-  } else if (subAnchors[hash]) {
-    const target = document.getElementById(hash);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    window.scrollTo({ top: 0 });
-  }
-}
-
-document.addEventListener('click', function (e) {
-  const a = e.target.closest('a[href]');
-  if (!a) return;
-  const url = new URL(a.href, location.href);
-  if (url.pathname !== location.pathname) return;
-  const hash = url.hash.slice(1);
-  if (!hash) return;
-  e.preventDefault();
-  navigate(hash);
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('[data-blog-entry]').forEach(function (el) {
-    subAnchors[el.id] = 'blog';
-  });
-  // Initialise blog visibility before first navigate
-  var blogIndex = document.getElementById('blog-index');
-  if (blogIndex) blogIndex.style.display = '';
-  document.querySelectorAll('.blog-post').forEach(function (el) {
-    el.style.display = 'none';
-  });
-  navigate(location.hash.slice(1));
-});
-
-// ── Comic lightbox ───────────────────────────────────────────
-(function () {
-  const overlay = document.createElement('div');
-  overlay.className = 'lb-overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Comic viewer');
-  overlay.innerHTML = `
+    <script>const sections=['about','cv','teaching','printlab','comics','blog','links'];const subAnchors={'1431':'teaching','1431f25':'teaching','lab-status':'printlab','lab-request':'printlab','lab-gallery':'printlab','lab-filament':'printlab'};function showSection(id){const parentId=subAnchors[id]||(sections.includes(id)?id:'about');sections.forEach(function(s){document.getElementById(s).classList.toggle('active',s===parentId);});}
+function navigate(hash){var bare=!hash;if(!hash)hash='about';showSection(hash);if(!bare)history.replaceState(null,'','#'+hash);if(subAnchors[hash]==='blog'){document.getElementById('blog-index').style.display='none';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display=el.id===hash?'':'none';});window.scrollTo({top:0});}else if(hash==='blog'){document.getElementById('blog-index').style.display='';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display='none';});window.scrollTo({top:0});}else if(subAnchors[hash]){const target=document.getElementById(hash);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}else{window.scrollTo({top:0});}}
+document.addEventListener('click',function(e){const a=e.target.closest('a[href]');if(!a)return;const url=new URL(a.href,location.href);if(url.pathname!==location.pathname)return;const hash=url.hash.slice(1);if(!hash)return;e.preventDefault();navigate(hash);});document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-blog-entry]').forEach(function(el){subAnchors[el.id]='blog';});var blogIndex=document.getElementById('blog-index');if(blogIndex)blogIndex.style.display='';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display='none';});navigate(location.hash.slice(1));});(function(){const overlay=document.createElement('div');overlay.className='lb-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Comic viewer');overlay.innerHTML=`
     <div class="lb-dialog" tabindex="-1">
       <span class="lb-counter" aria-live="polite"></span>
       <button class="lb-close" aria-label="Close">&times;</button>
@@ -1562,87 +605,15 @@ document.addEventListener('DOMContentLoaded', function () {
         <button class="lb-next" aria-label="Next comic">&#8594;</button>
       </div>
       <p class="lb-caption"></p>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  const dialog = overlay.querySelector('.lb-dialog');
-  const img = overlay.querySelector('img');
-  const caption = overlay.querySelector('.lb-caption');
-  const counter = overlay.querySelector('.lb-counter');
-  const btnClose = overlay.querySelector('.lb-close');
-  const btnPrev = overlay.querySelector('.lb-prev');
-  const btnNext = overlay.querySelector('.lb-next');
-
-  let comics = [];
-  let current = 0;
-
-  function collectComics() {
-    comics = Array.from(document.querySelectorAll('.comic-thumb'));
-  }
-
-  function show(index) {
-    const btn = comics[index];
-    img.src = btn.dataset.src;
-    img.alt = btn.dataset.alt;
-    caption.textContent = btn.dataset.caption;
-    counter.textContent = (index + 1) + ' / ' + comics.length;
-    btnPrev.style.visibility = index === 0 ? 'hidden' : '';
-    btnNext.style.visibility = index === comics.length - 1 ? 'hidden' : '';
-    current = index;
-  }
-
-  function open(index) {
-    collectComics();
-    show(index);
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    dialog.focus();
-  }
-
-  function close() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-    if (comics[current]) comics[current].focus();
-  }
-
-  document.addEventListener('click', function (e) {
-    const thumb = e.target.closest('.comic-thumb');
-    if (!thumb) return;
-    collectComics();
-    open(comics.indexOf(thumb));
-  });
-
-  btnClose.addEventListener('click', close);
-  btnPrev.addEventListener('click', function () { if (current > 0) show(current - 1); });
-  btnNext.addEventListener('click', function () { if (current < comics.length - 1) show(current + 1); });
-
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) close();
-  });
-
-  overlay.addEventListener('keydown', function (e) {
-    if (!overlay.classList.contains('open')) return;
-    if (e.key === 'Escape') { close(); return; }
-    if (e.key === 'ArrowLeft' && current > 0) { show(current - 1); return; }
-    if (e.key === 'ArrowRight' && current < comics.length - 1) { show(current + 1); return; }
-    if (e.key === 'Tab') {
-      const focusable = Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));
-      const first = focusable[0], last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
-})();
-
-const aboutQuotes = [
-  "Try the chocolate chip cookies!", "No mitsakes -- but undo is C-/ just in case.", "Caution: Hearing protection required!", "THE SNAIL!", "How... old is that onion?", "Aaaand that's a nat 1. Sorry.", "The lesser of two weevils!", "Daemonic!", "You have to have some body positivity when you're making graphs.", "Sparkle? You're the whole tub of glitter, baby!", "Bing bong? I don't know.", "Copyleft womanhood!", "Save the pandas!", "Renee Descartes, my mortal enemy!", "Heat from fire, fire from heat!", "Shut up and let me see your jazz hands!", "Coins, evil.", "LOUD INCORRECT BUZZER.", "I'm out of spell slots.", "Jet fuel ice tea, supersonic, lightspeed!!", "Take that kerosene and put it in my coffee!", "Gear up and blast off!", "Hyneri lanla!", "The Lockett monster of Bore Pit B!", "Succumbing to the bone broth madness...", "Lay back and dive!"
-];
-
-document.addEventListener('DOMContentLoaded', function () {
-  const el = document.getElementById('about-splash');
-  if (el) el.textContent = aboutQuotes[Math.floor(Math.random() * aboutQuotes.length)];
-});
-</script>
+    </div>`;document.body.appendChild(overlay);const dialog=overlay.querySelector('.lb-dialog');const img=overlay.querySelector('img');const caption=overlay.querySelector('.lb-caption');const counter=overlay.querySelector('.lb-counter');const btnClose=overlay.querySelector('.lb-close');const btnPrev=overlay.querySelector('.lb-prev');const btnNext=overlay.querySelector('.lb-next');let comics=[];let current=0;function collectComics(){comics=Array.from(document.querySelectorAll('.comic-thumb'));}
+function show(index){const btn=comics[index];img.src=btn.dataset.src;img.alt=btn.dataset.alt;caption.textContent=btn.dataset.caption;counter.textContent=(index+1)+' / '+comics.length;btnPrev.style.visibility=index===0?'hidden':'';btnNext.style.visibility=index===comics.length-1?'hidden':'';current=index;}
+function open(index){collectComics();show(index);overlay.classList.add('open');document.body.style.overflow='hidden';dialog.focus();}
+function close(){overlay.classList.remove('open');document.body.style.overflow='';if(comics[current])comics[current].focus();}
+document.addEventListener('click',function(e){const thumb=e.target.closest('.comic-thumb');if(!thumb)return;collectComics();open(comics.indexOf(thumb));});btnClose.addEventListener('click',close);btnPrev.addEventListener('click',function(){if(current>0)show(current-1);});btnNext.addEventListener('click',function(){if(current<comics.length-1)show(current+1);});overlay.addEventListener('click',function(e){if(e.target===overlay)close();});overlay.addEventListener('keydown',function(e){if(!overlay.classList.contains('open'))return;if(e.key==='Escape'){close();return;}
+if(e.key==='ArrowLeft'&&current>0){show(current-1);return;}
+if(e.key==='ArrowRight'&&current<comics.length-1){show(current+1);return;}
+if(e.key==='Tab'){const focusable=Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});})();const aboutQuotes=["Try the chocolate chip cookies!","No mitsakes -- but undo is C-/ just in case.","Caution: Hearing protection required!","THE SNAIL!","How... old is that onion?","Aaaand that's a nat 1. Sorry.","The lesser of two weevils!","Daemonic!","You have to have some body positivity when you're making graphs.","Sparkle? You're the whole tub of glitter, baby!","Bing bong? I don't know.","Copyleft womanhood!","Save the pandas!","Renee Descartes, my mortal enemy!","Heat from fire, fire from heat!","Shut up and let me see your jazz hands!","Coins, evil.","LOUD INCORRECT BUZZER.","I'm out of spell slots.","Jet fuel ice tea, supersonic, lightspeed!!","Take that kerosene and put it in my coffee!","Gear up and blast off!","Hyneri lanla!","The Lockett monster of Bore Pit B!","Succumbing to the bone broth madness...","Lay back and dive!"];document.addEventListener('DOMContentLoaded',function(){const el=document.getElementById('about-splash');if(el)el.textContent=aboutQuotes[Math.floor(Math.random()*aboutQuotes.length)];});</script>
 </body>
 
 </html>

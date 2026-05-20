@@ -8,8 +8,8 @@
     <link rel="icon" href="images/rose.svg" />
     <meta name="description" content="Welcome to my website! Here, you'll find math, comics, and info about Hailey!" />
     <link rel="alternate" type="application/rss+xml" title="Hailey Jay Garcia" href="https://math.lsu.edu/~jgarc86/rss.xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="preload" href="fonts/eb-garamond-v32-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/eb-garamond-v32-latin-500.woff2" as="font" type="font/woff2" crossorigin>
     {css}
 </head>
 
@@ -22,18 +22,6 @@
         <!--    Sidebar    -->
         <aside class="sidebar" aria-label="Site information and navigation">
             <p class="sidebar-name">Hailey Jay Garcia</p>
-            <p class="sidebar-pronoun">she/her/hers/Ms.</p>
-            <hr class="desktop-only">
-            <div class="sidebar-meta desktop-only">
-                <strong>Position</strong>
-                Graduate Teaching Assistant<br>Louisiana State University
-                <strong>Email</strong>
-                <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
-                <strong>Office</strong>
-                363 Lockett Hall
-                <strong>CV</strong>
-                <a href="#cv">Web</a> &middot; <a href="files/cv.pdf">PDF</a>
-            </div>
             <hr>
             <nav aria-label="Sections">
                 <ul class="sidenav">
@@ -43,8 +31,27 @@
                     <li><a href="#printlab">3D Print Lab</a></li>
                     <li><a href="#comics">Comics</a></li>
                     <li><a href="#blog">Blog</a></li>
-                    <li><a href="#links">Relevant Links</a></li>
+                    <li class="phone-only"><a href="#links">Relevant Links</a></li>
                 </ul>
+                <div class="desktop-only" aria-label="Other Links">
+                    <hr>
+                    <strong class="sidebar-meta">LSU</strong>
+                    <ul class="sidenav">
+                        <li><a href="https://www.math.lsu.edu/">Math Department</a></li>
+                        <li><a href="https://www.math.lsu.edu/~awm/">AWM Chapter</a></li>
+                        <li><a href="https://www.math.lsu.edu/~trm-rtg/">Research &amp; Training Group</a></li>
+                    </ul>
+                    <hr>
+                    <strong class="sidebar-meta">Personal</strong>
+                    <ul class="sidenav">
+                        <li><a href="rss.xml" class="rss-link" aria-label="RSS feed">
+                                <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="5" cy="19" r="2" />
+                                    <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9" />
+                                </svg>
+                                Blog RSS</a></li>
+                    </ul>
+                </div>
             </nav>
         </aside>
 
@@ -70,7 +77,7 @@
         <!--    Footer    -->
         <footer>
             <!-- Rose SVG ornament -->
-            <img src="images/rose.svg" width=40px>
+            <img src="images/rose.svg" width=40px height="63px" alt="">
 
             <p>Copyleft 2025&ndash;2026 Hailey Garcia. All wrongs reserved.</p>
             <p>The statements and opinions on these pages are those of Hailey Garcia only, not of Louisiana State University or the LSU Board of Supervisors.</p>

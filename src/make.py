@@ -1,5 +1,7 @@
+from PIL import Image
 from pathlib import Path
 from datetime import datetime, timezone
+import rcssmin, rjsmin
 
 BASE_URL = "https://haileyjay.net"
 
@@ -7,6 +9,10 @@ tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
 src = Path("src")
 
 raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
+
+def get_size(path):
+    with Image.open(path) as im:
+        return im.size
 
 # ── Parse comics ─────────────────────────────────────────────
 comics_html, comic_template, comic_data = raw_content["comics"].split("§")
@@ -17,7 +23,8 @@ def parse_comics(data, template):
     comics = []
     for i in range(0, len(lines), 3):
         src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
-        comics.append(template.format(src=f"comics/{src_file}", alt=alt, caption=caption).strip())
+        w,h = get_size(f"comics/{src_file}.webp")
+        comics.append(template.format(src=f"comics/{src_file}.webp", alt=alt, caption=caption, w=w, h=h).strip())
     return "\n\n".join(comics)
 
 raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_template))
@@ -243,14 +250,20 @@ def parse_printlab(raw):
 raw_content["printlab"] = parse_printlab(raw_content["printlab"])
 
 # ── Assemble index.html ──────────────────────────────────────
+
+about_fix = {"about":' class="active"'}
 sections = {
-    key: f'<section id="{key}">\n{raw_content[key]}\n</section>'
+    key: f'<section id="{key}"{about_fix.get(key,"")}>\n{raw_content[key]}\n</section>'
     for key in tabs
 }
 
+
+css_raw = Path("src/main.css").read_text()
+js_raw  = Path("src/main.js").read_text()
+
 aux = {
-    "css": "<style>\n" + Path("src/main.css").read_text() + "\n</style>",
-    "js" : "<script>\n"+Path("src/main.js").read_text() + "\n</script>"
+    "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
+    "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
 }
 
 index_template = (src / "index.html").read_text()
