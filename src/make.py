@@ -1,3 +1,4 @@
+from PIL import Image
 from pathlib import Path
 from datetime import datetime, timezone
 import rcssmin, rjsmin
@@ -8,6 +9,10 @@ tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
 src = Path("src")
 
 raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
+
+def get_size(path):
+    with Image.open(path) as im:
+        return im.size
 
 # ── Parse comics ─────────────────────────────────────────────
 comics_html, comic_template, comic_data = raw_content["comics"].split("§")
