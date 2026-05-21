@@ -138,18 +138,14 @@ body {
     margin: 1rem 0;
 }
 
-.sidebar-meta, .about-meta {
+.about-meta {
     font-size: .88rem;
     line-height: 1.55;
     color: var(--muted);
     margin-bottom: 1.4rem;
 }
 
-.sidebar-meta {
-    color: var(--ink);
-}
-
-.about-meta strong {
+.sidebar-meta, .about-meta strong {
     display: block;
     color: var(--ink);
     font-weight: 500;
@@ -158,6 +154,10 @@ body {
     letter-spacing: .06em;
     margin-top: .6em;
     margin-bottom: .1em;
+}
+
+.sidebar-meta {
+    font-weight: 600;
 }
 
 .about-meta a {
@@ -429,7 +429,7 @@ footer svg {
 footer p {
     font-size: .82rem;
     color: var(--muted);
-    max-width: 65ch;
+    max-width: 100ch;
     line-height: 1.5;
     margin: 0;
 }
