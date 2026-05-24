@@ -94,6 +94,12 @@ body {
     min-height: 100vh;
 }
 
+hr {
+    border: none;
+    border-top: 1px solid var(--pink);
+    margin: 1rem 0;
+}
+
 /* ── Layout shell ───────────────────────────────────────────── */
 .page {
     display: grid;
@@ -130,12 +136,6 @@ body {
     font-size: .92rem;
     color: var(--muted);
     font-weight: 400;
-}
-
-.sidebar hr, hr.pink {
-    border: none;
-    border-top: 1px solid var(--pink);
-    margin: 1rem 0;
 }
 
 .about-meta {
@@ -322,6 +322,12 @@ a:focus {
     margin-bottom: .2em;
 }
 
+.course-rule {
+    border:none;
+    border-top:1px solid var(--rule);
+    margin:2rem 0;
+}
+
 .course-meta {
     font-size: .9rem;
     color: var(--muted);
@@ -353,27 +359,27 @@ a:focus {
     font-size: .97rem;
     line-height: 1.65;
 }
-/* ── Comics section ─────────────────────────────────────────── */
-.comics-grid {
+/* ── Galleries  ─────────────────────────────────────────── */
+.gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1.2rem;
     margin-top: .5rem;
 }
 
-.comic-card {
+.gallery-card {
     border: 1px solid var(--rule);
     padding: .6rem;
 }
 
-.comic-card img {
+.gallery-card img {
     width: 100%;
     height: auto;
     display: block;
     margin-bottom: .5rem;
 }
 
-.comic-title {
+.gallery-title {
     font-size: .88rem;
     color: var(--muted);
 }
@@ -530,8 +536,8 @@ footer a {
     }
 }
 
-/* ── Comic thumbnails (replace <a> with <button>) ───────────── */
-.comic-thumb {
+/* ──  Thumbnails (replace <a> with <button>) ───────────── */
+.thumb {
     display: block;
     width: 100%;
     background: none;
@@ -541,7 +547,7 @@ footer a {
     margin-bottom: .5rem;
 }
 
-.comic-thumb img {
+.thumb img {
     display: block;
     width: 100%;
     height: auto;
@@ -549,13 +555,13 @@ footer a {
     transition: border-color .15s;
 }
 
-.comic-thumb:hover img,
-.comic-thumb:focus img {
+.thumb:hover img,
+.thumb:focus img {
     border-color: var(--pink);
     outline: none;
 }
 
-.comic-thumb:focus {
+.thumb:focus {
     outline: none;
 }
 
