@@ -2,12 +2,11 @@
     <h1>3D Print Lab</h1>
 </div>
 
-<p style="max-width:60ch;margin-bottom:.4rem;">The LSU Math 3D Print Lab is located in 373 Lockett Hall. I manage the lab and handle print requests for members of the LSU Mathematics Department.</p>
-<p style="max-width:60ch;margin-bottom:1.6rem;">The lab currently houses {printer_count} printers. Check the status board before submitting a request.</p>
+<p style="max-width:60ch;margin-bottom:1.6rem;">The LSU Math 3D Print Lab is located in 373 Lockett Hall. I manage the lab and handle print requests for members of the LSU Mathematics Department.</p>
 
 <p style="font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600;">Quick Links</p>
 <ul style="list-style:none;padding:0;margin-bottom:2rem;font-size:.95rem;">
-    <li><a href="#lab-status">Printer Status</a></li>
+    <li><a href="#lab-status">Printers</a></li>
     <li><a href="#lab-request">How to Request a Print</a></li>
     <li><a href="#lab-gallery">Gallery</a></li>
     <li><a href="#lab-filament">Filament Inventory</a></li>
@@ -15,7 +14,7 @@
 
 <!-- Printer status -->
 <div id="lab-status">
-    <h2 class="lab-section-title">Printer Status</h2>
+    <h2 class="lab-section-title">Printers</h2>
     <div class="printer-table">
         {printers}
     </div>
@@ -34,10 +33,10 @@
 </div>
 
 <!-- Gallery -->
-<div id="lab-gallery">
+<div id="lab-gallery" style="margin-bottom:1em">
     <h2 class="lab-section-title">Gallery</h2>
     <p style="max-width:56ch;margin-bottom:1.4rem;">A selection of prints from the lab.</p>
-    <div class="comics-grid">
+    <div class="gallery-grid">
         {gallery}
     </div>
 </div>
@@ -45,7 +44,7 @@
 <!-- Filament inventory -->
 <div id="lab-filament">
     <h2 class="lab-section-title">Filament Inventory</h2>
-    <p style="max-width:60ch;margin-bottom:1.4rem;">Updated alongside the printer status board. Spool counts are approximate.</p>
+    <p style="max-width:60ch;margin-bottom:1.4rem;">Spool counts are approximate.</p>
     {filament}
 </div>
 
@@ -53,17 +52,16 @@
 
 <div class="printer-row printer-row--{status}">
     <span class="printer-name">{name}</span>
-    <span class="printer-status-badge">{status_label}</span>
     <span class="printer-note">{note}</span>
 </div>
 
 §GALLERY§
 
-<div class="comic-card">
-    <button class="comic-thumb" data-src="{src}" data-alt="{alt}" data-caption="{caption}" aria-label="View print: {caption}">
+<div class="gallery-card">
+    <button class="gallery-thumb thumb" data-src="{src}" data-alt="{alt}" data-caption="{caption}" aria-label="View print: {caption}">
         <img src="{src}" alt="{alt}">
     </button>
-    <p class="comic-title">{caption}</p>
+    <p class="gallery-title">{caption}</p>
 </div>
 
 §FILAMENT§
@@ -111,7 +109,7 @@ note:
 name: Prusa Core One+
 id: prusa-core
 status: idle
-note:
+note: Undergoing repairs
 
 ---GALLERY---
 

@@ -157,6 +157,96 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 })();
 
+// ── Gallery lightbox ─────────────────────────────────────────
+(function () {
+  const overlay = document.createElement('div');
+  overlay.className = 'lb-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Gallery viewer');
+  overlay.innerHTML = `
+    <div class="lb-dialog" tabindex="-1">
+      <span class="lb-counter" aria-live="polite"></span>
+      <button class="lb-close" aria-label="Close">&times;</button>
+      <div class="lb-img-wrap">
+        <button class="lb-prev" aria-label="Previous image">&#8592;</button>
+        <img src="" alt="">
+        <button class="lb-next" aria-label="Next image">&#8594;</button>
+      </div>
+      <p class="lb-caption"></p>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const dialog = overlay.querySelector('.lb-dialog');
+  const img = overlay.querySelector('img');
+  const caption = overlay.querySelector('.lb-caption');
+  const counter = overlay.querySelector('.lb-counter');
+  const btnClose = overlay.querySelector('.lb-close');
+  const btnPrev = overlay.querySelector('.lb-prev');
+  const btnNext = overlay.querySelector('.lb-next');
+
+  let images= [];
+  let current = 0;
+
+  function collectImages() {
+    images = Array.from(document.querySelectorAll('.gallery-thumb'));
+  }
+
+  function show(index) {
+    const btn = images[index];
+    img.src = btn.dataset.src;
+    img.alt = btn.dataset.alt;
+    caption.textContent = btn.dataset.caption;
+    counter.textContent = (index + 1) + ' / ' + images.length;
+    btnPrev.style.visibility = index === 0 ? 'hidden' : '';
+    btnNext.style.visibility = index === images.length - 1 ? 'hidden' : '';
+    current = index;
+  }
+
+  function open(index) {
+    collectImages();
+    show(index);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    dialog.focus();
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (images[current]) images[current].focus();
+  }
+
+  document.addEventListener('click', function (e) {
+    const thumb = e.target.closest('.gallery-thumb');
+    if (!thumb) return;
+    collectImages();
+    open(images.indexOf(thumb));
+  });
+
+  btnClose.addEventListener('click', close);
+  btnPrev.addEventListener('click', function () { if (current > 0) show(current - 1); });
+  btnNext.addEventListener('click', function () { if (current < comics.length - 1) show(current + 1); });
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) close();
+  });
+
+  overlay.addEventListener('keydown', function (e) {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape') { close(); return; }
+    if (e.key === 'ArrowLeft' && current > 0) { show(current - 1); return; }
+    if (e.key === 'ArrowRight' && current < comics.length - 1) { show(current + 1); return; }
+    if (e.key === 'Tab') {
+      const focusable = Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+})();
+
+
 const aboutQuotes = [
   "Try the chocolate chip cookies!", "No mitsakes -- but undo is C-/ just in case.", "Caution: Hearing protection required!", "THE SNAIL!", "How... old is that onion?", "Aaaand that's a nat 1. Sorry.", "The lesser of two weevils!", "Daemonic!", "You have to have some body positivity when you're making graphs.", "Sparkle? You're the whole tub of glitter, baby!", "Bing bong? I don't know.", "Copyleft womanhood!", "Save the pandas!", "Renee Descartes, my mortal enemy!", "Heat from fire, fire from heat!", "Shut up and let me see your jazz hands!", "Coins, evil.", "LOUD INCORRECT BUZZER.", "I'm out of spell slots.", "Jet fuel ice tea, supersonic, lightspeed!!", "Take that kerosene and put it in my coffee!", "Gear up and blast off!", "Hyneri lanla!", "The Lockett monster of Bore Pit B!", "Succumbing to the bone broth madness...", "Lay back and dive!"
 ];
