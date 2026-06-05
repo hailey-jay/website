@@ -2,6 +2,7 @@ from PIL import Image
 from pathlib import Path
 from datetime import datetime, timezone
 import rcssmin, rjsmin
+import re
 
 BASE_URL = "https://haileyjay.net"
 
@@ -87,7 +88,10 @@ raw_content["blog"] = blog_html.format(entries=entries_html, posts=posts_html)
 
 # ── Generate RSS feed ─────────────────────────────────────────
 def format_rfc2822(isodate):
-    dt = datetime.strptime(isodate, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    try:
+        dt = datetime.strptime(isodate, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    except ValueError:
+        dt = datetime.strptime(re.sub(r'(\d+)(st|nd|rd|th)', r'\1', isodate), "%B %d, %Y").replace(tzinfo=timezone.utc)
     return dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
 items_xml = ""
