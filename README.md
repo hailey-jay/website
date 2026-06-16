@@ -1,5 +1,5 @@
 # haileyjay.net
-Source for my personal website. Built with a small Python script; no dependencies.
+Source for my personal website. Built with a small Python script.
 
 ## Structure
 + `src/` — source files (HTML partials, CSS, JS)
@@ -8,4 +8,8 @@ Source for my personal website. Built with a small Python script; no dependencie
 
 ## Building
 ``` python make.py ```
-That's it. Edit files in `src/`, run the script.
+Edit files in `src/`, run the script.
+
+## TODO
++ Fix gallery lightbox script to be more easily reloaded across pages
++ Autogenerate CV pdf from HTML for single source of truth
