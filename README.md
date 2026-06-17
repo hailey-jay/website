@@ -12,4 +12,3 @@ Edit files in `src/`, run the script.
 
 ## TODO
 + Fix gallery lightbox script to be more easily reloaded across pages
-+ Autogenerate CV pdf from HTML for single source of truth
