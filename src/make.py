@@ -7,6 +7,7 @@ import re
 BASE_URL = "https://haileyjay.net"
 
 tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
+unpublished = {"printlab"}  # still built, but emitted as an empty section
 src = Path("src")
 
 raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
@@ -16,7 +17,10 @@ def get_size(path):
         return im.size
 
 # ── Parse comics ─────────────────────────────────────────────
-comics_html, comic_template, comic_data = raw_content["comics"].split("§")
+# Data lives in src/data/comics.txt: three lines per comic
+# (filename stem, alt text, caption), blank lines ignored.
+comics_html, comic_template = raw_content["comics"].split("§")
+comic_data = (src / "data/comics.txt").read_text()
 
 def parse_comics(data, template):
     lines = [l for l in data.splitlines() if l.strip()]
@@ -31,16 +35,22 @@ def parse_comics(data, template):
 raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_template))
 
 # ── Parse blog ───────────────────────────────────────────────
-blog_html, entry_template, entry_data = raw_content["blog"].split("§")
+# One file per post under src/data/blog/, named <isodate>-<slug>.html:
+# key: value meta lines, then the HTML body. Filename sort gives
+# newest-first order; an underscore prefix marks a draft (skipped).
+blog_html, entry_template = raw_content["blog"].split("§")
 
-def parse_blog(data, index_template):
-    raw_entries = [e.strip() for e in data.strip().split("---") if e.strip()]
+def load_blog_entries():
+    files = sorted((src / "data/blog").glob("*.html"), reverse=True)
+    return [f.read_text() for f in files if not f.name.startswith("_")]
+
+def parse_blog(raw_entries, index_template):
     index_items   = []
     post_sections = []
     feed_entries  = []  # list of (slug, title, isodate, teaser, body)
 
     for raw in raw_entries:
-        lines = raw.splitlines()
+        lines = raw.strip().splitlines()
 
         meta = {}
         body_start = 0
@@ -83,7 +93,7 @@ def parse_blog(data, index_template):
 
     return "\n\n".join(index_items), "\n\n".join(post_sections), feed_entries
 
-entries_html, posts_html, feed_entries = parse_blog(entry_data, entry_template)
+entries_html, posts_html, feed_entries = parse_blog(load_blog_entries(), entry_template)
 raw_content["blog"] = blog_html.format(entries=entries_html, posts=posts_html)
 
 # ── Generate RSS feed ─────────────────────────────────────────
@@ -257,7 +267,8 @@ raw_content["printlab"] = parse_printlab(raw_content["printlab"])
 
 about_fix = {"about":' class="active"'}
 sections = {
-    key: f'<section id="{key}"{about_fix.get(key,"")}>\n{raw_content[key]}\n</section>'
+    key: "" if key in unpublished
+    else f'<section id="{key}"{about_fix.get(key,"")}>\n{raw_content[key]}\n</section>'
     for key in tabs
 }
 
@@ -271,4 +282,6 @@ aux = {
 }
 
 index_template = (src / "index.html").read_text()
-Path("index.html").write_text(index_template.format(**sections, **aux))
+html = index_template.format(**sections, **aux)
+html = re.sub(r"<!--.*?-->", "", html, flags=re.S)  # comments (incl. blog drafts) stay out of prod
+Path("index.html").write_text(html)

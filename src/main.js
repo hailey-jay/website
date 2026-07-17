@@ -1,5 +1,7 @@
 // ── Section registry ─────────────────────────────────────────
-const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links'];
+// Filtered against the DOM so unpublished sections drop out cleanly.
+const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links']
+  .filter(function (s) { return document.getElementById(s); });
 
 const subAnchors = {
   '1431': 'teaching',
@@ -12,7 +14,8 @@ const subAnchors = {
 
 // ── Navigation ───────────────────────────────────────────────
 function showSection(id) {
-  const parentId = subAnchors[id] || (sections.includes(id) ? id : 'about');
+  let parentId = subAnchors[id] || id;
+  if (!sections.includes(parentId)) parentId = 'about';
   sections.forEach(function (s) {
     document.getElementById(s).classList.toggle('active', s === parentId);
   });
@@ -68,21 +71,23 @@ document.addEventListener('DOMContentLoaded', function () {
   navigate(location.hash.slice(1));
 });
 
-// ── Comic lightbox ───────────────────────────────────────────
-(function () {
+// ── Lightbox ─────────────────────────────────────────────────
+// One factory serving every thumbnail gallery. Items are collected
+// on open, so galleries added or re-rendered later still work.
+function makeLightbox(opts) {
   const overlay = document.createElement('div');
   overlay.className = 'lb-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Comic viewer');
+  overlay.setAttribute('aria-label', opts.label);
   overlay.innerHTML = `
     <div class="lb-dialog" tabindex="-1">
       <span class="lb-counter" aria-live="polite"></span>
       <button class="lb-close" aria-label="Close">&times;</button>
       <div class="lb-img-wrap">
-        <button class="lb-prev" aria-label="Previous comic">&#8592;</button>
+        <button class="lb-prev" aria-label="${opts.prevLabel}">&#8592;</button>
         <img src="" alt="">
-        <button class="lb-next" aria-label="Next comic">&#8594;</button>
+        <button class="lb-next" aria-label="${opts.nextLabel}">&#8594;</button>
       </div>
       <p class="lb-caption"></p>
     </div>`;
@@ -96,26 +101,26 @@ document.addEventListener('DOMContentLoaded', function () {
   const btnPrev = overlay.querySelector('.lb-prev');
   const btnNext = overlay.querySelector('.lb-next');
 
-  let comics = [];
+  let items = [];
   let current = 0;
 
-  function collectComics() {
-    comics = Array.from(document.querySelectorAll('.comic-thumb'));
+  function collectItems() {
+    items = Array.from(document.querySelectorAll(opts.selector));
   }
 
   function show(index) {
-    const btn = comics[index];
+    const btn = items[index];
     img.src = btn.dataset.src;
     img.alt = btn.dataset.alt;
     caption.textContent = btn.dataset.caption;
-    counter.textContent = (index + 1) + ' / ' + comics.length;
+    counter.textContent = (index + 1) + ' / ' + items.length;
     btnPrev.style.visibility = index === 0 ? 'hidden' : '';
-    btnNext.style.visibility = index === comics.length - 1 ? 'hidden' : '';
+    btnNext.style.visibility = index === items.length - 1 ? 'hidden' : '';
     current = index;
   }
 
   function open(index) {
-    collectComics();
+    collectItems();
     show(index);
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -125,19 +130,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function close() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-    if (comics[current]) comics[current].focus();
+    if (items[current]) items[current].focus();
   }
 
   document.addEventListener('click', function (e) {
-    const thumb = e.target.closest('.comic-thumb');
+    const thumb = e.target.closest(opts.selector);
     if (!thumb) return;
-    collectComics();
-    open(comics.indexOf(thumb));
+    collectItems();
+    open(items.indexOf(thumb));
   });
 
   btnClose.addEventListener('click', close);
   btnPrev.addEventListener('click', function () { if (current > 0) show(current - 1); });
-  btnNext.addEventListener('click', function () { if (current < comics.length - 1) show(current + 1); });
+  btnNext.addEventListener('click', function () { if (current < items.length - 1) show(current + 1); });
 
   overlay.addEventListener('click', function (e) {
     if (e.target === overlay) close();
@@ -147,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!overlay.classList.contains('open')) return;
     if (e.key === 'Escape') { close(); return; }
     if (e.key === 'ArrowLeft' && current > 0) { show(current - 1); return; }
-    if (e.key === 'ArrowRight' && current < comics.length - 1) { show(current + 1); return; }
+    if (e.key === 'ArrowRight' && current < items.length - 1) { show(current + 1); return; }
     if (e.key === 'Tab') {
       const focusable = Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));
       const first = focusable[0], last = focusable[focusable.length - 1];
@@ -155,96 +160,21 @@ document.addEventListener('DOMContentLoaded', function () {
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
   });
-})();
+}
 
-// ── Gallery lightbox ─────────────────────────────────────────
-(function () {
-  const overlay = document.createElement('div');
-  overlay.className = 'lb-overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Gallery viewer');
-  overlay.innerHTML = `
-    <div class="lb-dialog" tabindex="-1">
-      <span class="lb-counter" aria-live="polite"></span>
-      <button class="lb-close" aria-label="Close">&times;</button>
-      <div class="lb-img-wrap">
-        <button class="lb-prev" aria-label="Previous image">&#8592;</button>
-        <img src="" alt="">
-        <button class="lb-next" aria-label="Next image">&#8594;</button>
-      </div>
-      <p class="lb-caption"></p>
-    </div>`;
-  document.body.appendChild(overlay);
+makeLightbox({
+  selector: '.comic-thumb',
+  label: 'Comic viewer',
+  prevLabel: 'Previous comic',
+  nextLabel: 'Next comic'
+});
 
-  const dialog = overlay.querySelector('.lb-dialog');
-  const img = overlay.querySelector('img');
-  const caption = overlay.querySelector('.lb-caption');
-  const counter = overlay.querySelector('.lb-counter');
-  const btnClose = overlay.querySelector('.lb-close');
-  const btnPrev = overlay.querySelector('.lb-prev');
-  const btnNext = overlay.querySelector('.lb-next');
-
-  let images= [];
-  let current = 0;
-
-  function collectImages() {
-    images = Array.from(document.querySelectorAll('.gallery-thumb'));
-  }
-
-  function show(index) {
-    const btn = images[index];
-    img.src = btn.dataset.src;
-    img.alt = btn.dataset.alt;
-    caption.textContent = btn.dataset.caption;
-    counter.textContent = (index + 1) + ' / ' + images.length;
-    btnPrev.style.visibility = index === 0 ? 'hidden' : '';
-    btnNext.style.visibility = index === images.length - 1 ? 'hidden' : '';
-    current = index;
-  }
-
-  function open(index) {
-    collectImages();
-    show(index);
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    dialog.focus();
-  }
-
-  function close() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-    if (images[current]) images[current].focus();
-  }
-
-  document.addEventListener('click', function (e) {
-    const thumb = e.target.closest('.gallery-thumb');
-    if (!thumb) return;
-    collectImages();
-    open(images.indexOf(thumb));
-  });
-
-  btnClose.addEventListener('click', close);
-  btnPrev.addEventListener('click', function () { if (current > 0) show(current - 1); });
-  btnNext.addEventListener('click', function () { if (current < comics.length - 1) show(current + 1); });
-
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) close();
-  });
-
-  overlay.addEventListener('keydown', function (e) {
-    if (!overlay.classList.contains('open')) return;
-    if (e.key === 'Escape') { close(); return; }
-    if (e.key === 'ArrowLeft' && current > 0) { show(current - 1); return; }
-    if (e.key === 'ArrowRight' && current < comics.length - 1) { show(current + 1); return; }
-    if (e.key === 'Tab') {
-      const focusable = Array.from(dialog.querySelectorAll('button:not([style*="visibility: hidden"])'));
-      const first = focusable[0], last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
-})();
+makeLightbox({
+  selector: '.gallery-thumb',
+  label: 'Gallery viewer',
+  prevLabel: 'Previous image',
+  nextLabel: 'Next image'
+});
 
 
 const aboutQuotes = [
