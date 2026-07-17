@@ -15,8 +15,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-PINK = "#f8a7b6"
-PAPER = "#f9f6f1"
+VARIANTS = {
+    "": dict(pink="#f8a7b6", paper="#f9f6f1"),
+    "-dark": dict(pink="#f2a3b5", paper="#171421"),
+}
 SIZE_PX = 360
 FRAMES = 130
 FPS = 12
@@ -164,7 +166,7 @@ def _rotation_matrix(axis, angle_deg):
     return np.eye(3) + np.sin(theta) * k + (1 - np.cos(theta)) * (k @ k)
 
 
-def render_mp4(name, segments_fn, zoom=1.2, frames=FRAMES):
+def render_mp4(name, segments_fn, zoom=1.2, frames=FRAMES, suffix="", pink=None, paper=None):
     """Rotate the geometry (not the camera) around two fixed axes 45
     degrees apart, then render with a fixed camera. See AXIS_A/AXIS_B
     above for why this replaced sweeping elev/azim/roll directly."""
@@ -180,22 +182,22 @@ def render_mp4(name, segments_fn, zoom=1.2, frames=FRAMES):
             r = r_a @ r_b
             fig = plt.figure(figsize=(SIZE_PX / 100, SIZE_PX / 100), dpi=100)
             ax = fig.add_axes([0, 0, 1, 1], projection="3d")
-            fig.patch.set_facecolor(PAPER)
-            ax.set_facecolor(PAPER)
+            fig.patch.set_facecolor(paper)
+            ax.set_facecolor(paper)
             for seg in segments:
                 seg_rot = seg @ r.T
                 ax.plot(seg_rot[:, 0], seg_rot[:, 1], seg_rot[:, 2],
-                        color=PINK, linewidth=0.9, alpha=0.9, solid_capstyle="round")
+                        color=pink, linewidth=0.9, alpha=0.9, solid_capstyle="round")
             ax.set_xlim(-zoom, zoom)
             ax.set_ylim(-zoom, zoom)
             ax.set_zlim(-zoom, zoom)
             ax.set_box_aspect((1, 1, 1))
             ax.view_init(elev=CAM_ELEV, azim=CAM_AZIM)
             ax.set_axis_off()
-            fig.savefig(tmp / f"f{i:04d}.png", facecolor=PAPER)
+            fig.savefig(tmp / f"f{i:04d}.png", facecolor=paper)
             plt.close(fig)
 
-        path = OUT_DIR / f"{name}.mp4"
+        path = OUT_DIR / f"{name}{suffix}.mp4"
         subprocess.run([
             "ffmpeg", "-y", "-framerate", str(FPS),
             "-i", str(tmp / "f%04d.png"),
@@ -211,4 +213,5 @@ if __name__ == "__main__":
     names = sys.argv[1:] or list(SHAPES.keys())
     for name in names:
         fn, kwargs = SHAPES[name]
-        render_mp4(name, fn, **kwargs)
+        for suffix, colors in VARIANTS.items():
+            render_mp4(name, fn, suffix=suffix, **colors, **kwargs)

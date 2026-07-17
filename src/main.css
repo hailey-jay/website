@@ -56,12 +56,56 @@
 
 :root {
     --pink: #f8a7b6;
+    --pink-rgb: 248, 167, 182;
+    --pink-strong: #c0607a;
     --ink: #2c2520;
     --muted: #6b5f58;
+    --muted-rgb: 107, 95, 88;
     --paper: #f9f6f1;
     --rule: #e8e0d8;
+    --green: #4a7a5a;
+    --green-rgb: 120, 180, 140;
+    --gold: #8a6e20;
+    --gold-rgb: 200, 168, 80;
+    --status-printing: #b05068;
     --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
     --lh: 1.7;
+    --body-weight: 400;
+}
+
+/* Dark palette. Applied when the user's OS prefers dark (and they haven't
+   explicitly chosen a theme), or when they toggle dark on. The toggle
+   sets data-theme on <html>; see main.js. */
+:root[data-theme="dark"] {
+    --pink: #f2a3b5;
+    --pink-rgb: 242, 163, 181;
+    --pink-strong: #ff96ae;
+    --ink: #f7f2ea;
+    --muted: #a9a0b4;
+    --muted-rgb: 169, 160, 180;
+    --paper: #171421;
+    --rule: #3a332b;
+    --green: #7fc79a;
+    --gold: #d9b64a;
+    --status-printing: #ff9db2;
+    --body-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --pink: #f2a3b5;
+        --pink-rgb: 242, 163, 181;
+        --pink-strong: #ff96ae;
+        --ink: #f7f2ea;
+        --muted: #a9a0b4;
+        --muted-rgb: 169, 160, 180;
+        --paper: #171421;
+        --rule: #3a332b;
+        --green: #7fc79a;
+        --gold: #d9b64a;
+        --status-printing: #ff9db2;
+        --body-weight: 500;
+    }
 }
 
 /* ── Skip link ──────────────────────────────────────────────── */
@@ -92,6 +136,7 @@ html {
 body {
     font-family: var(--serif);
     font-size: 1.1rem;
+    font-weight: var(--body-weight);
     line-height: var(--lh);
     color: var(--ink);
     background: var(--paper);
@@ -169,6 +214,42 @@ hr {
 
 .mobile-menu-btn.open span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Theme toggle: a sliding switch, lower-right ─────────────── */
+.theme-toggle {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 150;
+    width: 52px;
+    height: 28px;
+    padding: 3px;
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    cursor: pointer;
+    background: var(--paper);
+    box-shadow: 0 2px 8px rgba(44, 37, 32, .15);
+    transition: background .2s, border-color .2s;
+}
+
+.theme-toggle .knob {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--pink);
+    color: var(--ink);
+    font-size: .78rem;
+    line-height: 1;
+    transition: transform .2s;
+    transform: translateX(0);
+}
+
+.theme-toggle.is-dark .knob {
+    transform: translateX(22px);
 }
 
 .sidebar-backdrop {
@@ -305,7 +386,7 @@ a {
 
 a:hover,
 a:focus {
-    color: #c0607a;
+    color: var(--pink-strong);
     outline: none;
 }
 
@@ -314,7 +395,7 @@ a:focus {
     margin: 1.8rem 0 1.4rem;
     padding: .9rem 1.1rem;
     border-left: 3px solid var(--pink);
-    background: rgba(248, 167, 182, .07);
+    background: rgba(var(--pink-rgb), .07);
     font-size: .96rem;
     max-width: 58ch;
 }
@@ -685,7 +766,7 @@ footer a {
     width: auto;
     height: auto;
     object-fit: contain;
-    border: 1px solid rgba(248, 167, 182, .25);
+    border: 1px solid rgba(var(--pink-rgb), .25);
 }
 
 .lb-caption {
@@ -794,7 +875,7 @@ footer a {
 
 .blog-entry-link:hover .blog-entry-title,
 .blog-entry-link:focus .blog-entry-title {
-    color: #c0607a;
+    color: var(--pink-strong);
 }
 
 .blog-entry-link:focus {
@@ -848,7 +929,7 @@ footer a {
 
 .blog-back:hover,
 .blog-back:focus {
-    color: #c0607a;
+    color: var(--pink-strong);
     text-decoration-color: var(--pink);
     outline: none;
 }
@@ -935,23 +1016,23 @@ footer a {
 }
 
 .printer-row--idle .printer-status-badge {
-    background: rgba(120, 180, 140, .15);
-    color: #4a7a5a;
+    background: rgba(var(--green-rgb), .15);
+    color: var(--green);
 }
 
 .printer-row--printing .printer-status-badge {
-    background: rgba(248, 167, 182, .18);
-    color: #b05068;
+    background: rgba(var(--pink-rgb), .18);
+    color: var(--status-printing);
 }
 
 .printer-row--offline .printer-status-badge {
-    background: rgba(107, 95, 88, .1);
+    background: rgba(var(--muted-rgb), .1);
     color: var(--muted);
 }
 
 .printer-row--maintenance .printer-status-badge {
-    background: rgba(200, 168, 80, .15);
-    color: #8a6e20;
+    background: rgba(var(--gold-rgb), .15);
+    color: var(--gold);
 }
 
 .printer-note {
@@ -1014,7 +1095,7 @@ footer a {
     width: .9em;
     height: .9em;
     border-radius: 2px;
-    border: 1px solid rgba(44, 37, 32, .15);
+    border: 1px solid var(--rule);
     margin-right: .4em;
     vertical-align: middle;
     position: relative;

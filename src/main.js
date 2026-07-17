@@ -1,3 +1,59 @@
+// ── Light/dark toggle ────────────────────────────────────────
+// Defaults to the OS preference; an explicit choice is stored in
+// localStorage and set as data-theme on <html> (see main.css).
+(function () {
+  const KEY = 'haileyjay-theme';
+  const root = document.documentElement;
+
+  function systemDark() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function effective() {
+    const s = root.getAttribute('data-theme');
+    return s ? s : (systemDark() ? 'dark' : 'light');
+  }
+
+  const changeListeners = [];
+  window.haileyjayTheme = {
+    effective: effective,
+    onChange: function (cb) { changeListeners.push(cb); }
+  };
+
+  function notifyChange() {
+    changeListeners.forEach(function (cb) { cb(effective()); });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (!root.getAttribute('data-theme')) { updateBtn(); notifyChange(); }
+    });
+  }
+
+  function updateBtn() {
+    const btn = document.querySelector('.theme-toggle');
+    if (!btn) return;
+    const dark = effective() === 'dark';
+    const knob = btn.querySelector('.knob');
+    if (knob) knob.textContent = dark ? '☀' : '☾';
+    btn.classList.toggle('is-dark', dark);
+    btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    updateBtn();
+    const btn = document.querySelector('.theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      const next = effective() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      updateBtn();
+      notifyChange();
+    });
+  });
+})();
+
 // ── Mobile sidebar drawer ────────────────────────────────────
 (function () {
   const sidebar = document.getElementById('sidebar');
@@ -247,7 +303,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const video = document.getElementById('wireframe-video');
   if (!video) return;
   const pick = wireframeShapes[Math.floor(Math.random() * wireframeShapes.length)];
-  video.src = 'images/wireframes/' + pick + '.mp4';
+
+  function setVariant(theme) {
+    const suffix = theme === 'dark' ? '-dark' : '';
+    const time = video.currentTime;
+    video.src = 'images/wireframes/' + pick + suffix + '.mp4';
+    video.currentTime = time;
+  }
+
+  setVariant(window.haileyjayTheme ? window.haileyjayTheme.effective() : 'light');
+  if (window.haileyjayTheme) window.haileyjayTheme.onChange(setVariant);
 });
 
 // ── Blog image carousel (about page) ────────────────────────
