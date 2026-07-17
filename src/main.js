@@ -1,3 +1,41 @@
+// ── Mobile sidebar drawer ────────────────────────────────────
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const btn = document.getElementById('mobile-menu-btn');
+  if (!sidebar || !backdrop || !btn) return;
+
+  function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    backdrop.classList.add('active');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    backdrop.classList.remove('active');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', function () {
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+  });
+
+  backdrop.addEventListener('click', closeSidebar);
+
+  sidebar.addEventListener('click', function (e) {
+    if (e.target.closest('a')) closeSidebar();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSidebar();
+  });
+})();
+
 // ── Section registry ─────────────────────────────────────────
 // Filtered against the DOM so unpublished sections drop out cleanly.
 const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links']
@@ -21,11 +59,17 @@ function showSection(id) {
   });
 }
 
-function navigate(hash) {
+function navigate(hash, push) {
   var bare = !hash;
   if (!hash) hash = 'about';
   showSection(hash);
-  if (!bare) history.replaceState(null, '', '#' + hash);
+  if (!bare) {
+    if (push && location.hash.slice(1) !== hash) {
+      history.pushState(null, '', '#' + hash);
+    } else {
+      history.replaceState(null, '', '#' + hash);
+    }
+  }
 
   if (subAnchors[hash] === 'blog') {
     document.getElementById('blog-index').style.display = 'none';
@@ -55,7 +99,11 @@ document.addEventListener('click', function (e) {
   const hash = url.hash.slice(1);
   if (!hash) return;
   e.preventDefault();
-  navigate(hash);
+  navigate(hash, true);
+});
+
+window.addEventListener('popstate', function () {
+  navigate(location.hash.slice(1));
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -104,8 +152,11 @@ function makeLightbox(opts) {
   let items = [];
   let current = 0;
 
-  function collectItems() {
-    items = Array.from(document.querySelectorAll(opts.selector));
+  function collectItems(fromEl) {
+    // Scoped to the nearest gallery so unrelated posts/sections
+    // don't leak into the same prev/next sequence.
+    const scope = (fromEl && fromEl.closest('.gallery-grid')) || document;
+    items = Array.from(scope.querySelectorAll(opts.selector));
   }
 
   function show(index) {
@@ -120,7 +171,6 @@ function makeLightbox(opts) {
   }
 
   function open(index) {
-    collectItems();
     show(index);
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -136,7 +186,7 @@ function makeLightbox(opts) {
   document.addEventListener('click', function (e) {
     const thumb = e.target.closest(opts.selector);
     if (!thumb) return;
-    collectItems();
+    collectItems(thumb);
     open(items.indexOf(thumb));
   });
 
@@ -185,3 +235,87 @@ document.addEventListener('DOMContentLoaded', function () {
   const el = document.getElementById('about-splash');
   if (el) el.textContent = aboutQuotes[Math.floor(Math.random() * aboutQuotes.length)];
 });
+
+// ── Sidebar wireframe animation ─────────────────────────────
+// Shape list mirrors SHAPES in scripts/gen_wireframes.py.
+const wireframeShapes = [
+  'tetrahedron', 'cube', 'octahedron', 'dodecahedron', 'icosahedron',
+  'sphere', 'torus', 'mobius', 'klein_bottle'
+];
+
+document.addEventListener('DOMContentLoaded', function () {
+  const video = document.getElementById('wireframe-video');
+  if (!video) return;
+  const pick = wireframeShapes[Math.floor(Math.random() * wireframeShapes.length)];
+  video.src = 'images/wireframes/' + pick + '.mp4';
+});
+
+// ── Blog image carousel (about page) ────────────────────────
+// Image list is baked in at build time; the shuffle and pick
+// happen client-side so the selection varies per visit.
+document.addEventListener('DOMContentLoaded', function () {
+  const dataEl = document.getElementById('blog-carousel-data');
+  const container = document.getElementById('blog-carousel');
+  if (!dataEl || !container) return;
+
+  const images = JSON.parse(dataEl.textContent);
+  for (let i = images.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [images[i], images[j]] = [images[j], images[i]];
+  }
+
+  const picks = images.slice(0, 10);
+  // Render the picks twice back-to-back so the auto-scroll can wrap
+  // from the end of the first copy to the start of the second one
+  // without a visible jump.
+  const frag = document.createDocumentFragment();
+  picks.concat(picks).forEach(function (entry) {
+    const a = document.createElement('a');
+    a.className = 'blog-carousel-item';
+    a.href = '#blog-' + entry.slug;
+
+    const img = document.createElement('img');
+    img.src = entry.src;
+    img.alt = entry.alt;
+    a.appendChild(img);
+
+    const caption = document.createElement('span');
+    caption.className = 'blog-carousel-caption';
+    caption.textContent = entry.title;
+    a.appendChild(caption);
+
+    frag.appendChild(a);
+  });
+  container.appendChild(frag);
+
+  if (picks.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    autoScroll(container);
+  }
+});
+
+function autoScroll(container) {
+  const speed = .35; // px per frame
+  let paused = false;
+  // scrollLeft rounds to an integer pixel on read, so accumulating
+  // sub-pixel steps directly on it stalls at 0. Track the true
+  // offset separately and only push the rounded value to the DOM.
+  let offset = container.scrollLeft;
+
+  container.addEventListener('mouseenter', function () { paused = true; });
+  container.addEventListener('mouseleave', function () { paused = false; });
+  container.addEventListener('touchstart', function () { paused = true; }, { passive: true });
+  container.addEventListener('touchend', function () { paused = false; });
+  container.addEventListener('focusin', function () { paused = true; });
+  container.addEventListener('focusout', function () { paused = false; });
+
+  function step() {
+    if (!paused) {
+      const half = container.scrollWidth / 2;
+      offset += speed;
+      if (offset >= half) offset -= half;
+      container.scrollLeft = offset;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}

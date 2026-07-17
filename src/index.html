@@ -17,10 +17,15 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
     <div class="page">
 
         <!--    Sidebar    -->
-        <aside class="sidebar" aria-label="Site information and navigation">
+        <aside class="sidebar" id="sidebar" aria-label="Site information and navigation">
             <p class="sidebar-name">Hailey Jay Garcia</p>
             <hr>
             <nav aria-label="Navigation">
@@ -30,9 +35,8 @@
                     <li><a href="#teaching">Teaching</a></li>
                     <li><a href="#comics">Comics</a></li>
                     <li><a href="#blog">Blog</a></li>
-                    <li class="phone-only"><a href="#links">Relevant Links</a></li>
                 </ul>
-                <div class="desktop-only" aria-label="Other Links">
+                <div aria-label="Other Links">
                     <hr>
                     <span class="sidebar-meta">LSU</span>
                     <ul class="sidenav">
@@ -50,6 +54,10 @@
                                 </svg>
                                 Blog RSS</a></li>
                     </ul>
+                    <hr>
+                    <div class="wireframe-slot" aria-hidden="true">
+                        <video id="wireframe-video" autoplay muted loop playsinline></video>
+                    </div>
                 </div>
             </nav>
         </aside>

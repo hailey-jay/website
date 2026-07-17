@@ -3,11 +3,12 @@ from pathlib import Path
 from datetime import datetime, timezone
 import rcssmin, rjsmin
 import re
+import json
 
 BASE_URL = "https://haileyjay.net"
 
 tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
-unpublished = {"printlab"}  # still built, but emitted as an empty section
+unpublished = {"printlab", "links"}  # still built, but emitted as an empty section
 src = Path("src")
 
 raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
@@ -74,8 +75,11 @@ def parse_blog(raw_entries, index_template):
         title   = meta["title"]
         teaser  = meta["teaser"]
 
+        img_match = re.search(r'<img[^>]+src="([^"]+)"', body)
+        thumb = f'<img class="blog-entry-thumb" src="{img_match.group(1)}" alt="">' if img_match else ""
+
         index_items.append(
-            index_template.format(slug=slug, date=date, title=title, teaser=teaser).strip()
+            index_template.format(slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
         )
 
         post_sections.append(f'''<div class="blog-post" id="blog-{slug}" data-blog-entry="true">
@@ -95,6 +99,14 @@ def parse_blog(raw_entries, index_template):
 
 entries_html, posts_html, feed_entries = parse_blog(load_blog_entries(), entry_template)
 raw_content["blog"] = blog_html.format(entries=entries_html, posts=posts_html)
+
+# ── Collect blog images for the homepage carousel ──────────────
+blog_images = []
+for slug, title, isodate, teaser, body in feed_entries:
+    for img_src, alt in re.findall(r'<img[^>]+src="([^"]+)"[^>]*alt="([^"]*)"', body):
+        blog_images.append({"src": img_src, "alt": alt, "slug": slug, "title": title})
+
+raw_content["about"] = raw_content["about"].format(blog_images_json=json.dumps(blog_images))
 
 # ── Generate RSS feed ─────────────────────────────────────────
 def format_rfc2822(isodate):

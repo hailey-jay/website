@@ -85,6 +85,10 @@ html {
     scroll-behavior: smooth;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: var(--serif);
     font-size: 1.1rem;
@@ -92,6 +96,11 @@ body {
     color: var(--ink);
     background: var(--paper);
     min-height: 100vh;
+    overflow-wrap: anywhere;
+}
+
+img, video, table {
+    max-width: 100%;
 }
 
 hr {
@@ -103,7 +112,7 @@ hr {
 /* ── Layout shell ───────────────────────────────────────────── */
 .page {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
     grid-template-rows: auto 1fr auto;
     max-width: 900px;
     margin: 0 auto;
@@ -115,9 +124,63 @@ hr {
 .sidebar {
     grid-column: 1;
     grid-row: 1 / 3;
+    min-width: 0;
     padding: 2.5rem 0 2rem;
     border-right: 1px solid var(--rule);
     padding-right: 2rem;
+}
+
+/* ── Mobile menu button (hidden on desktop) ────────────────── */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: .85rem;
+    right: 1rem;
+    z-index: 210;
+    width: 46px;
+    height: 46px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(44, 37, 32, .15);
+}
+
+.mobile-menu-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: transform .2s, opacity .2s;
+}
+
+.mobile-menu-btn.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-btn.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(44, 37, 32, .4);
+}
+
+.sidebar-backdrop.active {
+    display: block;
 }
 
 .sidebar-name, .about-name {
@@ -198,6 +261,7 @@ hr {
 main {
     grid-column: 2;
     grid-row: 1;
+    min-width: 0;
     padding: 2.5rem 0 3rem;
 }
 
@@ -264,6 +328,56 @@ a:focus {
     font-weight: 500;
 }
 
+/* ── Blog carousel (about page) ────────────────────────────── */
+.blog-carousel-wrap {
+    margin: 1.8rem 0 1.4rem;
+    max-width: 74ch;
+}
+
+.blog-carousel-label {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: .5em;
+    font-weight: 500;
+}
+
+.blog-carousel {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: .4rem;
+}
+
+.blog-carousel-item {
+    flex: 0 0 auto;
+    width: 220px;
+    text-decoration: none;
+    color: var(--ink);
+}
+
+.blog-carousel-item img {
+    width: 220px;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--rule);
+}
+
+.blog-carousel-item:hover img,
+.blog-carousel-item:focus img {
+    border-color: var(--pink);
+}
+
+.blog-carousel-caption {
+    display: block;
+    font-size: .78rem;
+    color: var(--muted);
+    margin-top: .3rem;
+    font-style: italic;
+}
+
 /* ── CV section ─────────────────────────────────────────────── */
 .cv-block {
     margin-bottom: 2rem;
@@ -282,7 +396,7 @@ a:focus {
 
 .cv-entry {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: .1rem 1rem;
     margin-bottom: .8rem;
     font-size: .97rem;
@@ -459,42 +573,47 @@ footer a {
 
 /* ── Responsive ─────────────────────────────────────────────── */
 
-.phone-only {
-    display: none;
-}
-
 @media (max-width: 640px) {
-    .phone-only {
-        display: block;
-    }
-
-    .desktop-only {
-        display: none;
-    }
-
     .page {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto;
         padding: 0 1rem;
     }
 
+    .mobile-menu-btn {
+        display: flex;
+    }
+
     .sidebar {
-        grid-column: 1;
-        grid-row: 1;
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-        padding-right: 0;
-        padding-bottom: 1.4rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        max-width: 80vw;
+        z-index: 205;
+        background: var(--paper);
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        border-right: 1px solid var(--rule);
+        border-bottom: none;
+        padding: 4rem 1.5rem 2rem;
+        box-shadow: 2px 0 12px rgba(44, 37, 32, .15);
+    }
+
+    .sidebar.mobile-open {
+        transform: none;
     }
 
     main {
         grid-column: 1;
-        grid-row: 2;
+        grid-row: 1;
     }
 
     footer {
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 2;
     }
 }
 
@@ -654,13 +773,23 @@ footer a {
 
 .blog-entry-link {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
     column-gap: 1.2rem;
     row-gap: .1rem;
     padding: .75rem 0;
     text-decoration: none;
     color: var(--ink);
+    align-items: center;
+}
+
+.blog-entry-thumb {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border: 1px solid var(--rule);
 }
 
 .blog-entry-link:hover .blog-entry-title,
@@ -673,7 +802,7 @@ footer a {
 }
 
 .blog-entry-title {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
     font-size: 1rem;
     font-weight: 500;
@@ -684,7 +813,7 @@ footer a {
 }
 
 .blog-entry-date {
-    grid-column: 2;
+    grid-column: 3;
     grid-row: 1;
     font-style: italic;
     font-size: .88rem;
@@ -694,7 +823,7 @@ footer a {
 }
 
 .blog-entry-teaser {
-    grid-column: 1 / 3;
+    grid-column: 2 / 4;
     grid-row: 2;
     font-size: .92rem;
     color: var(--muted);
@@ -779,7 +908,7 @@ footer a {
 
 .printer-row {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: baseline;
     gap: .2rem 1rem;
     padding: .55rem 0;
@@ -919,4 +1048,10 @@ footer a {
     flex-shrink: 0;
     position: relative;
     top: -.05em;
+}
+
+.wireframe-slot video {
+    display: block;
+    width: 100%;
+    height: auto;
 }
