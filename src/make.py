@@ -204,6 +204,44 @@ def rows_of(text):
     """Yield the non-blank lines of a block of pipe rows."""
     return [line for line in text.splitlines() if line.strip()]
 
+def group_rows(text, label):
+    """Group pipe rows under bare heading lines.
+
+    A line with no `|` opens a group and every row after it belongs to
+    that group, which is how the filament table gets its diameters and
+    the links list its categories."""
+    groups  = []
+    current = None
+    for line in rows_of(text):
+        line = line.strip()
+        if "|" not in line:
+            current = (line, [])
+            groups.append(current)
+        else:
+            assert current, f"{label}: row before any heading: {line!r}"
+            current[1].append(line)
+    return groups
+
+def indent(text, pad):
+    """Indent every line of `text` after the first by `pad`.
+
+    Templates place their own first line, so only the continuations
+    need padding to line up under it."""
+    return text.replace("\n", "\n" + pad)
+
+def paragraphs(text, template="<p>{body}</p>"):
+    """Wrap blank-line-separated prose in `template`.
+
+    Lets a data file hold body copy without the <p> boilerplate, while
+    still allowing inline markup (a link, an <em>) inside a paragraph.
+    Lines within one paragraph are joined, so prose can be wrapped to a
+    comfortable width in the source."""
+    blocks = [b.strip() for b in re.split(r"\n[ \t]*\n", text) if b.strip()]
+    return "\n\n".join(
+        render(template, body=" ".join(line.strip() for line in b.splitlines()))
+        for b in blocks
+    )
+
 def parse_row(row):
     """Split an `image | caption | alt` row.
 
@@ -445,6 +483,28 @@ for post in posts:
     for image in post.images:
         blog_images.append({**image, "slug": post.slug, "title": post.title})
 
+# ── Parse about ──────────────────────────────────────────────
+# Everything the page says lives in src/data/about.txt: the identity
+# fields, the labelled meta pairs, the bio prose, and the Lately note.
+# The partial is left holding only the shape.
+def parse_about(raw):
+    parts    = split_sections(raw)
+    data     = split_data((src / "data/about.txt").read_text(encoding="utf-8"))
+    identity = parse_kv(data[""], "about",
+                        ("name", "pronouns", "splash", "photo_alt", "photo_caption"))
+
+    meta = repeat(parts["META_ROW"], [
+        {"label": label, "value": value}
+        for label, value in (parse_fields(row, 2) for row in rows_of(data["META"]))
+    ], sep="\n")
+
+    return render(parts[""], **identity,
+        meta   = indent(meta, "    "),
+        bio    = paragraphs(data["BIO"]),
+        lately = data["LATELY"],
+    )
+
+raw_content["about"] = parse_about(raw_content["about"])
 raw_content["about"] = render(raw_content["about"], blog_images_json=json.dumps(blog_images))
 
 # ── Generate RSS feed ─────────────────────────────────────────
