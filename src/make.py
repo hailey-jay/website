@@ -403,16 +403,16 @@ def parse_printlab(raw):
         filament      = "\n\n".join(filament_groups),
     )
 
-raw_content["printlab"] = parse_printlab(raw_content["printlab"])
+if "printlab" not in unpublished:
+    raw_content["printlab"] = parse_printlab(raw_content["printlab"])
 
 # ── Assemble index.html ──────────────────────────────────────
 
-about_fix = {"about":' class="active"'}
-sections = {
-    key: "" if key in unpublished
-    else f'<section id="{key}"{about_fix.get(key,"")}>\n{raw_content[key]}\n</section>'
-    for key in tabs
-}
+def wrap_section(key):
+    active = ' class="active"' if key == "about" else ""
+    return f'<section id="{key}"{active}>\n{raw_content[key]}\n</section>'
+
+sections = {key: "" if key in unpublished else wrap_section(key) for key in tabs}
 
 
 css_raw = (src / "main.css").read_text()
