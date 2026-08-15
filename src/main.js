@@ -209,9 +209,11 @@ function makeLightbox(opts) {
   let current = 0;
 
   function collectItems(fromEl) {
-    // Scoped to the nearest gallery so unrelated posts/sections
-    // don't leak into the same prev/next sequence.
-    const scope = (fromEl && fromEl.closest('.gallery-grid')) || document;
+    // Scoped to the containing post so a post's grid and its inline
+    // [image ...] figures share one prev/next sequence, while other
+    // posts/sections stay out of it. Comics have no post wrapper and
+    // fall back to their grid.
+    const scope = (fromEl && (fromEl.closest('.blog-post') || fromEl.closest('.gallery-grid'))) || document;
     items = Array.from(scope.querySelectorAll(opts.selector));
   }
 

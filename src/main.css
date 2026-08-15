@@ -560,6 +560,26 @@ a:focus {
     color: var(--muted);
 }
 
+/* A single image set inline in a post, via [image ...] */
+.blog-figure {
+    margin: 1.6rem auto;
+    max-width: 420px;
+}
+
+.blog-figure figcaption {
+    font-size: .82rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.45;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .blog-figure {
+        max-width: 100%;
+    }
+}
+
 /* ── Links section ──────────────────────────────────────────── */
 .links-group {
     margin-bottom: 1.8rem;

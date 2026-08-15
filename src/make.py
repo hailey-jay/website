@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import rcssmin, rjsmin
 import re
 import json
+from html import escape
 
 BASE_URL = "https://haileyjay.net"
 
@@ -30,7 +31,7 @@ def parse_comics(data, template):
     for i in range(0, len(lines), 3):
         src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
         w,h = get_size(f"comics/{src_file}.webp")
-        comics.append(template.format(src=f"comics/{src_file}.webp", alt=alt, caption=caption, w=w, h=h).strip())
+        comics.append(template.format(src=f"comics/{src_file}.webp", alt=escape(alt), caption=escape(caption), w=w, h=h).strip())
     return "\n\n".join(comics)
 
 raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_template))
@@ -39,7 +40,42 @@ raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_t
 # One file per post under src/data/blog/, named <isodate>-<slug>.html:
 # key: value meta lines, then the HTML body. Filename sort gives
 # newest-first order; an underscore prefix marks a draft (skipped).
-blog_html, entry_template = raw_content["blog"].split("§")
+blog_html, entry_template, grid_template, card_template, figure_template = raw_content["blog"].split("§")
+
+# A post body may contain image directives instead of hand-written markup:
+#
+#   [gallery]
+#   hilles | Hilles Hall
+#   path   | The gravel path | alt text, if it should differ from the caption
+#   [/gallery]
+#
+#   [image mordor | A passthrough between buildings]
+#
+# Both take `image | caption | alt` rows. A bare stem resolves to
+# images/blog/<slug>/<stem>.webp; a value with a slash is used as-is
+# (and a missing extension defaults to .webp).
+GALLERY_RE = re.compile(r"^[ \t]*\[gallery\][ \t]*\n(.*?)^[ \t]*\[/gallery\][ \t]*$", re.M | re.S)
+IMAGE_RE   = re.compile(r"^[ \t]*\[image[ \t]+(.+?)\][ \t]*$", re.M)
+
+def build_image(row, slug, template):
+    fields  = [f.strip() for f in row.split("|")]
+    img     = fields[0]
+    caption = fields[1] if len(fields) > 1 else ""
+    alt     = fields[2] if len(fields) > 2 else caption
+    if "/" not in img:
+        img = f"images/blog/{slug}/{img}"
+    if "." not in img.rsplit("/", 1)[-1]:
+        img += ".webp"
+    assert Path(img).exists(), f"Image {img} (post: {slug}) does not exist"
+    return template.format(
+        src     = img,
+        alt     = escape(alt),
+        caption = escape(caption),
+    ).strip()
+
+def build_gallery(rows, slug):
+    cards = [build_image(line, slug, card_template) for line in rows.splitlines() if line.strip()]
+    return grid_template.format(cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
 def load_blog_entries():
     files = sorted((src / "data/blog").glob("*.html"), reverse=True)
@@ -74,6 +110,9 @@ def parse_blog(raw_entries, index_template):
         isodate = meta["isodate"]
         title   = meta["title"]
         teaser  = meta["teaser"]
+
+        body = GALLERY_RE.sub(lambda m: build_gallery(m.group(1), slug), body)
+        body = IMAGE_RE.sub(lambda m: build_image(m.group(1), slug, figure_template), body)
 
         img_match = re.search(r'<img[^>]+src="([^"]+)"', body)
         thumb = f'<img class="blog-entry-thumb" src="{img_match.group(1)}" alt="">' if img_match else ""
