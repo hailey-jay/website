@@ -193,6 +193,41 @@ def build_gallery(rows, slug, collected):
     cards = [build_image(line, slug, card_template, collected) for line in rows.splitlines() if line.strip()]
     return render(grid_template, cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
+# ── Feed rendering ───────────────────────────────────────────
+# The page markup is wrong for a feed twice over: it wraps every image
+# in a <button> that carries the lightbox data (feed sanitisers drop
+# buttons, taking the <img> with them), and its URLs are relative, so
+# a reader resolves them against its own origin and shows nothing.
+# Directives are therefore expanded a second time against plain
+# <figure> markup, and the result is made absolute.
+FEED_FIGURE = (
+    '<figure>\n'
+    '  <img src="{src}" alt="{alt}"{dims}>\n'
+    '  <figcaption>{caption}</figcaption>\n'
+    '</figure>'
+)
+
+FEED_URL_RE = re.compile(r'\b(src|href)="(?!https?://|mailto:|//)([^"]*)"')
+
+def absolutize(markup):
+    """Point relative src/href at BASE_URL, including bare #fragments."""
+    def fix(m):
+        attr, value = m.group(1), m.group(2)
+        return f'{attr}="{BASE_URL}/{value.lstrip("/")}"'
+    return FEED_URL_RE.sub(fix, markup)
+
+def build_feed_body(body, slug):
+    throwaway = []
+
+    def expand(m):
+        if m.group("rows") is not None:
+            figures = [build_image(line, slug, FEED_FIGURE, throwaway)
+                       for line in m.group("rows").splitlines() if line.strip()]
+            return "\n".join(figures)
+        return build_image(m.group("row"), slug, FEED_FIGURE, throwaway)
+
+    return absolutize(DIRECTIVE_RE.sub(expand, body))
+
 POST_NAME_RE = re.compile(r"^(?P<isodate>\d{4}-\d{2}-\d{2})-(?P<slug>.+)$")
 
 def ordinal(n):
@@ -224,12 +259,13 @@ def load_blog_entries():
 
 @dataclass
 class Post:
-    slug:    str
-    isodate: str
-    title:   str
-    teaser:  str
-    body:    str
-    images:  list = field(default_factory=list)
+    slug:      str
+    isodate:   str
+    title:     str
+    teaser:    str
+    body:      str
+    feed_body: str = ""
+    images:    list = field(default_factory=list)
 
     @property
     def date(self):
@@ -275,6 +311,9 @@ def parse_blog(raw_entries):
 
         post.body = DIRECTIVE_RE.sub(expand, body)
         check_balance(post.body, f"Post {slug}")
+
+        post.feed_body = build_feed_body(body, post.slug)
+        check_balance(post.feed_body, f"Post {slug} (feed)")
         thumb = (f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="" '
                  f'width="56" height="56" loading="lazy" decoding="async">') if post.images else ""
 
@@ -319,7 +358,7 @@ for post in posts:
         <guid isPermaLink="true">{post.url}</guid>
         <pubDate>{format_rfc2822(post.isodate)}</pubDate>
         <description>{escape(post.teaser, quote=False)}</description>
-        <content:encoded>{cdata(post.body)}</content:encoded>
+        <content:encoded>{cdata(post.feed_body)}</content:encoded>
     </item>"""
 
 feed = f"""<?xml version="1.0" encoding="UTF-8"?>

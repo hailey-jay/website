@@ -16,10 +16,8 @@
         <description>Public transit? What's that?</description>
         <content:encoded><![CDATA[<p>Hey yall!</p>
 <p>I recently returned from yet another summer adventure! This time, I was up at Haverford College, TA'ing for an REU. It was sponsored by <a href="https://budapestsemesters.com/">Budapest Semesters in Mathematics</a> and the professor for our group was the brilliant (and extremely friendly) <a href="https://www.haverford.edu/users/jsabloff">Josh Sabloff</a>. Everyone in the group was beyond wonderful; shout-out to Peter Ahlin, <a href="https://arxiv.org/abs/2509.06363">Catherine DiLeo</a>, <a href="https://www.linkedin.com/in/olivia-mcgrew-35b895341/">Olivia McGrew</a>, and <a href="https://profiles.stanford.edu/rishubh-thaper">Rishubh Thaper</a> for their sharp minds, work ethic, and collaborative spirit! I loved working with yall and would love to see yall again.</p>
-<figure class="blog-figure">
-  <button class="gallery-thumb thumb" data-src="images/blog/haverford/strawbridge.webp" data-alt="Strawbridge Observatory through the brush" data-caption="Strawbridge Observatory through the brush" aria-label="View image: Strawbridge Observatory through the brush">
-    <img src="images/blog/haverford/strawbridge.webp" alt="Strawbridge Observatory through the brush" width="1600" height="1200" loading="lazy" decoding="async">
-  </button>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/strawbridge.webp" alt="Strawbridge Observatory through the brush" width="1600" height="1200">
   <figcaption>Strawbridge Observatory through the brush</figcaption>
 </figure>
 <p>More than just a fun summer project, we ended up doing really good research! Keep your eyes peeled for that, but it's still a work-in-progress. I was pleasantly surprised that everyone in the group was more than strong enough to hold their own in serious math research, even through big challenges and many, many failed Reidemeister moves. I feel confident in being able to call them my collaborators.</p>
@@ -28,56 +26,38 @@
 <p>I've done my very best to provide links to everyone to give them all the proper credit. If I haven't, I'm sure they'll let me know.</p>
 <p>Two special mentions from the above: Catherine is an organizer of the <a href="https://meetings.ams.org/math/jmm2025/meetingapp.cgi/Session/12655">National Set Championship</a> at the JMM every year. The preceding link is stale, so go sign up for the upcoming one whenever that's available. Additionally, Aren is an officer and writer for the <a href="https://www.brownpuzzlehunt.com/">Brown Puzzlehunt</a>.</p>
 <p>Here are some pictures I took around campus. It was an absolutely gorgeous place and I really enjoyed my time there.</p>
-<div class="gallery-grid">
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/hilles.webp" data-alt="Hilles Hall" data-caption="Hilles Hall" aria-label="View image: Hilles Hall">
-          <img src="images/blog/haverford/hilles.webp" alt="Hilles Hall" width="1600" height="1162" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">Hilles Hall</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/rotunda.webp" data-alt="The Rotunda from the ground floor" data-caption="The Rotunda from the ground floor" aria-label="View image: The Rotunda from the ground floor">
-          <img src="images/blog/haverford/rotunda.webp" alt="The Rotunda from the ground floor" width="1200" height="1600" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The Rotunda from the ground floor</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/staircase.webp" data-alt="The staircase leading up to Hilles" data-caption="The staircase leading up to Hilles" aria-label="View image: The staircase leading up to Hilles">
-          <img src="images/blog/haverford/staircase.webp" alt="The staircase leading up to Hilles" width="1203" height="1600" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The staircase leading up to Hilles</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/passthrough.webp" data-alt="A garden between buildings" data-caption="A garden between buildings" aria-label="View image: A garden between buildings">
-          <img src="images/blog/haverford/passthrough.webp" alt="A garden between buildings" width="1024" height="702" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A garden between buildings</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/walkway.webp" data-alt="A rather beautiful sidewalk view" data-caption="A rather beautiful sidewalk view" aria-label="View image: A rather beautiful sidewalk view">
-          <img src="images/blog/haverford/walkway.webp" alt="A rather beautiful sidewalk view" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A rather beautiful sidewalk view</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/path.webp" data-alt="The gravel path through the woods I walked daily" data-caption="The gravel path through the woods I walked daily" aria-label="View image: The gravel path through the woods I walked daily">
-          <img src="images/blog/haverford/path.webp" alt="The gravel path through the woods I walked daily" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The gravel path through the woods I walked daily</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/pyramid.webp" data-alt="A human pyramid! (Image credit: Sofia Piccirillo)" data-caption="A human pyramid! (Image credit: Sofia Piccirillo)" aria-label="View image: A human pyramid! (Image credit: Sofia Piccirillo)">
-          <img src="images/blog/haverford/pyramid.webp" alt="A human pyramid! (Image credit: Sofia Piccirillo)" width="1600" height="889" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A human pyramid! (Image credit: Sofia Piccirillo)</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/haverford/mordor.webp" data-alt="A passthrough between buildings, apparently dubbed Mordor" data-caption="A passthrough between buildings, apparently dubbed Mordor" aria-label="View image: A passthrough between buildings, apparently dubbed Mordor">
-          <img src="images/blog/haverford/mordor.webp" alt="A passthrough between buildings, apparently dubbed Mordor" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A passthrough between buildings, apparently dubbed Mordor</p>
-  </div>
-</div>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/hilles.webp" alt="Hilles Hall" width="1600" height="1162">
+  <figcaption>Hilles Hall</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/rotunda.webp" alt="The Rotunda from the ground floor" width="1200" height="1600">
+  <figcaption>The Rotunda from the ground floor</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/staircase.webp" alt="The staircase leading up to Hilles" width="1203" height="1600">
+  <figcaption>The staircase leading up to Hilles</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/passthrough.webp" alt="A garden between buildings" width="1024" height="702">
+  <figcaption>A garden between buildings</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/walkway.webp" alt="A rather beautiful sidewalk view" width="1600" height="1200">
+  <figcaption>A rather beautiful sidewalk view</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/path.webp" alt="The gravel path through the woods I walked daily" width="1600" height="1200">
+  <figcaption>The gravel path through the woods I walked daily</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/pyramid.webp" alt="A human pyramid! (Image credit: Sofia Piccirillo)" width="1600" height="889">
+  <figcaption>A human pyramid! (Image credit: Sofia Piccirillo)</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/haverford/mordor.webp" alt="A passthrough between buildings, apparently dubbed Mordor" width="1600" height="1200">
+  <figcaption>A passthrough between buildings, apparently dubbed Mordor</figcaption>
+</figure>
 <p>Best,<br>Hailey</p>]]></content:encoded>
     </item>
     <item>
@@ -133,38 +113,26 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
 <p>
   Attached are some images of the group, posted with permission.
   </p>
-<div class="gallery-grid">
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/frc2026/wide.webp" data-alt="The number theory group finishes their presentation, wide shot" data-caption="The group finishes their presentation" aria-label="View image: The group finishes their presentation">
-          <img src="images/blog/frc2026/wide.webp" alt="The number theory group finishes their presentation, wide shot" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The group finishes their presentation</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/frc2026/group-sans-hailey-and-nico.webp" data-alt="The group, minus Hailey and Nico" data-caption="The group, minus Hailey and Nico" aria-label="View image: The group, minus Hailey and Nico">
-          <img src="images/blog/frc2026/group-sans-hailey-and-nico.webp" alt="The group, minus Hailey and Nico" width="1600" height="793" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The group, minus Hailey and Nico</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/frc2026/boardwork.webp" data-alt="The final presentation!" data-caption="The final presentation!" aria-label="View image: The final presentation!">
-          <img src="images/blog/frc2026/boardwork.webp" alt="The final presentation!" width="1600" height="446" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The final presentation!</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/frc2026/grelfie.webp" data-alt="Greg takes a selfie with the group" data-caption="A Greg selfie" aria-label="View image: A Greg selfie">
-          <img src="images/blog/frc2026/grelfie.webp" alt="Greg takes a selfie with the group" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A Greg selfie</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/frc2026/hailelfie.webp" data-alt="Hailey takes a selfie with the group" data-caption="A Hailey selfie" aria-label="View image: A Hailey selfie">
-          <img src="images/blog/frc2026/hailelfie.webp" alt="Hailey takes a selfie with the group" width="1202" height="1599" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A Hailey selfie</p>
-  </div>
-</div>
+<figure>
+  <img src="https://haileyjay.net/images/blog/frc2026/wide.webp" alt="The number theory group finishes their presentation, wide shot" width="1600" height="1200">
+  <figcaption>The group finishes their presentation</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/frc2026/group-sans-hailey-and-nico.webp" alt="The group, minus Hailey and Nico" width="1600" height="793">
+  <figcaption>The group, minus Hailey and Nico</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/frc2026/boardwork.webp" alt="The final presentation!" width="1600" height="446">
+  <figcaption>The final presentation!</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/frc2026/grelfie.webp" alt="Greg takes a selfie with the group" width="1600" height="1200">
+  <figcaption>A Greg selfie</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/frc2026/hailelfie.webp" alt="Hailey takes a selfie with the group" width="1202" height="1599">
+  <figcaption>A Hailey selfie</figcaption>
+</figure>
 <p>Best,<br>Hailey</p>]]></content:encoded>
     </item>
     <item>
@@ -186,44 +154,30 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
 <p>The one thing I'll complain a little bit about: There was too much cheese! I have a dairy allergy, so finding food to eat wasn't always easy.
   I'm used to people liking cheese, but there was cheese with basically every meal. It was... impressive, in a way.</p>
 <p>The last thing I'll share here are the pictures I was able to snag. The nature and venue were beyond beautiful and I'd leap at the opportunity to return.</p>
-<div class="gallery-grid">
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/mountains_1.webp" data-alt="Mountains in the Dolomites" data-caption="The Dolomites" aria-label="View image: The Dolomites">
-          <img src="images/blog/dolomites/mountains_1.webp" alt="Mountains in the Dolomites" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The Dolomites</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/mountains_2.webp" data-alt="More mountains in the Dolomites" data-caption="More of the Dolomites" aria-label="View image: More of the Dolomites">
-          <img src="images/blog/dolomites/mountains_2.webp" alt="More mountains in the Dolomites" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">More of the Dolomites</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/lake.webp" data-alt="The Dobbiaco Lake" data-caption="A lake near Dobbiaco" aria-label="View image: A lake near Dobbiaco">
-          <img src="images/blog/dolomites/lake.webp" alt="The Dobbiaco Lake" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">A lake near Dobbiaco</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/striations.webp" data-alt="Rock striations along a river" data-caption="Rock striations along a river" aria-label="View image: Rock striations along a river">
-          <img src="images/blog/dolomites/striations.webp" alt="Rock striations along a river" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">Rock striations along a river</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/cultural_center.webp" data-alt="The Gustav Mahler Cultural Center" data-caption="The Gustav Mahler Cultural Center" aria-label="View image: The Gustav Mahler Cultural Center">
-          <img src="images/blog/dolomites/cultural_center.webp" alt="The Gustav Mahler Cultural Center" width="1600" height="1200" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">The Gustav Mahler Cultural Center</p>
-  </div>
-  <div class="gallery-card">
-      <button class="gallery-thumb thumb" data-src="images/blog/dolomites/strudel.webp" data-alt="Strudel" data-caption="Strudel (dairy allergy be damned)" aria-label="View image: Strudel (dairy allergy be damned)">
-          <img src="images/blog/dolomites/strudel.webp" alt="Strudel" width="1164" height="1600" loading="lazy" decoding="async">
-      </button>
-      <p class="gallery-title">Strudel (dairy allergy be damned)</p>
-  </div>
-</div>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/mountains_1.webp" alt="Mountains in the Dolomites" width="1600" height="1200">
+  <figcaption>The Dolomites</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/mountains_2.webp" alt="More mountains in the Dolomites" width="1600" height="1200">
+  <figcaption>More of the Dolomites</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/lake.webp" alt="The Dobbiaco Lake" width="1600" height="1200">
+  <figcaption>A lake near Dobbiaco</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/striations.webp" alt="Rock striations along a river" width="1600" height="1200">
+  <figcaption>Rock striations along a river</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/cultural_center.webp" alt="The Gustav Mahler Cultural Center" width="1600" height="1200">
+  <figcaption>The Gustav Mahler Cultural Center</figcaption>
+</figure>
+<figure>
+  <img src="https://haileyjay.net/images/blog/dolomites/strudel.webp" alt="Strudel" width="1164" height="1600">
+  <figcaption>Strudel (dairy allergy be damned)</figcaption>
+</figure>
 <p>Ciao,<br>Hailey</p>]]></content:encoded>
     </item>
     <item>
@@ -258,7 +212,7 @@ Actually, a bit of a story behind that last item… </p>
 
 <p>As you've noticed (presumably; you are on a new page, after all), I've updated this website considerably. This shouldn't come as a great shock to anyone. While I like the retro, deeply personal design I was using, it wasn't the most efficient to update. A clean design, prioritizing simplicity and modularity, was the solution.</p>
 
-<p>There are, for now, two new sections. The <a href="#blog">blog</a> section is, as you've been able to discover, a place for blogs and updates. I'm excited to write stories, information, and the occasional math blurb for all of the two-and-a-half people that'll read this.</p>
+<p>There are, for now, two new sections. The <a href="https://haileyjay.net/#blog">blog</a> section is, as you've been able to discover, a place for blogs and updates. I'm excited to write stories, information, and the occasional math blurb for all of the two-and-a-half people that'll read this.</p>
 
 <p>The other new tab is the relevant links tab. It's probably the least special and it just lists the links that used to be scattered around the page. On desktop, the link isn't even shown and the sidebar takes care of showing the extra links.</p>
 
