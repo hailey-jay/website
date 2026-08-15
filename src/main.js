@@ -88,7 +88,9 @@
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeSidebar();
+    if (e.key !== 'Escape' || !sidebar.classList.contains('mobile-open')) return;
+    closeSidebar();
+    btn.focus();
   });
 })();
 
@@ -118,6 +120,9 @@ function showSection(id) {
 function navigate(hash, push) {
   var bare = !hash;
   if (!hash) hash = 'about';
+  // A hash this router does not own (#main-content, say) reached us
+  // via history, not a click. Leave the active section as it is.
+  if (!bare && !sections.includes(hash) && !subAnchors[hash]) return;
   showSection(hash);
   if (!bare) {
     if (push && location.hash.slice(1) !== hash) {
@@ -154,6 +159,11 @@ document.addEventListener('click', function (e) {
   if (url.pathname !== location.pathname) return;
   const hash = url.hash.slice(1);
   if (!hash) return;
+  // Only claim anchors this router actually owns. Anything else --
+  // the skip link's #main-content above all -- must keep its native
+  // behaviour, or it silently falls through to the About section
+  // (see showSection) and never moves focus.
+  if (!sections.includes(hash) && !subAnchors[hash]) return;
   e.preventDefault();
   navigate(hash, true);
 });
@@ -304,6 +314,13 @@ const wireframeShapes = [
 document.addEventListener('DOMContentLoaded', function () {
   const video = document.getElementById('wireframe-video');
   if (!video) return;
+  // The video autoplays and loops with no pause control, so under
+  // reduced-motion it is left unloaded entirely (WCAG 2.2.2). This
+  // also saves the visitor up to 1.2 MB.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.remove();
+    return;
+  }
   const pick = wireframeShapes[Math.floor(Math.random() * wireframeShapes.length)];
 
   function setVariant(theme) {
