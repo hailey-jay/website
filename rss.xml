@@ -62,7 +62,7 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
   </p>
 <div class="gallery-grid">
   <div class="gallery-card">
-    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/wide.webp" data-alt="The number theory group finishes their presentation, wide shot" data-caption="The finished final presentation" aria-label="View image: The finished final presentation">
+    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/wide.webp" data-alt="The number theory group finishes their presentation, wide shot" data-caption="The group finishes their presentation" aria-label="View image: The group finishes their presentation">
       <img src="images/blog/frc2026/wide.webp" alt="The number theory group finishes their presentation, wide shot">
     </button>
     <p class="gallery-title">The group finishes their presentation</p>
@@ -74,19 +74,19 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
     <p class="gallery-title">The group, minus Hailey and Nico</p>
   </div>
   <div class="gallery-card">
-    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/boardwork.webp" data-alt="Working through problems at the board" data-caption="Boardwork" aria-label="View image: Boardwork">
+    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/boardwork.webp" data-alt="The final presentation!" data-caption="The final presentation!" aria-label="View image: The final presentation!">
       <img src="images/blog/frc2026/boardwork.webp" alt="The final presentation!">
     </button>
     <p class="gallery-title">The final presentation!</p>
   </div>
   <div class="gallery-card">
-    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/grelfie.webp" data-alt="Greg takes a selfie with the group" data-caption="Grelfie" aria-label="View image: Greg Selfie">
+    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/grelfie.webp" data-alt="Greg takes a selfie with the group" data-caption="A Greg selfie" aria-label="View image: A Greg selfie">
       <img src="images/blog/frc2026/grelfie.webp" alt="Greg takes a selfie with the group">
     </button>
     <p class="gallery-title">A Greg selfie</p>
   </div>
   <div class="gallery-card">
-    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/hailelfie.webp" data-alt="Hailey takes a selfie with the group" data-caption="Hailelfie" aria-label="View image: Hailey Selfie">
+    <button class="gallery-thumb thumb" data-src="images/blog/frc2026/hailelfie.webp" data-alt="Hailey takes a selfie with the group" data-caption="A Hailey selfie" aria-label="View image: A Hailey selfie">
       <img src="images/blog/frc2026/hailelfie.webp" alt="Hailey takes a selfie with the group">
     </button>
     <p class="gallery-title">A Hailey selfie</p>
@@ -127,7 +127,7 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
     <p class="gallery-title">More of the Dolomites</p>
   </div>
   <div class="gallery-card">
-    <button class="gallery-thumb thumb" data-src="images/blog/dolomites/lake.webp" data-alt="The Dobbiaco Lake" data-caption="The Dobbiaco Lake" aria-label="View image: The Dobbiaco Lake">
+    <button class="gallery-thumb thumb" data-src="images/blog/dolomites/lake.webp" data-alt="The Dobbiaco Lake" data-caption="A lake near Dobbiaco" aria-label="View image: A lake near Dobbiaco">
       <img src="images/blog/dolomites/lake.webp" alt="The Dobbiaco Lake">
     </button>
     <p class="gallery-title">A lake near Dobbiaco</p>
