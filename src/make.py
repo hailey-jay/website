@@ -663,6 +663,11 @@ if "links" not in unpublished:
 # ── Assemble index.html ──────────────────────────────────────
 
 def wrap_section(key):
+    # Checked here rather than at read time: a partial is only whole
+    # once its sub-templates have been filled, and this is also where a
+    # data file's inline markup (a bio paragraph's link, a meta value)
+    # first meets the page.
+    check_balance(raw_content[key], f"Section {key}")
     active = ' class="active"' if key == "about" else ""
     return f'<section id="{key}"{active}>\n{raw_content[key]}\n</section>'
 

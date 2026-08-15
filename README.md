@@ -5,7 +5,9 @@ Source for my personal website. Built with a small Python script.
 + `src/`: source files (HTML partials, CSS, JS, build script)
 + `src/shared.html`: sub-templates used by more than one section (currently the gallery card)
 + `src/data/`: content data, kept separate from markup
+  + `about.txt`: the identity fields, meta pairs, bio, and Lately note
   + `comics.txt`: one `stem | caption | alt` row per comic
+  + `links.txt`: a bare heading line, then `label | url` rows under it
   + `printlab.txt`: printer, gallery, and filament data for the 3D print lab.
     Currently absent: the section is unpublished and its last contents were
     placeholders, archived to `~/Port/website-printlab-data-2026-08-15.tar.xz`.
@@ -57,10 +59,39 @@ no-op build is fast. They are committed alongside the other built output.
 + `src/make.py`: builds `index.html`, `rss.xml`, and `images/thumbs/` from the source files
 + `index.html`, `rss.xml`, `images/thumbs/`: built output
 
+## Data formats
+Four shapes cover every section, and they are parsed by shared helpers in
+`make.py` rather than per-section code:
+
++ `---NAME---` on its own line splits a data file into blocks (`split_data`).
+  Screaming case only, so a line of prose cannot open one. Markup uses `§NAME§`
+  for the same job (`split_sections`).
++ `key: value` lines are fields (`parse_kv`). A line with no colon is an error,
+  as is a missing required field.
++ Blank-line-separated groups of those are records (`parse_records`), used for
+  the printer list.
++ `a | b | c` lines are rows (`parse_fields`). Too many fields is an error.
+  A bare line with no `|` opens a group, and the rows under it belong to it
+  (`group_rows`), which is how the filament table gets its diameters and the
+  links list its categories.
+
+Prose in a data file needs no `<p>` boilerplate: blank-line-separated blocks
+are wrapped by the build, and a block may be soft-wrapped across lines. Inline
+markup inside a paragraph (a link, an `<em>`) is passed through as written.
+
 ## Templates
 Partials are split on `§NAME§` marker lines, and `{name}` placeholders are
 filled by `render()` in `make.py`. Braces that are not a known placeholder are
 left alone, so a partial can contain inline CSS or JS verbatim.
+
+Every emitted section is checked for unclosed tags before it is wrapped, which
+covers the markup a data file contributes. An unclosed `<a>` in a bio paragraph
+is invisible in the built page but swallows the prose after it, so the build
+fails instead.
+
+`src/about.html` keeps the photo's `srcset` and its 148x185 display size:
+those are layout, and swapping the photo means regenerating both widths
+anyway. The alt text and caption are in `about.txt`.
 
 Partials carry no `style` attributes; styling lives in `src/main.css`. The
 shared pieces are `.section-intro` and `.section-note` for the paragraphs under
