@@ -22,11 +22,33 @@ def get_size(path):
     with Image.open(path) as im:
         return im.size
 
+def split_sections(raw):
+    """Split a partial on §NAME§ delimiter lines.
+
+    The text before the first delimiter is keyed "" (the section's own
+    markup); every §NAME§ line opens a named sub-template. Naming the
+    pieces means adding one cannot silently shift the others."""
+    parts   = {}
+    key     = ""
+    current = []
+    for line in raw.splitlines():
+        marker = line.strip()
+        if marker.startswith("§") and marker.endswith("§") and marker.strip("§").strip():
+            parts[key] = "\n".join(current).strip()
+            key        = marker.strip("§").strip()
+            current    = []
+        else:
+            current.append(line)
+    parts[key] = "\n".join(current).strip()
+    return parts
+
 # ── Parse comics ─────────────────────────────────────────────
 # Data lives in src/data/comics.txt: three lines per comic
 # (filename stem, alt text, caption), blank lines ignored.
-comics_html, comic_template = raw_content["comics"].split("§")
-comic_data = (src / "data/comics.txt").read_text()
+comic_parts    = split_sections(raw_content["comics"])
+comics_html    = comic_parts[""]
+comic_template = comic_parts["CARD"]
+comic_data     = (src / "data/comics.txt").read_text()
 
 def parse_comics(data, template):
     lines = [l for l in data.splitlines() if l.strip()]
@@ -44,7 +66,12 @@ raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_t
 # One file per post under src/data/blog/, named <isodate>-<slug>.html:
 # key: value meta lines, then the HTML body. Filename sort gives
 # newest-first order; an underscore prefix marks a draft (skipped).
-blog_html, entry_template, grid_template, card_template, figure_template = raw_content["blog"].split("§")
+blog_parts      = split_sections(raw_content["blog"])
+blog_html       = blog_parts[""]
+entry_template  = blog_parts["ENTRY"]
+grid_template   = blog_parts["GRID"]
+card_template   = blog_parts["CARD"]
+figure_template = blog_parts["FIGURE"]
 
 # A post body may contain image directives instead of hand-written markup:
 #
@@ -187,17 +214,7 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
 
 # ── Parse print lab ──────────────────────────────────────────
 def parse_printlab(raw):
-    parts = {}
-    current_key = ""
-    current_lines = []
-    for line in raw.splitlines():
-        if line.startswith("§") and line.endswith("§") and line != "§":
-            parts[current_key] = "\n".join(current_lines).strip()
-            current_key = line.strip("§").strip()
-            current_lines = []
-        else:
-            current_lines.append(line)
-    parts[current_key] = "\n".join(current_lines).strip()
+    parts = split_sections(raw)
 
     html_template     = parts[""]
     printer_template  = parts["PRINTER"]
