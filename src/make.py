@@ -33,6 +33,57 @@ def get_size(path):
     with Image.open(path) as im:
         return im.size
 
+# ── Thumbnails ───────────────────────────────────────────────
+# Gallery originals are 1024-1600px but are displayed at ~200px in a
+# grid and capped at 640px in the lightbox, so the grid was pulling
+# half-megabyte photos to fill a thumbnail. A downscaled copy is
+# generated per image and offered first; the original stays in the
+# srcset for wide viewports and remains what the lightbox opens.
+THUMB_WIDTH = 640
+thumb_dir = root / "images/thumbs"
+
+def thumb_for(path):
+    """Return (relative path, width, height) of `path`'s thumbnail.
+
+    Images already at or under THUMB_WIDTH are their own thumbnail.
+    Regenerated only when the source is newer, so repeat builds are
+    cheap and the output stays byte-stable."""
+    src_file = root / path
+    w, h = get_size(src_file)
+    if w <= THUMB_WIDTH:
+        return path, w, h
+
+    # Mirror the source tree under images/thumbs/, minus a leading
+    # "images/" so blog photos land at images/thumbs/blog/... rather
+    # than images/thumbs/images/blog/...
+    stem = path.rsplit(".", 1)[0]
+    if stem.startswith("images/"):
+        stem = stem[len("images/"):]
+    out_rel = f"images/thumbs/{stem}.webp"
+    out_file = root / out_rel
+    tw = THUMB_WIDTH
+    th = round(h * THUMB_WIDTH / w)
+
+    if not out_file.exists() or out_file.stat().st_mtime < src_file.stat().st_mtime:
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+        with Image.open(src_file) as im:
+            im.resize((tw, th), Image.LANCZOS).save(out_file, "WEBP", quality=82, method=6)
+    return out_rel, tw, th
+
+def img_attrs(path, sizes):
+    """src/srcset/sizes/width/height for a gallery image."""
+    w, h = get_size(root / path)
+    thumb, tw, _ = thumb_for(path)
+    if thumb == path:
+        return f'src="{path}" width="{w}" height="{h}"'
+    return (f'src="{thumb}" srcset="{thumb} {tw}w, {path} {w}w" '
+            f'sizes="{sizes}" width="{w}" height="{h}"')
+
+# Grid cards sit in a ~640px main column at three-up, and go roughly
+# half-width once the sidebar collapses.
+GRID_SIZES   = "(max-width: 640px) 45vw, 210px"
+FIGURE_SIZES = "(max-width: 480px) 100vw, 420px"
+
 # ── Markup validation ────────────────────────────────────────
 # An unclosed tag is invisible in the built page (the parser closes
 # it for you, usually in the wrong place) but corrupts the RSS body
@@ -123,14 +174,13 @@ def parse_comics(data, template):
             continue
         stem, caption, alt = parse_row(line)
         path = f"comics/{stem}.webp"
-        w, h = get_size(root / path)
         comics.append(render(template,
             thumb_class = "comic-thumb",
             label       = "View comic",
             src         = path,
+            img_attrs   = img_attrs(path, GRID_SIZES),
             alt         = escape(alt),
             caption     = escape(caption),
-            dims        = f' width="{w}" height="{h}"',
         ).strip())
     return "\n\n".join(comics)
 
@@ -169,7 +219,7 @@ DIRECTIVE_RE = re.compile(
     re.M | re.S,
 )
 
-def build_image(row, slug, template, collected):
+def build_image(row, slug, template, collected, sizes=None):
     img, caption, alt = parse_row(row)
     if "/" not in img:
         img = f"images/blog/{slug}/{img}"
@@ -178,12 +228,15 @@ def build_image(row, slug, template, collected):
     assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
     w, h = get_size(root / img)
     # Recorded as raw text, in DOM order. The carousel assigns these to
-    # img.alt as a property, so they must not be HTML-escaped.
-    collected.append({"src": img, "alt": alt})
+    # img.alt as a property, so they must not be HTML-escaped. The
+    # carousel wants the thumbnail; the lightbox wants the original.
+    thumb, _, _ = thumb_for(img)
+    collected.append({"src": img, "thumb": thumb, "alt": alt})
     return render(template,
         thumb_class = "gallery-thumb",
         label       = "View image",
         src         = img,
+        img_attrs   = img_attrs(img, sizes or GRID_SIZES),
         alt         = escape(alt),
         caption     = escape(caption),
         dims        = f' width="{w}" height="{h}"',
@@ -307,14 +360,14 @@ def parse_blog(raw_entries):
         def expand(m, post=post):
             if m.group("rows") is not None:
                 return build_gallery(m.group("rows"), post.slug, post.images)
-            return build_image(m.group("row"), post.slug, figure_template, post.images)
+            return build_image(m.group("row"), post.slug, figure_template, post.images, FIGURE_SIZES)
 
         post.body = DIRECTIVE_RE.sub(expand, body)
         check_balance(post.body, f"Post {slug}")
 
         post.feed_body = build_feed_body(body, post.slug)
         check_balance(post.feed_body, f"Post {slug} (feed)")
-        thumb = (f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="" '
+        thumb = (f'<img class="blog-entry-thumb" src="{post.images[0]["thumb"]}" alt="" '
                  f'width="56" height="56" loading="lazy" decoding="async">') if post.images else ""
 
         index_items.append(render(entry_template,
@@ -443,14 +496,13 @@ def parse_printlab(raw):
             continue
         img, caption, alt = parse_row(line)
         assert (root / img).exists(), f"Print gallery image {img} does not exist"
-        w, h = get_size(root / img)
         gallery_cards.append(render(card_template,
             thumb_class = "gallery-thumb",
             label       = "View print",
             src         = img,
+            img_attrs   = img_attrs(img, GRID_SIZES),
             alt         = escape(alt),
             caption     = escape(caption),
-            dims        = f' width="{w}" height="{h}"',
         ).strip())
 
     # ── Filament ──────────────────────────────────────────────

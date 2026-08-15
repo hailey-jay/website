@@ -42,8 +42,15 @@ space before they load. The build fails if an image is missing.
 
 Both forms open the lightbox, and the prev/next sequence is scoped to the post, so a post's gallery and its inline figures scroll together in DOM order.
 
-+ `src/make.py`: builds `index.html` and `rss.xml` from the source files
-+ `index.html`, `rss.xml`: built output
+Anything wider than 640px also gets a 640px thumbnail written to
+`images/thumbs/`, mirroring the source path minus the leading `images/`.
+The thumbnail is what the grid, the blog index, and the homepage carousel
+load; the original stays in the `srcset` for wide viewports and is what the
+lightbox opens. Thumbnails are rebuilt only when the source is newer, so a
+no-op build is fast. They are committed alongside the other built output.
+
++ `src/make.py`: builds `index.html`, `rss.xml`, and `images/thumbs/` from the source files
++ `index.html`, `rss.xml`, `images/thumbs/`: built output
 
 ## Templates
 Partials are split on `§NAME§` marker lines, and `{name}` placeholders are

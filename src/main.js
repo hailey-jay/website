@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
     a.href = '#blog-' + entry.slug;
 
     const img = document.createElement('img');
-    img.src = entry.src;
+    img.src = entry.thumb;
     img.alt = entry.alt;
     // Only two or three items are on screen at a time, and the second
     // copy is entirely off screen until the scroll wraps.
