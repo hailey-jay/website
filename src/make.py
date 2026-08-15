@@ -171,23 +171,19 @@ def parse_blog(raw_entries, index_template):
     feed_entries  = []  # list of (slug, title, isodate, teaser, body, images)
 
     for isodate, slug, raw in raw_entries:
-        lines = raw.strip().splitlines()
+        # Front matter is the leading key: value block, ended by a blank
+        # line. An explicit terminator means a body whose first line
+        # happens to contain a colon cannot be swallowed as metadata.
+        head, sep, body = raw.strip().partition("\n\n")
+        assert sep, f"Post {slug} has no blank line after its front matter"
 
         meta = {}
-        body_start = 0
-        for i, line in enumerate(lines):
-            stripped = line.strip()
-            if stripped == "":
-                continue
-            if ":" in stripped and not stripped.startswith("<"):
-                key, _, val = stripped.partition(":")
-                meta[key.strip()] = val.strip()
-                body_start = i + 1
-            else:
-                body_start = i
-                break
+        for line in head.splitlines():
+            key, colon, val = line.partition(":")
+            assert colon, f"Front matter line in {slug} is not 'key: value': {line!r}"
+            meta[key.strip()] = val.strip()
 
-        body = "\n".join(lines[body_start:]).strip()
+        body = body.strip()
 
         date   = display_date(isodate)
         title  = meta["title"]
