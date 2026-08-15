@@ -275,7 +275,8 @@ def parse_blog(raw_entries):
 
         post.body = DIRECTIVE_RE.sub(expand, body)
         check_balance(post.body, f"Post {slug}")
-        thumb = f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="">' if post.images else ""
+        thumb = (f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="" '
+                 f'width="56" height="56" loading="lazy" decoding="async">') if post.images else ""
 
         index_items.append(render(entry_template,
             slug=post.slug, date=post.date, title=post.title,

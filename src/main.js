@@ -344,6 +344,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const img = document.createElement('img');
     img.src = entry.src;
     img.alt = entry.alt;
+    // Only two or three items are on screen at a time, and the second
+    // copy is entirely off screen until the scroll wraps.
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.width = 220;
+    img.height = 150;
     a.appendChild(img);
 
     const caption = document.createElement('span');

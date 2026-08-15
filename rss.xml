@@ -18,7 +18,7 @@
 <p>I recently returned from yet another summer adventure! This time, I was up at Haverford College, TA'ing for an REU. It was sponsored by <a href="https://budapestsemesters.com/">Budapest Semesters in Mathematics</a> and the professor for our group was the brilliant (and extremely friendly) <a href="https://www.haverford.edu/users/jsabloff">Josh Sabloff</a>. Everyone in the group was beyond wonderful; shout-out to Peter Ahlin, <a href="https://arxiv.org/abs/2509.06363">Catherine DiLeo</a>, <a href="https://www.linkedin.com/in/olivia-mcgrew-35b895341/">Olivia McGrew</a>, and <a href="https://profiles.stanford.edu/rishubh-thaper">Rishubh Thaper</a> for their sharp minds, work ethic, and collaborative spirit! I loved working with yall and would love to see yall again.</p>
 <figure class="blog-figure">
   <button class="gallery-thumb thumb" data-src="images/blog/haverford/strawbridge.webp" data-alt="Strawbridge Observatory through the brush" data-caption="Strawbridge Observatory through the brush" aria-label="View image: Strawbridge Observatory through the brush">
-    <img src="images/blog/haverford/strawbridge.webp" alt="Strawbridge Observatory through the brush" width="1600" height="1200">
+    <img src="images/blog/haverford/strawbridge.webp" alt="Strawbridge Observatory through the brush" width="1600" height="1200" loading="lazy" decoding="async">
   </button>
   <figcaption>Strawbridge Observatory through the brush</figcaption>
 </figure>
@@ -31,49 +31,49 @@
 <div class="gallery-grid">
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/hilles.webp" data-alt="Hilles Hall" data-caption="Hilles Hall" aria-label="View image: Hilles Hall">
-          <img src="images/blog/haverford/hilles.webp" alt="Hilles Hall" width="1600" height="1162">
+          <img src="images/blog/haverford/hilles.webp" alt="Hilles Hall" width="1600" height="1162" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">Hilles Hall</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/rotunda.webp" data-alt="The Rotunda from the ground floor" data-caption="The Rotunda from the ground floor" aria-label="View image: The Rotunda from the ground floor">
-          <img src="images/blog/haverford/rotunda.webp" alt="The Rotunda from the ground floor" width="1200" height="1600">
+          <img src="images/blog/haverford/rotunda.webp" alt="The Rotunda from the ground floor" width="1200" height="1600" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The Rotunda from the ground floor</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/staircase.webp" data-alt="The staircase leading up to Hilles" data-caption="The staircase leading up to Hilles" aria-label="View image: The staircase leading up to Hilles">
-          <img src="images/blog/haverford/staircase.webp" alt="The staircase leading up to Hilles" width="1203" height="1600">
+          <img src="images/blog/haverford/staircase.webp" alt="The staircase leading up to Hilles" width="1203" height="1600" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The staircase leading up to Hilles</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/passthrough.webp" data-alt="A garden between buildings" data-caption="A garden between buildings" aria-label="View image: A garden between buildings">
-          <img src="images/blog/haverford/passthrough.webp" alt="A garden between buildings" width="1024" height="702">
+          <img src="images/blog/haverford/passthrough.webp" alt="A garden between buildings" width="1024" height="702" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A garden between buildings</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/walkway.webp" data-alt="A rather beautiful sidewalk view" data-caption="A rather beautiful sidewalk view" aria-label="View image: A rather beautiful sidewalk view">
-          <img src="images/blog/haverford/walkway.webp" alt="A rather beautiful sidewalk view" width="1600" height="1200">
+          <img src="images/blog/haverford/walkway.webp" alt="A rather beautiful sidewalk view" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A rather beautiful sidewalk view</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/path.webp" data-alt="The gravel path through the woods I walked daily" data-caption="The gravel path through the woods I walked daily" aria-label="View image: The gravel path through the woods I walked daily">
-          <img src="images/blog/haverford/path.webp" alt="The gravel path through the woods I walked daily" width="1600" height="1200">
+          <img src="images/blog/haverford/path.webp" alt="The gravel path through the woods I walked daily" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The gravel path through the woods I walked daily</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/pyramid.webp" data-alt="A human pyramid! (Image credit: Sofia Piccirillo)" data-caption="A human pyramid! (Image credit: Sofia Piccirillo)" aria-label="View image: A human pyramid! (Image credit: Sofia Piccirillo)">
-          <img src="images/blog/haverford/pyramid.webp" alt="A human pyramid! (Image credit: Sofia Piccirillo)" width="1600" height="889">
+          <img src="images/blog/haverford/pyramid.webp" alt="A human pyramid! (Image credit: Sofia Piccirillo)" width="1600" height="889" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A human pyramid! (Image credit: Sofia Piccirillo)</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/haverford/mordor.webp" data-alt="A passthrough between buildings, apparently dubbed Mordor" data-caption="A passthrough between buildings, apparently dubbed Mordor" aria-label="View image: A passthrough between buildings, apparently dubbed Mordor">
-          <img src="images/blog/haverford/mordor.webp" alt="A passthrough between buildings, apparently dubbed Mordor" width="1600" height="1200">
+          <img src="images/blog/haverford/mordor.webp" alt="A passthrough between buildings, apparently dubbed Mordor" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A passthrough between buildings, apparently dubbed Mordor</p>
   </div>
@@ -136,31 +136,31 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
 <div class="gallery-grid">
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/frc2026/wide.webp" data-alt="The number theory group finishes their presentation, wide shot" data-caption="The group finishes their presentation" aria-label="View image: The group finishes their presentation">
-          <img src="images/blog/frc2026/wide.webp" alt="The number theory group finishes their presentation, wide shot" width="1600" height="1200">
+          <img src="images/blog/frc2026/wide.webp" alt="The number theory group finishes their presentation, wide shot" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The group finishes their presentation</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/frc2026/group-sans-hailey-and-nico.webp" data-alt="The group, minus Hailey and Nico" data-caption="The group, minus Hailey and Nico" aria-label="View image: The group, minus Hailey and Nico">
-          <img src="images/blog/frc2026/group-sans-hailey-and-nico.webp" alt="The group, minus Hailey and Nico" width="1600" height="793">
+          <img src="images/blog/frc2026/group-sans-hailey-and-nico.webp" alt="The group, minus Hailey and Nico" width="1600" height="793" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The group, minus Hailey and Nico</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/frc2026/boardwork.webp" data-alt="The final presentation!" data-caption="The final presentation!" aria-label="View image: The final presentation!">
-          <img src="images/blog/frc2026/boardwork.webp" alt="The final presentation!" width="1600" height="446">
+          <img src="images/blog/frc2026/boardwork.webp" alt="The final presentation!" width="1600" height="446" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The final presentation!</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/frc2026/grelfie.webp" data-alt="Greg takes a selfie with the group" data-caption="A Greg selfie" aria-label="View image: A Greg selfie">
-          <img src="images/blog/frc2026/grelfie.webp" alt="Greg takes a selfie with the group" width="1600" height="1200">
+          <img src="images/blog/frc2026/grelfie.webp" alt="Greg takes a selfie with the group" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A Greg selfie</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/frc2026/hailelfie.webp" data-alt="Hailey takes a selfie with the group" data-caption="A Hailey selfie" aria-label="View image: A Hailey selfie">
-          <img src="images/blog/frc2026/hailelfie.webp" alt="Hailey takes a selfie with the group" width="1202" height="1599">
+          <img src="images/blog/frc2026/hailelfie.webp" alt="Hailey takes a selfie with the group" width="1202" height="1599" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A Hailey selfie</p>
   </div>
@@ -189,37 +189,37 @@ For now, I gotta get back to programming. I wonder how my slurm jobs are doing..
 <div class="gallery-grid">
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/mountains_1.webp" data-alt="Mountains in the Dolomites" data-caption="The Dolomites" aria-label="View image: The Dolomites">
-          <img src="images/blog/dolomites/mountains_1.webp" alt="Mountains in the Dolomites" width="1600" height="1200">
+          <img src="images/blog/dolomites/mountains_1.webp" alt="Mountains in the Dolomites" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The Dolomites</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/mountains_2.webp" data-alt="More mountains in the Dolomites" data-caption="More of the Dolomites" aria-label="View image: More of the Dolomites">
-          <img src="images/blog/dolomites/mountains_2.webp" alt="More mountains in the Dolomites" width="1600" height="1200">
+          <img src="images/blog/dolomites/mountains_2.webp" alt="More mountains in the Dolomites" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">More of the Dolomites</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/lake.webp" data-alt="The Dobbiaco Lake" data-caption="A lake near Dobbiaco" aria-label="View image: A lake near Dobbiaco">
-          <img src="images/blog/dolomites/lake.webp" alt="The Dobbiaco Lake" width="1600" height="1200">
+          <img src="images/blog/dolomites/lake.webp" alt="The Dobbiaco Lake" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">A lake near Dobbiaco</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/striations.webp" data-alt="Rock striations along a river" data-caption="Rock striations along a river" aria-label="View image: Rock striations along a river">
-          <img src="images/blog/dolomites/striations.webp" alt="Rock striations along a river" width="1600" height="1200">
+          <img src="images/blog/dolomites/striations.webp" alt="Rock striations along a river" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">Rock striations along a river</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/cultural_center.webp" data-alt="The Gustav Mahler Cultural Center" data-caption="The Gustav Mahler Cultural Center" aria-label="View image: The Gustav Mahler Cultural Center">
-          <img src="images/blog/dolomites/cultural_center.webp" alt="The Gustav Mahler Cultural Center" width="1600" height="1200">
+          <img src="images/blog/dolomites/cultural_center.webp" alt="The Gustav Mahler Cultural Center" width="1600" height="1200" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">The Gustav Mahler Cultural Center</p>
   </div>
   <div class="gallery-card">
       <button class="gallery-thumb thumb" data-src="images/blog/dolomites/strudel.webp" data-alt="Strudel" data-caption="Strudel (dairy allergy be damned)" aria-label="View image: Strudel (dairy allergy be damned)">
-          <img src="images/blog/dolomites/strudel.webp" alt="Strudel" width="1164" height="1600">
+          <img src="images/blog/dolomites/strudel.webp" alt="Strudel" width="1164" height="1600" loading="lazy" decoding="async">
       </button>
       <p class="gallery-title">Strudel (dairy allergy be damned)</p>
   </div>
