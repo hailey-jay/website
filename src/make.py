@@ -42,12 +42,18 @@ def split_sections(raw):
     parts[key] = "\n".join(current).strip()
     return parts
 
+# ── Shared sub-templates ─────────────────────────────────────
+# Markup used by more than one section. The gallery card is identical
+# for comics and blog galleries apart from the thumb class, which picks
+# which lightbox instance claims it (see makeLightbox in main.js).
+shared_parts  = split_sections((src / "shared.html").read_text())
+card_template = shared_parts["CARD"]
+
 # ── Parse comics ─────────────────────────────────────────────
 # Data lives in src/data/comics.txt: three lines per comic
 # (filename stem, alt text, caption), blank lines ignored.
 comic_parts    = split_sections(raw_content["comics"])
 comics_html    = comic_parts[""]
-comic_template = comic_parts["CARD"]
 comic_data     = (src / "data/comics.txt").read_text()
 
 def parse_comics(data, template):
@@ -56,11 +62,19 @@ def parse_comics(data, template):
     comics = []
     for i in range(0, len(lines), 3):
         src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
-        w,h = get_size(root / f"comics/{src_file}.webp")
-        comics.append(template.format(src=f"comics/{src_file}.webp", alt=escape(alt), caption=escape(caption), w=w, h=h).strip())
+        path = f"comics/{src_file}.webp"
+        w, h = get_size(root / path)
+        comics.append(template.format(
+            thumb_class = "comic-thumb",
+            label       = "View comic",
+            src         = path,
+            alt         = escape(alt),
+            caption     = escape(caption),
+            dims        = f' width="{w}" height="{h}"',
+        ).strip())
     return "\n\n".join(comics)
 
-raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_template))
+raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, card_template))
 
 # ── Parse blog ───────────────────────────────────────────────
 # One file per post under src/data/blog/, named <isodate>-<slug>.html:
@@ -71,7 +85,6 @@ blog_html       = blog_parts[""]
 entry_template  = blog_parts["ENTRY"]
 post_template   = blog_parts["POST"]
 grid_template   = blog_parts["GRID"]
-card_template   = blog_parts["CARD"]
 figure_template = blog_parts["FIGURE"]
 
 # A post body may contain image directives instead of hand-written markup:
@@ -100,9 +113,12 @@ def build_image(row, slug, template):
         img += ".webp"
     assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
     return template.format(
-        src     = img,
-        alt     = escape(alt),
-        caption = escape(caption),
+        thumb_class = "gallery-thumb",
+        label       = "View image",
+        src         = img,
+        alt         = escape(alt),
+        caption     = escape(caption),
+        dims        = "",
     ).strip()
 
 def build_gallery(rows, slug):
