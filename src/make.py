@@ -46,6 +46,17 @@ def render(template, **fields):
         template,
     )
 
+def parse_row(row):
+    """Split an `image | caption | alt` row.
+
+    The caption fills the card title, the lightbox caption, and, absent
+    a third field, the alt text."""
+    fields  = [f.strip() for f in row.split("|")]
+    img     = fields[0]
+    caption = fields[1] if len(fields) > 1 else ""
+    alt     = fields[2] if len(fields) > 2 else caption
+    return img, caption, alt
+
 def split_sections(raw):
     """Split a partial on §NAME§ delimiter lines.
 
@@ -74,19 +85,19 @@ shared_parts  = split_sections(strip_comments((src / "shared.html").read_text())
 card_template = shared_parts["CARD"]
 
 # ── Parse comics ─────────────────────────────────────────────
-# Data lives in src/data/comics.txt: three lines per comic
-# (filename stem, alt text, caption), blank lines ignored.
+# Data lives in src/data/comics.txt: one `stem | caption | alt` row per
+# comic, the same row format the blog uses. Blank lines are ignored.
 comic_parts    = split_sections(raw_content["comics"])
 comics_html    = comic_parts[""]
 comic_data     = (src / "data/comics.txt").read_text()
 
 def parse_comics(data, template):
-    lines = [l for l in data.splitlines() if l.strip()]
-    assert len(lines) % 3 == 0, f"Comic data has {len(lines)} lines, expected a multiple of 3"
     comics = []
-    for i in range(0, len(lines), 3):
-        src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
-        path = f"comics/{src_file}.webp"
+    for line in data.splitlines():
+        if not line.strip():
+            continue
+        stem, caption, alt = parse_row(line)
+        path = f"comics/{stem}.webp"
         w, h = get_size(root / path)
         comics.append(render(template,
             thumb_class = "comic-thumb",
@@ -134,10 +145,7 @@ DIRECTIVE_RE = re.compile(
 )
 
 def build_image(row, slug, template, collected):
-    fields  = [f.strip() for f in row.split("|")]
-    img     = fields[0]
-    caption = fields[1] if len(fields) > 1 else ""
-    alt     = fields[2] if len(fields) > 2 else caption
+    img, caption, alt = parse_row(row)
     if "/" not in img:
         img = f"images/blog/{slug}/{img}"
     if "." not in img.rsplit("/", 1)[-1]:
@@ -288,7 +296,6 @@ def parse_printlab(raw):
 
     html_template     = parts[""]
     printer_template  = parts["PRINTER"]
-    gallery_template  = parts["GALLERY"]
     filament_template = parts["FILAMENT"]
     filament_row_tmpl = parts["FILAMENT_ROW"]
     data_block        = parts["DATA"]
@@ -342,15 +349,22 @@ def parse_printlab(raw):
         ).strip())
 
     # ── Gallery ───────────────────────────────────────────────
-    gallery_lines = [l for l in data_sections["GALLERY"].splitlines() if l.strip()]
-    assert len(gallery_lines) % 3 == 0, "Gallery data must have lines in multiples of 3"
+    # Same `image | caption | alt` rows and same shared card as the
+    # comics and blog galleries; only the aria-label verb differs.
     gallery_cards = []
-    for i in range(0, len(gallery_lines), 3):
-        src_file, alt, caption = gallery_lines[i], gallery_lines[i+1], gallery_lines[i+2]
-        gallery_cards.append(render(gallery_template,
-            src     = src_file,
-            alt     = alt,
-            caption = caption,
+    for line in data_sections["GALLERY"].splitlines():
+        if not line.strip():
+            continue
+        img, caption, alt = parse_row(line)
+        assert (root / img).exists(), f"Print gallery image {img} does not exist"
+        w, h = get_size(root / img)
+        gallery_cards.append(render(card_template,
+            thumb_class = "gallery-thumb",
+            label       = "View print",
+            src         = img,
+            alt         = escape(alt),
+            caption     = escape(caption),
+            dims        = f' width="{w}" height="{h}"',
         ).strip())
 
     # ── Filament ──────────────────────────────────────────────

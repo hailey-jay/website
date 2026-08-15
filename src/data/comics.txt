@@ -1,31 +1,8 @@
-officehours
-An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."
-I like to take inspiration from the Catholic Church's calendar for my office hours.
-
-dinosona
-A dinosaur wearing a bunny ears headband while saying 'Rawr'.
-The Mesozoic was far weirder than people give it credit for.
-
-borkosplingo
-Two mathematicians discuss applying the Borko-Splingo Theorem.
-According to my partner, this is how mathematicians speak.
-
-bashrc
-A .bashrc file containing the line "PS1=sudo: please enter your password:"
-My friends should NOT give me access to their devices.
-
-dne
-A whiteboard with a flower in the corner and the caption DNE.
-Sometimes we need the little things.
-
-inband
-A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud.
-Correcting my friends' gender in-band since 2004!
-
-compactsets
-A hydraulic press squishing an empty set.
-These hydraulic press channels are getting out of hand!
-
-jpeggatewaydrug
-JPEG: Gateway drug?
-Don't look at the file extension...
+officehours | I like to take inspiration from the Catholic Church's calendar for my office hours. | An email signature reading "Best, Hailey*. *office hours 12:00-13:00 MWF**. **terms and conditions apply***. ***every other week****. ****counting from the first full moon in March."
+dinosona | The Mesozoic was far weirder than people give it credit for. | A dinosaur wearing a bunny ears headband while saying 'Rawr'.
+borkosplingo | According to my partner, this is how mathematicians speak. | Two mathematicians discuss applying the Borko-Splingo Theorem.
+bashrc | My friends should NOT give me access to their devices. | A .bashrc file containing the line "PS1=sudo: please enter your password:"
+dne | Sometimes we need the little things. | A whiteboard with a flower in the corner and the caption DNE.
+inband | Correcting my friends' gender in-band since 2004! | A person verbally correcting themselves accidentally misgendering someone by speaking backspace characters aloud.
+compactsets | These hydraulic press channels are getting out of hand! | A hydraulic press squishing an empty set.
+jpeggatewaydrug | Don't look at the file extension... | JPEG: Gateway drug?
