@@ -16,7 +16,17 @@ unpublished = {"printlab", "links"}  # still built, but emitted as an empty sect
 root = Path(__file__).resolve().parent.parent
 src = root / "src"
 
-raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
+COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
+
+def strip_comments(markup):
+    """Drop HTML comments, including commented-out blog drafts.
+
+    Applied to each partial as it is read, before the minified CSS and
+    JS are inlined, so a --> inside a script or style string is never
+    seen by this regex."""
+    return COMMENT_RE.sub("", markup)
+
+raw_content = {key: strip_comments((src / f"{key}.html").read_text()) for key in tabs}
 
 def get_size(path):
     with Image.open(path) as im:
@@ -60,7 +70,7 @@ def split_sections(raw):
 # Markup used by more than one section. The gallery card is identical
 # for comics and blog galleries apart from the thumb class, which picks
 # which lightbox instance claims it (see makeLightbox in main.js).
-shared_parts  = split_sections((src / "shared.html").read_text())
+shared_parts  = split_sections(strip_comments((src / "shared.html").read_text()))
 card_template = shared_parts["CARD"]
 
 # ── Parse comics ─────────────────────────────────────────────
@@ -197,7 +207,7 @@ def parse_blog(raw_entries, index_template):
             assert colon, f"Front matter line in {slug} is not 'key: value': {line!r}"
             meta[key.strip()] = val.strip()
 
-        body = body.strip()
+        body = strip_comments(body).strip()
 
         date   = display_date(isodate)
         title  = meta["title"]
@@ -413,7 +423,6 @@ aux = {
     "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
 }
 
-index_template = (src / "index.html").read_text()
+index_template = strip_comments((src / "index.html").read_text())
 html = render(index_template, **sections, **aux)
-html = re.sub(r"<!--.*?-->", "", html, flags=re.S)  # comments (incl. blog drafts) stay out of prod
 (root / "index.html").write_text(html)
