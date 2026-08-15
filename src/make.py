@@ -136,16 +136,41 @@ def build_gallery(rows, slug, collected):
     cards = [build_image(line, slug, card_template, collected) for line in rows.splitlines() if line.strip()]
     return grid_template.format(cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
+POST_NAME_RE = re.compile(r"^(?P<isodate>\d{4}-\d{2}-\d{2})-(?P<slug>.+)$")
+
+def ordinal(n):
+    if 11 <= n % 100 <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+def display_date(isodate):
+    dt = datetime.strptime(isodate, "%Y-%m-%d")
+    return f"{dt.strftime('%B')} {ordinal(dt.day)}, {dt.year}"
+
 def load_blog_entries():
+    """Yield (isodate, slug, text) per published post.
+
+    The date and slug come from the filename rather than the front
+    matter, so they cannot drift out of sync with it. Filename sort
+    gives newest-first; an underscore prefix marks a draft."""
     files = sorted((src / "data/blog").glob("*.html"), reverse=True)
-    return [f.read_text() for f in files if not f.name.startswith("_")]
+    entries = []
+    for f in files:
+        if f.name.startswith("_"):
+            continue
+        m = POST_NAME_RE.match(f.stem)
+        assert m, f"Post {f.name} is not named <isodate>-<slug>.html"
+        entries.append((m["isodate"], m["slug"], f.read_text()))
+    return entries
 
 def parse_blog(raw_entries, index_template):
     index_items   = []
     post_sections = []
     feed_entries  = []  # list of (slug, title, isodate, teaser, body, images)
 
-    for raw in raw_entries:
+    for isodate, slug, raw in raw_entries:
         lines = raw.strip().splitlines()
 
         meta = {}
@@ -164,11 +189,9 @@ def parse_blog(raw_entries, index_template):
 
         body = "\n".join(lines[body_start:]).strip()
 
-        slug    = meta["slug"]
-        date    = meta["date"]
-        isodate = meta["isodate"]
-        title   = meta["title"]
-        teaser  = meta["teaser"]
+        date   = display_date(isodate)
+        title  = meta["title"]
+        teaser = meta["teaser"]
 
         images = []  # every [gallery]/[image] image in this post, in source order
 
@@ -205,10 +228,7 @@ raw_content["about"] = raw_content["about"].format(blog_images_json=json.dumps(b
 
 # ── Generate RSS feed ─────────────────────────────────────────
 def format_rfc2822(isodate):
-    try:
-        dt = datetime.strptime(isodate, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    except ValueError:
-        dt = datetime.strptime(re.sub(r'(\d+)(st|nd|rd|th)', r'\1', isodate), "%B %d, %Y").replace(tzinfo=timezone.utc)
+    dt = datetime.strptime(isodate, "%Y-%m-%d").replace(tzinfo=timezone.utc)
     return dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
 def cdata(text):
