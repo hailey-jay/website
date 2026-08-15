@@ -122,34 +122,32 @@ def render(template, **fields):
         template,
     )
 
-def parse_row(row):
-    """Split an `image | caption | alt` row.
+def repeat(template, records, sep="\n\n", **common):
+    """Render `template` once per record dict, joined by `sep`.
 
-    The caption fills the card title, the lightbox caption, and, absent
-    a third field, the alt text."""
-    fields  = [f.strip() for f in row.split("|")]
-    img     = fields[0]
-    caption = fields[1] if len(fields) > 1 else ""
-    alt     = fields[2] if len(fields) > 2 else caption
-    return img, caption, alt
+    `common` supplies the fields every copy shares; a record may
+    override them. Empty renders are dropped, so a record that expands
+    to nothing leaves no blank gap behind."""
+    out = [render(template, **{**common, **record}).strip() for record in records]
+    return sep.join(chunk for chunk in out if chunk)
 
-# Prose uses a literal § for section numbers ("§7: Monday 13:30-14:20"),
-# so the delimiter is matched strictly: a whole line, screaming case, no
-# inner punctuation. Anything less and a line of copy could open a
-# sub-template and silently truncate the section above it.
-SECTION_RE = re.compile(r"^§([A-Z][A-Z0-9_]*)§$")
+# ── Content formats ──────────────────────────────────────────
+# Four shapes cover every section: delimited blocks, `key: value`
+# fields, blank-line-separated records of those fields, and pipe rows.
+# They are defined once here and shared, so a section's data file reads
+# the same whichever section it belongs to.
 
-def split_sections(raw):
-    """Split a partial on §NAME§ delimiter lines.
+def split_on(text, pattern):
+    """Split `text` on whole-line delimiters matching `pattern`.
 
-    The text before the first delimiter is keyed "" (the section's own
-    markup); every §NAME§ line opens a named sub-template. Naming the
-    pieces means adding one cannot silently shift the others."""
+    The text before the first delimiter is keyed ""; each delimiter's
+    captured name keys the block that follows it. Naming the pieces
+    means adding one cannot silently shift the others."""
     parts   = {}
     key     = ""
     current = []
-    for line in raw.splitlines():
-        m = SECTION_RE.match(line.strip())
+    for line in text.splitlines():
+        m = pattern.match(line.strip())
         if m:
             parts[key] = "\n".join(current).strip()
             key        = m.group(1)
@@ -158,6 +156,61 @@ def split_sections(raw):
             current.append(line)
     parts[key] = "\n".join(current).strip()
     return parts
+
+# Markup uses §NAME§, data files use ---NAME---. Both are matched
+# strictly: a whole line, screaming case, nothing else. Prose contains a
+# literal § for section numbers ("§7: Monday 13:30-14:20"), and a loose
+# match would let a line of copy open a sub-template and silently
+# truncate the section above it.
+SECTION_RE = re.compile(r"^§([A-Z][A-Z0-9_]*)§$")
+DATA_RE    = re.compile(r"^-{3}([A-Z][A-Z0-9_]*)-{3}$")
+
+def split_sections(raw):
+    """Split a partial into its markup and its §NAME§ sub-templates."""
+    return split_on(raw, SECTION_RE)
+
+def split_data(raw):
+    """Split a data file into its ---NAME--- blocks."""
+    return split_on(raw, DATA_RE)
+
+def parse_kv(text, label, required=()):
+    """Parse a block of `key: value` lines into a dict."""
+    fields = {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        key, colon, val = line.partition(":")
+        assert colon, f"{label}: line is not 'key: value': {line!r}"
+        fields[key.strip()] = val.strip()
+    missing = [k for k in required if k not in fields]
+    assert not missing, f"{label}: missing {', '.join(missing)}"
+    return fields
+
+def parse_records(text, label, required=()):
+    """Parse blank-line-separated `key: value` blocks into a list of dicts."""
+    return [parse_kv(block, label, required)
+            for block in re.split(r"\n[ \t]*\n", text) if block.strip()]
+
+def parse_fields(row, count=None):
+    """Split a `a | b | c` row, padding to `count` with empty strings."""
+    fields = [f.strip() for f in row.split("|")]
+    if count is not None:
+        assert len(fields) <= count, \
+            f"Row has {len(fields)} fields, expected at most {count}: {row!r}"
+        fields += [""] * (count - len(fields))
+    return fields
+
+def rows_of(text):
+    """Yield the non-blank lines of a block of pipe rows."""
+    return [line for line in text.splitlines() if line.strip()]
+
+def parse_row(row):
+    """Split an `image | caption | alt` row.
+
+    The caption fills the card title, the lightbox caption, and, absent
+    a third field, the alt text."""
+    img, caption, alt = parse_fields(row, 3)
+    return img, caption, alt or caption
 
 # ── Shared sub-templates ─────────────────────────────────────
 # Markup used by more than one section. The gallery card is identical
@@ -174,21 +227,18 @@ comics_html    = comic_parts[""]
 comic_data     = (src / "data/comics.txt").read_text(encoding="utf-8")
 
 def parse_comics(data, template):
-    comics = []
-    for line in data.splitlines():
-        if not line.strip():
-            continue
+    records = []
+    for line in rows_of(data):
         stem, caption, alt = parse_row(line)
         path = f"comics/{stem}.webp"
-        comics.append(render(template,
-            thumb_class = "comic-thumb",
-            label       = "View comic",
-            src         = path,
-            img_attrs   = img_attrs(path, GRID_SIZES),
-            alt         = escape(alt),
-            caption     = escape(caption),
-        ).strip())
-    return "\n\n".join(comics)
+        records.append({
+            "src":       path,
+            "img_attrs": img_attrs(path, GRID_SIZES),
+            "alt":       escape(alt),
+            "caption":   escape(caption),
+        })
+    return repeat(template, records,
+                  thumb_class="comic-thumb", label="View comic")
 
 raw_content["comics"] = render(comics_html, body=parse_comics(comic_data, card_template))
 
@@ -249,7 +299,7 @@ def build_image(row, slug, template, collected, sizes=None):
     ).strip()
 
 def build_gallery(rows, slug, collected):
-    cards = [build_image(line, slug, card_template, collected) for line in rows.splitlines() if line.strip()]
+    cards = [build_image(line, slug, card_template, collected) for line in rows_of(rows)]
     return render(grid_template, cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
 # ── Feed rendering ───────────────────────────────────────────
@@ -281,7 +331,7 @@ def build_feed_body(body, slug):
     def expand(m):
         if m.group("rows") is not None:
             figures = [build_image(line, slug, FEED_FIGURE, throwaway)
-                       for line in m.group("rows").splitlines() if line.strip()]
+                       for line in rows_of(m.group("rows"))]
             return "\n".join(figures)
         return build_image(m.group("row"), slug, FEED_FIGURE, throwaway)
 
@@ -335,9 +385,7 @@ class Post:
         return f"{BASE_URL}/#blog-{self.slug}"
 
 def parse_blog(raw_entries):
-    index_items   = []
-    post_sections = []
-    posts         = []
+    posts = []
 
     for isodate, slug, raw in raw_entries:
         # Front matter is the leading key: value block, ended by a blank
@@ -346,12 +394,7 @@ def parse_blog(raw_entries):
         head, sep, body = raw.strip().partition("\n\n")
         assert sep, f"Post {slug} has no blank line after its front matter"
 
-        meta = {}
-        for line in head.splitlines():
-            key, colon, val = line.partition(":")
-            assert colon, f"Front matter line in {slug} is not 'key: value': {line!r}"
-            meta[key.strip()] = val.strip()
-
+        meta = parse_kv(head, f"Post {slug} front matter", ("title", "teaser"))
         body = strip_comments(body).strip()
 
         post = Post(
@@ -373,20 +416,25 @@ def parse_blog(raw_entries):
 
         post.feed_body = build_feed_body(body, post.slug)
         check_balance(post.feed_body, f"Post {slug} (feed)")
-        thumb = (f'<img class="blog-entry-thumb" src="{post.images[0]["thumb"]}" alt="" '
-                 f'width="56" height="56" loading="lazy" decoding="async">') if post.images else ""
-
-        index_items.append(render(entry_template,
-            slug=post.slug, date=post.date, title=post.title,
-            teaser=post.teaser, thumb=thumb).strip())
-
-        post_sections.append(render(post_template,
-            slug=post.slug, title=post.title, date=post.date,
-            body=post.body).strip())
 
         posts.append(post)
 
-    return "\n\n".join(index_items), "\n\n".join(post_sections), posts
+    def thumb_for_post(post):
+        if not post.images:
+            return ""
+        return (f'<img class="blog-entry-thumb" src="{post.images[0]["thumb"]}" alt="" '
+                f'width="56" height="56" loading="lazy" decoding="async">')
+
+    entries = repeat(entry_template, [
+        {"slug": p.slug, "date": p.date, "title": p.title,
+         "teaser": p.teaser, "thumb": thumb_for_post(p)}
+        for p in posts
+    ])
+    sections = repeat(post_template, [
+        {"slug": p.slug, "title": p.title, "date": p.date, "body": p.body}
+        for p in posts
+    ])
+    return entries, sections, posts
 
 entries_html, posts_html, posts = parse_blog(load_blog_entries())
 raw_content["blog"] = render(blog_html, entries=entries_html, posts=posts_html)
@@ -451,122 +499,78 @@ def parse_printlab(raw):
     data_file = src / "data/printlab.txt"
     assert data_file.exists(), \
         "src/data/printlab.txt is missing; printlab cannot be published without it"
-    data_block = data_file.read_text(encoding="utf-8")
-
-    # ── Parse DATA block ──────────────────────────────────────
-    data_sections = {}
-    cur_sec = None
-    cur_sec_lines = []
-    for line in data_block.splitlines():
-        if line.startswith("---") and line.endswith("---"):
-            if cur_sec is not None:
-                data_sections[cur_sec] = "\n".join(cur_sec_lines).strip()
-            cur_sec = line.strip("-").strip()
-            cur_sec_lines = []
-        else:
-            cur_sec_lines.append(line)
-    if cur_sec is not None:
-        data_sections[cur_sec] = "\n".join(cur_sec_lines).strip()
-
-    # Meta (key: value lines before first ---)
-    meta = {}
-    for line in data_block.splitlines():
-        if line.startswith("---"):
-            break
-        if ":" in line:
-            k, _, v = line.partition(":")
-            meta[k.strip()] = v.strip()
+    data = split_data(data_file.read_text(encoding="utf-8"))
+    meta = parse_kv(data[""], "printlab meta")
 
     # ── Printers ──────────────────────────────────────────────
-    status_labels = {
+    STATUS_LABELS = {
         "idle":        "Idle",
         "printing":    "Printing",
         "offline":     "Offline",
         "maintenance": "Maintenance",
     }
 
-    printer_blocks = [b.strip() for b in data_sections["PRINTERS"].split("\n\n") if b.strip()]
-    printer_rows = []
-    for block in printer_blocks:
-        p = {}
-        for line in block.splitlines():
-            if ":" in line:
-                k, _, v = line.partition(":")
-                p[k.strip()] = v.strip()
-        status = p.get("status", "offline")
-        printer_rows.append(render(printer_template,
-            name         = p.get("name", ""),
-            status       = status,
-            status_label = status_labels.get(status, status.title()),
-            note         = p.get("note", ""),
-        ).strip())
+    printers = parse_records(data["PRINTERS"], "printlab printer", ("name", "status"))
+    printer_rows = repeat(printer_template, [
+        {
+            "name":         p["name"],
+            "status":       p["status"],
+            "status_label": STATUS_LABELS.get(p["status"], p["status"].title()),
+            "note":         p.get("note", ""),
+        }
+        for p in printers
+    ], sep="\n        ")
 
     # ── Gallery ───────────────────────────────────────────────
     # Same `image | caption | alt` rows and same shared card as the
     # comics and blog galleries; only the aria-label verb differs.
-    gallery_cards = []
-    for line in data_sections["GALLERY"].splitlines():
-        if not line.strip():
-            continue
+    gallery_records = []
+    for line in rows_of(data["GALLERY"]):
         img, caption, alt = parse_row(line)
         assert (root / img).exists(), f"Print gallery image {img} does not exist"
-        gallery_cards.append(render(card_template,
-            thumb_class = "gallery-thumb",
-            label       = "View print",
-            src         = img,
-            img_attrs   = img_attrs(img, GRID_SIZES),
-            alt         = escape(alt),
-            caption     = escape(caption),
-        ).strip())
+        gallery_records.append({
+            "src":       img,
+            "img_attrs": img_attrs(img, GRID_SIZES),
+            "alt":       escape(alt),
+            "caption":   escape(caption),
+        })
+    gallery_cards = repeat(card_template, gallery_records,
+                           thumb_class="gallery-thumb", label="View print")
 
     # ── Filament ──────────────────────────────────────────────
-    filament_groups = []
-    current_diameter = None
-    current_rows = []
-
-    def flush_group(diameter, rows, ftmpl, rtmpl):
-        if not diameter or not rows:
-            return ""
-        row_html = []
-        for r in rows:
-            fields = [f.strip() for f in r.split("|")]
-            material = fields[0]
-            color    = fields[1]
-            hex_val  = fields[2]
-            stock    = fields[3]
-            blurb    = fields[4] if len(fields) > 4 else ""
-            blurb_html = f'<span class="filament-blurb">({blurb})</span>' if blurb else ""
-            row_html.append(render(rtmpl,
-                material = material,
-                color    = color,
-                hex      = hex_val,
-                stock    = stock + " spools",
-                blurb    = blurb_html,
-            ).strip())
-        return render(ftmpl,
-            diameter = diameter,
-            rows     = "\n            ".join(row_html),
-        ).strip()
-
-    for line in data_sections["FILAMENT"].splitlines():
-        stripped = line.strip()
-        if not stripped:
+    # Rows are grouped under bare diameter headings ("1.75mm"), so a
+    # heading is any non-row line; everything else is a filament row.
+    groups  = []
+    current = None
+    for line in rows_of(data["FILAMENT"]):
+        line = line.strip()
+        if "|" not in line:
+            current = (line, [])
+            groups.append(current)
             continue
-        if stripped.endswith("mm") and "|" not in stripped:
-            if current_diameter:
-                filament_groups.append(flush_group(current_diameter, current_rows, filament_template, filament_row_tmpl))
-            current_diameter = stripped
-            current_rows = []
-        else:
-            current_rows.append(stripped)
-    if current_diameter:
-        filament_groups.append(flush_group(current_diameter, current_rows, filament_template, filament_row_tmpl))
+        assert current, f"Filament row before any diameter heading: {line!r}"
+        material, color, hex_val, stock, blurb = parse_fields(line, 5)
+        current[1].append({
+            "material": material,
+            "color":    color,
+            "hex":      hex_val,
+            "stock":    f"{stock} spools",
+            "blurb":    f'<span class="filament-blurb">({blurb})</span>' if blurb else "",
+        })
+
+    filament = repeat(filament_template, [
+        {
+            "diameter": diameter,
+            "rows":     repeat(filament_row_tmpl, rows, sep="\n            "),
+        }
+        for diameter, rows in groups if rows
+    ])
 
     return render(html_template,
         printer_count = meta.get("printer_count", ""),
-        printers      = "\n        ".join(printer_rows),
-        gallery       = "\n\n".join(gallery_cards),
-        filament      = "\n\n".join(filament_groups),
+        printers      = printer_rows,
+        gallery       = gallery_cards,
+        filament      = filament,
     )
 
 if "printlab" not in unpublished:
