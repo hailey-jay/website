@@ -112,13 +112,14 @@ def build_image(row, slug, template):
     if "." not in img.rsplit("/", 1)[-1]:
         img += ".webp"
     assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
+    w, h = get_size(root / img)
     return template.format(
         thumb_class = "gallery-thumb",
         label       = "View image",
         src         = img,
         alt         = escape(alt),
         caption     = escape(caption),
-        dims        = "",
+        dims        = f' width="{w}" height="{h}"',
     ).strip()
 
 def build_gallery(rows, slug):
