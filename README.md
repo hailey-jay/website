@@ -62,6 +62,13 @@ Partials are split on `§NAME§` marker lines, and `{name}` placeholders are
 filled by `render()` in `make.py`. Braces that are not a known placeholder are
 left alone, so a partial can contain inline CSS or JS verbatim.
 
+Partials carry no `style` attributes; styling lives in `src/main.css`. The
+shared pieces are `.section-intro` and `.section-note` for the paragraphs under
+a heading, `.eyebrow` for a small uppercase label, `.quick-links`,
+`.plain-list` for an unbulleted nested list, and `.reason-list` for a bulleted
+one. The two exceptions are a value the build computes (the filament swatch's
+`background`) and `src/cv.html`, which is generated from `~/Quarters/CV`.
+
 ## Typography
 Type the character. Source files are UTF-8, the page and the feed both declare
 UTF-8, and every read and write in `make.py` pins `encoding="utf-8"`, so a

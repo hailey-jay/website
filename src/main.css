@@ -399,6 +399,43 @@ section.active {
     letter-spacing: .01em;
 }
 
+/* ── Section furniture ──────────────────────────────────────── */
+/* Shared by teaching, comics, blog, and the print lab. The 60ch
+   measure and the 1rem bottom margin come from the base `p` rule
+   below, so these only adjust the spacing a lead or a caption needs. */
+.section-intro        { margin-bottom: 1.6rem; }
+.section-intro--tight { margin-bottom: .4rem; }
+.section-note         { margin-bottom: 1.4rem; }
+
+/* Small uppercase label above a list, e.g. "Quick Links". */
+.eyebrow {
+    font-size: .85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: .5rem;
+}
+
+.quick-links {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    font-size: .95rem;
+}
+
+/* Unbulleted list nested inside prose: section times, grading rules. */
+.plain-list {
+    list-style: none;
+    padding: 0;
+    margin: .4rem 0;
+}
+
+.plain-list--flush { margin-bottom: 0; }
+
+/* Bulleted list that keeps its markers, indented to clear them. */
+.reason-list { margin: .4rem 0 .4rem 1.2rem; }
+
 /* ── Prose ──────────────────────────────────────────────────── */
 p {
     margin-bottom: 1rem;
@@ -562,6 +599,11 @@ a:focus {
     font-size: .97rem;
     line-height: 1.65;
 }
+
+/* Follow-on paragraphs within one definition, e.g. the phone policy
+   under Overview. Every one of these carried its own inline margin,
+   drifting between .4 and .6rem; they all do the same job. */
+.course-dl dd p { margin-top: .5rem; }
 /* ── Galleries  ─────────────────────────────────────────── */
 .gallery-grid {
     display: grid;
@@ -1008,6 +1050,17 @@ footer a {
 }
 
 /* ── Print lab section ──────────────────────────────────────── */
+#lab-gallery { margin-bottom: 1em; }
+
+/* What to include in a print request. */
+.request-list {
+    max-width: 58ch;
+    padding-left: 1.4rem;
+    margin: .6rem 0 1rem;
+    font-size: .97rem;
+    line-height: 1.75;
+}
+
 .lab-section-title {
     font-size: 1rem;
     font-weight: 600;
