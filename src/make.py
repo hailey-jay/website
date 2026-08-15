@@ -22,6 +22,20 @@ def get_size(path):
     with Image.open(path) as im:
         return im.size
 
+PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
+
+def render(template, **fields):
+    """Substitute {name} placeholders in a template.
+
+    Unlike str.format, a literal brace needs no escaping and an
+    unrecognised {name} is left alone, so a partial can carry inline
+    JS or CSS verbatim. Values are inserted as-is; escape before
+    passing anything that needs it."""
+    return PLACEHOLDER_RE.sub(
+        lambda m: str(fields[m.group(1)]) if m.group(1) in fields else m.group(0),
+        template,
+    )
+
 def split_sections(raw):
     """Split a partial on §NAME§ delimiter lines.
 
@@ -64,7 +78,7 @@ def parse_comics(data, template):
         src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
         path = f"comics/{src_file}.webp"
         w, h = get_size(root / path)
-        comics.append(template.format(
+        comics.append(render(template,
             thumb_class = "comic-thumb",
             label       = "View comic",
             src         = path,
@@ -74,7 +88,7 @@ def parse_comics(data, template):
         ).strip())
     return "\n\n".join(comics)
 
-raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, card_template))
+raw_content["comics"] = render(comics_html, body=parse_comics(comic_data, card_template))
 
 # ── Parse blog ───────────────────────────────────────────────
 # One file per post under src/data/blog/, named <isodate>-<slug>.html:
@@ -123,7 +137,7 @@ def build_image(row, slug, template, collected):
     # Recorded as raw text, in DOM order. The carousel assigns these to
     # img.alt as a property, so they must not be HTML-escaped.
     collected.append({"src": img, "alt": alt})
-    return template.format(
+    return render(template,
         thumb_class = "gallery-thumb",
         label       = "View image",
         src         = img,
@@ -134,7 +148,7 @@ def build_image(row, slug, template, collected):
 
 def build_gallery(rows, slug, collected):
     cards = [build_image(line, slug, card_template, collected) for line in rows.splitlines() if line.strip()]
-    return grid_template.format(cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
+    return render(grid_template, cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
 POST_NAME_RE = re.compile(r"^(?P<isodate>\d{4}-\d{2}-\d{2})-(?P<slug>.+)$")
 
@@ -200,11 +214,11 @@ def parse_blog(raw_entries, index_template):
         thumb = f'<img class="blog-entry-thumb" src="{images[0]["src"]}" alt="">' if images else ""
 
         index_items.append(
-            index_template.format(slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
+            render(index_template, slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
         )
 
         post_sections.append(
-            post_template.format(slug=slug, title=title, date=date, body=body).strip()
+            render(post_template, slug=slug, title=title, date=date, body=body).strip()
         )
 
         feed_entries.append((slug, title, isodate, teaser, body, images))
@@ -212,7 +226,7 @@ def parse_blog(raw_entries, index_template):
     return "\n\n".join(index_items), "\n\n".join(post_sections), feed_entries
 
 entries_html, posts_html, feed_entries = parse_blog(load_blog_entries(), entry_template)
-raw_content["blog"] = blog_html.format(entries=entries_html, posts=posts_html)
+raw_content["blog"] = render(blog_html, entries=entries_html, posts=posts_html)
 
 # ── Collect blog images for the homepage carousel ──────────────
 blog_images = []
@@ -220,7 +234,7 @@ for slug, title, isodate, teaser, body, images in feed_entries:
     for image in images:
         blog_images.append({**image, "slug": slug, "title": title})
 
-raw_content["about"] = raw_content["about"].format(blog_images_json=json.dumps(blog_images))
+raw_content["about"] = render(raw_content["about"], blog_images_json=json.dumps(blog_images))
 
 # ── Generate RSS feed ─────────────────────────────────────────
 def format_rfc2822(isodate):
@@ -310,7 +324,7 @@ def parse_printlab(raw):
                 k, _, v = line.partition(":")
                 p[k.strip()] = v.strip()
         status = p.get("status", "offline")
-        printer_rows.append(printer_template.format(
+        printer_rows.append(render(printer_template,
             name         = p.get("name", ""),
             status       = status,
             status_label = status_labels.get(status, status.title()),
@@ -323,7 +337,7 @@ def parse_printlab(raw):
     gallery_cards = []
     for i in range(0, len(gallery_lines), 3):
         src_file, alt, caption = gallery_lines[i], gallery_lines[i+1], gallery_lines[i+2]
-        gallery_cards.append(gallery_template.format(
+        gallery_cards.append(render(gallery_template,
             src     = src_file,
             alt     = alt,
             caption = caption,
@@ -346,14 +360,14 @@ def parse_printlab(raw):
             stock    = fields[3]
             blurb    = fields[4] if len(fields) > 4 else ""
             blurb_html = f'<span class="filament-blurb">({blurb})</span>' if blurb else ""
-            row_html.append(rtmpl.format(
+            row_html.append(render(rtmpl,
                 material = material,
                 color    = color,
                 hex      = hex_val,
                 stock    = stock + " spools",
                 blurb    = blurb_html,
             ).strip())
-        return ftmpl.format(
+        return render(ftmpl,
             diameter = diameter,
             rows     = "\n            ".join(row_html),
         ).strip()
@@ -372,7 +386,7 @@ def parse_printlab(raw):
     if current_diameter:
         filament_groups.append(flush_group(current_diameter, current_rows, filament_template, filament_row_tmpl))
 
-    return html_template.format(
+    return render(html_template,
         printer_count = meta.get("printer_count", ""),
         printers      = "\n        ".join(printer_rows),
         gallery       = "\n\n".join(gallery_cards),
@@ -400,6 +414,6 @@ aux = {
 }
 
 index_template = (src / "index.html").read_text()
-html = index_template.format(**sections, **aux)
+html = render(index_template, **sections, **aux)
 html = re.sub(r"<!--.*?-->", "", html, flags=re.S)  # comments (incl. blog drafts) stay out of prod
 (root / "index.html").write_text(html)
