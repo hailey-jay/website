@@ -33,6 +33,30 @@ def get_size(path):
     with Image.open(path) as im:
         return im.size
 
+# ── Markup validation ────────────────────────────────────────
+# An unclosed tag is invisible in the built page (the parser closes
+# it for you, usually in the wrong place) but corrupts the RSS body
+# and swallows following prose into a link. Cheaper to catch here.
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "source", "track", "wbr"}
+TAG_RE = re.compile(r"<(/?)([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(/?)>")
+
+def check_balance(markup, label):
+    """Assert that every non-void element in `markup` is closed, in order."""
+    stack = []
+    for closing, name, self_closing in TAG_RE.findall(markup):
+        name = name.lower()
+        if name in VOID or self_closing:
+            continue
+        if not closing:
+            stack.append(name)
+        else:
+            assert stack, f"{label}: stray </{name}>"
+            assert stack[-1] == name, \
+                f"{label}: </{name}> closes <{stack[-1]}>"
+            stack.pop()
+    assert not stack, f"{label}: unclosed <{stack[-1]}>"
+
 PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
 
 def render(template, **fields):
@@ -250,6 +274,7 @@ def parse_blog(raw_entries):
             return build_image(m.group("row"), post.slug, figure_template, post.images)
 
         post.body = DIRECTIVE_RE.sub(expand, body)
+        check_balance(post.body, f"Post {slug}")
         thumb = f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="">' if post.images else ""
 
         index_items.append(render(entry_template,
@@ -459,5 +484,6 @@ aux = {
 }
 
 index_template = strip_comments((src / "index.html").read_text())
+check_balance(index_template, "src/index.html")
 html = render(index_template, **sections, **aux)
 (root / "index.html").write_text(html)
