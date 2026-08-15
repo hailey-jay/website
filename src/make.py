@@ -211,16 +211,20 @@ def format_rfc2822(isodate):
         dt = datetime.strptime(re.sub(r'(\d+)(st|nd|rd|th)', r'\1', isodate), "%B %d, %Y").replace(tzinfo=timezone.utc)
     return dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
+def cdata(text):
+    """Wrap text in CDATA, splitting any literal ]]> that would close it early."""
+    return "<![CDATA[" + text.replace("]]>", "]]]]><![CDATA[>") + "]]>"
+
 items_xml = ""
 for slug, title, isodate, teaser, body, images in feed_entries:
     items_xml += f"""
     <item>
-        <title>{title}</title>
+        <title>{escape(title, quote=False)}</title>
         <link>{BASE_URL}/#blog-{slug}</link>
         <guid isPermaLink="true">{BASE_URL}/#blog-{slug}</guid>
         <pubDate>{format_rfc2822(isodate)}</pubDate>
-        <description>{teaser}</description>
-        <content:encoded><![CDATA[{body}]]></content:encoded>
+        <description>{escape(teaser, quote=False)}</description>
+        <content:encoded>{cdata(body)}</content:encoded>
     </item>"""
 
 feed = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -230,6 +234,7 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
         <link>{BASE_URL}/</link>
         <description>Math, teaching, and whatever else is on my mind.</description>
         <language>en-us</language>
+        <lastBuildDate>{format_rfc2822(feed_entries[0][2]) if feed_entries else ""}</lastBuildDate>
         <atom:link href="{BASE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
 {items_xml}
     </channel>
