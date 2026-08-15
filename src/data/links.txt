@@ -1,0 +1,12 @@
+LSU
+LSU AWM Chapter                       | https://www.math.lsu.edu/~awm/
+LSU Research and Training Group (RTG) | https://www.math.lsu.edu/~trm-rtg/
+LSU Mathematics Department            | https://www.math.lsu.edu/
+
+Resources
+arXiv         | https://arxiv.org
+MathSciNet    | https://mathscinet.ams.org
+MathOverflow  | https://mathoverflow.net
+
+Fun
+Personal RSS feed | rss.xml | rss

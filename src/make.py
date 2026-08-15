@@ -636,6 +636,30 @@ def parse_printlab(raw):
 if "printlab" not in unpublished:
     raw_content["printlab"] = parse_printlab(raw_content["printlab"])
 
+# ── Parse links ──────────────────────────────────────────────
+# src/data/links.txt is heading-then-rows, the same shape as the
+# filament table: a bare line opens a group, and each `label | url`
+# row under it is one link. An optional third field names a variant
+# template, which is how the RSS entry gets its icon.
+def parse_links(raw):
+    parts = split_sections(raw)
+    data  = (src / "data/links.txt").read_text(encoding="utf-8")
+
+    groups = []
+    for title, rows in group_rows(data, "links"):
+        links = []
+        for row in rows:
+            label, url, variant = parse_fields(row, 3)
+            key = f"LINK_{variant.upper()}" if variant else "LINK"
+            assert key in parts, f"links: no §{key}§ template for {label!r}"
+            links.append(render(parts[key], label=label, url=url).strip())
+        groups.append({"title": title, "links": indent("\n".join(links), "        ")})
+
+    return render(parts[""], groups=repeat(parts["GROUP"], groups))
+
+if "links" not in unpublished:
+    raw_content["links"] = parse_links(raw_content["links"])
+
 # ── Assemble index.html ──────────────────────────────────────
 
 def wrap_section(key):
