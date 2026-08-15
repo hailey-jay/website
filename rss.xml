@@ -5,9 +5,81 @@
         <link>https://haileyjay.net/</link>
         <description>Math, teaching, and whatever else is on my mind.</description>
         <language>en-us</language>
-        <lastBuildDate>Sat, 18 Jul 2026 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Fri, 14 Aug 2026 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://haileyjay.net/rss.xml" rel="self" type="application/rss+xml"/>
 
+    <item>
+        <title>Haverford BSM REU</title>
+        <link>https://haileyjay.net/#blog-haverford</link>
+        <guid isPermaLink="true">https://haileyjay.net/#blog-haverford</guid>
+        <pubDate>Fri, 14 Aug 2026 00:00:00 +0000</pubDate>
+        <description>Public transit? What's that?</description>
+        <content:encoded><![CDATA[<p>Hey yall!</p>
+<p>I recently returned from yet another summer adventure! This time, I was up at Haverford College, TA'ing for an REU. It was sponsored by <a href="https://budapestsemesters.com/">Budapest Semesters in Mathematics</a> and the professor for our group was the brilliant (and extremely friendly) <a href="https://www.haverford.edu/users/jsabloff">Josh Sabloff</a>. Everyone in the group was beyond wonderful; shout-out to Peter Ahlin, <a href="https://arxiv.org/abs/2509.06363">Catherine DiLeo</a>, <a href="https://www.linkedin.com/in/olivia-mcgrew-35b895341/">Olivia McGrew</a>, and <a href="https://profiles.stanford.edu/rishubh-thaper">Rishubh Thaper</a> for their sharp minds, work ethic, and collaborative spirit! I loved working with yall and would love to see yall again.</p>
+<figure class="blog-figure">
+  <button class="gallery-thumb thumb" data-src="images/blog/haverford/strawbridge.webp" data-alt="Strawbridge Observatory through the brush" data-caption="Strawbridge Observatory through the brush" aria-label="View image: Strawbridge Observatory through the brush">
+    <img src="images/blog/haverford/strawbridge.webp" alt="Strawbridge Observatory through the brush" width="1600" height="1200">
+  </button>
+  <figcaption>Strawbridge Observatory through the brush</figcaption>
+</figure>
+<p>More than just a fun summer project, we ended up doing really good research! Keep your eyes peeled for that, but it's still a work-in-progress. I was pleasantly surprised that everyone in the group was more than strong enough to hold their own in serious math research, even through big challenges and many, many failed Reidemeister moves. I feel confident in being able to call them my collaborators.</p>
+<p>On a personal note, I got to rediscover my love of soccer! We all spent time watching the World Cup and took evenings off to kick the ball around. I'm told "math soccer" isn't normally as competitive and high-quality! Hopefully, I'll spend some time this semester continuing to play.</p>
+<p>This post would not be complete without mentioning my good friends in the "other" group: the professors <a href="https://aa.academic.wlu.edu/">Aaron Abrams</a> and <a href="https://people.reed.edu/~jamie/">Jamie Pommersheim</a>, the TA <a href="https://www.math.upenn.edu/people/annie-holden">Annie Holden</a>, and participants <a href="https://arenguralp.com/">Aren Gürlap</a>, Sofia Piccirillo, and Nickey Zhang. Yall more than impressed me and everyone else there.</p>
+<p>I've done my very best to provide links to everyone to give them all the proper credit. If I haven't, I'm sure they'll let me know.</p>
+<p>Two special mentions from the above: Catherine is an organizer of the <a href="https://meetings.ams.org/math/jmm2025/meetingapp.cgi/Session/12655">National Set Championship</a> at the JMM every year. The preceding link is stale, so go sign up for the upcoming one whenever that's available. Additionally, Aren is an officer and writer for the <a href="https://www.brownpuzzlehunt.com/">Brown Puzzlehunt</a>.</p>
+<p>Here are some pictures I took around campus. It was an absolutely gorgeous place and I really enjoyed my time there.</p>
+<div class="gallery-grid">
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/hilles.webp" data-alt="Hilles Hall" data-caption="Hilles Hall" aria-label="View image: Hilles Hall">
+          <img src="images/blog/haverford/hilles.webp" alt="Hilles Hall" width="1600" height="1162">
+      </button>
+      <p class="gallery-title">Hilles Hall</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/rotunda.webp" data-alt="The Rotunda from the ground floor" data-caption="The Rotunda from the ground floor" aria-label="View image: The Rotunda from the ground floor">
+          <img src="images/blog/haverford/rotunda.webp" alt="The Rotunda from the ground floor" width="1200" height="1600">
+      </button>
+      <p class="gallery-title">The Rotunda from the ground floor</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/staircase.webp" data-alt="The staircase leading up to Hilles" data-caption="The staircase leading up to Hilles" aria-label="View image: The staircase leading up to Hilles">
+          <img src="images/blog/haverford/staircase.webp" alt="The staircase leading up to Hilles" width="1203" height="1600">
+      </button>
+      <p class="gallery-title">The staircase leading up to Hilles</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/passthrough.webp" data-alt="A garden between buildings" data-caption="A garden between buildings" aria-label="View image: A garden between buildings">
+          <img src="images/blog/haverford/passthrough.webp" alt="A garden between buildings" width="1024" height="702">
+      </button>
+      <p class="gallery-title">A garden between buildings</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/walkway.webp" data-alt="A rather beautiful sidewalk view" data-caption="A rather beautiful sidewalk view" aria-label="View image: A rather beautiful sidewalk view">
+          <img src="images/blog/haverford/walkway.webp" alt="A rather beautiful sidewalk view" width="1600" height="1200">
+      </button>
+      <p class="gallery-title">A rather beautiful sidewalk view</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/path.webp" data-alt="The gravel path through the woods I walked daily" data-caption="The gravel path through the woods I walked daily" aria-label="View image: The gravel path through the woods I walked daily">
+          <img src="images/blog/haverford/path.webp" alt="The gravel path through the woods I walked daily" width="1600" height="1200">
+      </button>
+      <p class="gallery-title">The gravel path through the woods I walked daily</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/pyramid.webp" data-alt="A human pyramid! (Image credit: Sofia Piccirillo)" data-caption="A human pyramid! (Image credit: Sofia Piccirillo)" aria-label="View image: A human pyramid! (Image credit: Sofia Piccirillo)">
+          <img src="images/blog/haverford/pyramid.webp" alt="A human pyramid! (Image credit: Sofia Piccirillo)" width="1600" height="889">
+      </button>
+      <p class="gallery-title">A human pyramid! (Image credit: Sofia Piccirillo)</p>
+  </div>
+  <div class="gallery-card">
+      <button class="gallery-thumb thumb" data-src="images/blog/haverford/mordor.webp" data-alt="A passthrough between buildings, apparently dubbed Mordor" data-caption="A passthrough between buildings, apparently dubbed Mordor" aria-label="View image: A passthrough between buildings, apparently dubbed Mordor">
+          <img src="images/blog/haverford/mordor.webp" alt="A passthrough between buildings, apparently dubbed Mordor" width="1600" height="1200">
+      </button>
+      <p class="gallery-title">A passthrough between buildings, apparently dubbed Mordor</p>
+  </div>
+</div>
+<p>Best,<br>Hailey</p>]]></content:encoded>
+    </item>
     <item>
         <title>Quick updates</title>
         <link>https://haileyjay.net/#blog-updates</link>
