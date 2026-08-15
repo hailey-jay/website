@@ -99,10 +99,17 @@ figure_template = blog_parts["FIGURE"]
 # Both take `image | caption | alt` rows. A bare stem resolves to
 # images/blog/<slug>/<stem>.webp; a value with a slash is used as-is
 # (and a missing extension defaults to .webp).
-GALLERY_RE = re.compile(r"^[ \t]*\[gallery\][ \t]*\n(.*?)^[ \t]*\[/gallery\][ \t]*$", re.M | re.S)
-IMAGE_RE   = re.compile(r"^[ \t]*\[image[ \t]+(.+?)\][ \t]*$", re.M)
+# One alternation rather than two passes, so a post's galleries and its
+# inline figures are expanded in a single left-to-right sweep and the
+# collected image list comes out in true source order.
+DIRECTIVE_RE = re.compile(
+    r"^[ \t]*\[gallery\][ \t]*\n(?P<rows>.*?)^[ \t]*\[/gallery\][ \t]*$"
+    r"|"
+    r"^[ \t]*\[image[ \t]+(?P<row>[^\]\n]+)\][ \t]*$",
+    re.M | re.S,
+)
 
-def build_image(row, slug, template):
+def build_image(row, slug, template, collected):
     fields  = [f.strip() for f in row.split("|")]
     img     = fields[0]
     caption = fields[1] if len(fields) > 1 else ""
@@ -113,6 +120,9 @@ def build_image(row, slug, template):
         img += ".webp"
     assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
     w, h = get_size(root / img)
+    # Recorded as raw text, in DOM order. The carousel assigns these to
+    # img.alt as a property, so they must not be HTML-escaped.
+    collected.append({"src": img, "alt": alt})
     return template.format(
         thumb_class = "gallery-thumb",
         label       = "View image",
@@ -122,8 +132,8 @@ def build_image(row, slug, template):
         dims        = f' width="{w}" height="{h}"',
     ).strip()
 
-def build_gallery(rows, slug):
-    cards = [build_image(line, slug, card_template) for line in rows.splitlines() if line.strip()]
+def build_gallery(rows, slug, collected):
+    cards = [build_image(line, slug, card_template, collected) for line in rows.splitlines() if line.strip()]
     return grid_template.format(cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
 def load_blog_entries():
@@ -133,7 +143,7 @@ def load_blog_entries():
 def parse_blog(raw_entries, index_template):
     index_items   = []
     post_sections = []
-    feed_entries  = []  # list of (slug, title, isodate, teaser, body)
+    feed_entries  = []  # list of (slug, title, isodate, teaser, body, images)
 
     for raw in raw_entries:
         lines = raw.strip().splitlines()
@@ -160,11 +170,15 @@ def parse_blog(raw_entries, index_template):
         title   = meta["title"]
         teaser  = meta["teaser"]
 
-        body = GALLERY_RE.sub(lambda m: build_gallery(m.group(1), slug), body)
-        body = IMAGE_RE.sub(lambda m: build_image(m.group(1), slug, figure_template), body)
+        images = []  # every [gallery]/[image] image in this post, in source order
 
-        img_match = re.search(r'<img[^>]+src="([^"]+)"', body)
-        thumb = f'<img class="blog-entry-thumb" src="{img_match.group(1)}" alt="">' if img_match else ""
+        def expand(m, slug=slug, images=images):
+            if m.group("rows") is not None:
+                return build_gallery(m.group("rows"), slug, images)
+            return build_image(m.group("row"), slug, figure_template, images)
+
+        body  = DIRECTIVE_RE.sub(expand, body)
+        thumb = f'<img class="blog-entry-thumb" src="{images[0]["src"]}" alt="">' if images else ""
 
         index_items.append(
             index_template.format(slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
@@ -174,7 +188,7 @@ def parse_blog(raw_entries, index_template):
             post_template.format(slug=slug, title=title, date=date, body=body).strip()
         )
 
-        feed_entries.append((slug, title, isodate, teaser, body))
+        feed_entries.append((slug, title, isodate, teaser, body, images))
 
     return "\n\n".join(index_items), "\n\n".join(post_sections), feed_entries
 
@@ -183,9 +197,9 @@ raw_content["blog"] = blog_html.format(entries=entries_html, posts=posts_html)
 
 # ── Collect blog images for the homepage carousel ──────────────
 blog_images = []
-for slug, title, isodate, teaser, body in feed_entries:
-    for img_src, alt in re.findall(r'<img[^>]+src="([^"]+)"[^>]*alt="([^"]*)"', body):
-        blog_images.append({"src": img_src, "alt": alt, "slug": slug, "title": title})
+for slug, title, isodate, teaser, body, images in feed_entries:
+    for image in images:
+        blog_images.append({**image, "slug": slug, "title": title})
 
 raw_content["about"] = raw_content["about"].format(blog_images_json=json.dumps(blog_images))
 
@@ -198,7 +212,7 @@ def format_rfc2822(isodate):
     return dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
 items_xml = ""
-for slug, title, isodate, teaser, body in feed_entries:
+for slug, title, isodate, teaser, body, images in feed_entries:
     items_xml += f"""
     <item>
         <title>{title}</title>
