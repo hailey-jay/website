@@ -27,7 +27,7 @@ def strip_comments(markup):
     seen by this regex."""
     return COMMENT_RE.sub("", markup)
 
-raw_content = {key: strip_comments((src / f"{key}.html").read_text()) for key in tabs}
+raw_content = {key: strip_comments((src / f"{key}.html").read_text(encoding="utf-8")) for key in tabs}
 
 def get_size(path):
     with Image.open(path) as im:
@@ -133,6 +133,12 @@ def parse_row(row):
     alt     = fields[2] if len(fields) > 2 else caption
     return img, caption, alt
 
+# Prose uses a literal § for section numbers ("§7: Monday 13:30-14:20"),
+# so the delimiter is matched strictly: a whole line, screaming case, no
+# inner punctuation. Anything less and a line of copy could open a
+# sub-template and silently truncate the section above it.
+SECTION_RE = re.compile(r"^§([A-Z][A-Z0-9_]*)§$")
+
 def split_sections(raw):
     """Split a partial on §NAME§ delimiter lines.
 
@@ -143,10 +149,10 @@ def split_sections(raw):
     key     = ""
     current = []
     for line in raw.splitlines():
-        marker = line.strip()
-        if marker.startswith("§") and marker.endswith("§") and marker.strip("§").strip():
+        m = SECTION_RE.match(line.strip())
+        if m:
             parts[key] = "\n".join(current).strip()
-            key        = marker.strip("§").strip()
+            key        = m.group(1)
             current    = []
         else:
             current.append(line)
@@ -157,7 +163,7 @@ def split_sections(raw):
 # Markup used by more than one section. The gallery card is identical
 # for comics and blog galleries apart from the thumb class, which picks
 # which lightbox instance claims it (see makeLightbox in main.js).
-shared_parts  = split_sections(strip_comments((src / "shared.html").read_text()))
+shared_parts  = split_sections(strip_comments((src / "shared.html").read_text(encoding="utf-8")))
 card_template = shared_parts["CARD"]
 
 # ── Parse comics ─────────────────────────────────────────────
@@ -165,7 +171,7 @@ card_template = shared_parts["CARD"]
 # comic, the same row format the blog uses. Blank lines are ignored.
 comic_parts    = split_sections(raw_content["comics"])
 comics_html    = comic_parts[""]
-comic_data     = (src / "data/comics.txt").read_text()
+comic_data     = (src / "data/comics.txt").read_text(encoding="utf-8")
 
 def parse_comics(data, template):
     comics = []
@@ -307,7 +313,7 @@ def load_blog_entries():
             continue
         m = POST_NAME_RE.match(f.stem)
         assert m, f"Post {f.name} is not named <isodate>-<slug>.html"
-        entries.append((m["isodate"], m["slug"], f.read_text()))
+        entries.append((m["isodate"], m["slug"], f.read_text(encoding="utf-8")))
     return entries
 
 @dataclass
@@ -427,7 +433,7 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
     </channel>
 </rss>"""
 
-(root / "rss.xml").write_text(feed)
+(root / "rss.xml").write_text(feed, encoding="utf-8")
 
 # ── Parse print lab ──────────────────────────────────────────
 def parse_printlab(raw):
@@ -437,7 +443,15 @@ def parse_printlab(raw):
     printer_template  = parts["PRINTER"]
     filament_template = parts["FILAMENT"]
     filament_row_tmpl = parts["FILAMENT_ROW"]
-    data_block        = parts["DATA"]
+
+    # Data lives in src/data/printlab.txt, not in the partial. The file
+    # is absent while the section is unpublished (the last contents were
+    # placeholders and were archived off); restore it before removing
+    # "printlab" from `unpublished`.
+    data_file = src / "data/printlab.txt"
+    assert data_file.exists(), \
+        "src/data/printlab.txt is missing; printlab cannot be published without it"
+    data_block = data_file.read_text(encoding="utf-8")
 
     # ── Parse DATA block ──────────────────────────────────────
     data_sections = {}
@@ -567,15 +581,15 @@ def wrap_section(key):
 sections = {key: "" if key in unpublished else wrap_section(key) for key in tabs}
 
 
-css_raw = (src / "main.css").read_text()
-js_raw  = (src / "main.js").read_text()
+css_raw = (src / "main.css").read_text(encoding="utf-8")
+js_raw  = (src / "main.js").read_text(encoding="utf-8")
 
 aux = {
     "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
     "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
 }
 
-index_template = strip_comments((src / "index.html").read_text())
+index_template = strip_comments((src / "index.html").read_text(encoding="utf-8"))
 check_balance(index_template, "src/index.html")
 html = render(index_template, **sections, **aux)
-(root / "index.html").write_text(html)
+(root / "index.html").write_text(html, encoding="utf-8")

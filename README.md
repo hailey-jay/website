@@ -6,6 +6,11 @@ Source for my personal website. Built with a small Python script.
 + `src/shared.html`: sub-templates used by more than one section (currently the gallery card)
 + `src/data/`: content data, kept separate from markup
   + `comics.txt`: one `stem | caption | alt` row per comic
+  + `printlab.txt`: printer, gallery, and filament data for the 3D print lab.
+    Currently absent: the section is unpublished and its last contents were
+    placeholders, archived to `~/Port/website-printlab-data-2026-08-15.tar.xz`.
+    The build asserts on the missing file, so restore it before taking
+    `printlab` out of `unpublished`.
   + `blog/<isodate>-<slug>.html`: one file per post. Filename sort gives newest-first order. An underscore prefix (`_2026-...`) marks a draft; drafts are skipped by the build.
 
 The date and slug come from the filename, so the front matter is just a
@@ -56,6 +61,26 @@ no-op build is fast. They are committed alongside the other built output.
 Partials are split on `§NAME§` marker lines, and `{name}` placeholders are
 filled by `render()` in `make.py`. Braces that are not a known placeholder are
 left alone, so a partial can contain inline CSS or JS verbatim.
+
+## Typography
+Type the character. Source files are UTF-8, the page and the feed both declare
+UTF-8, and every read and write in `make.py` pins `encoding="utf-8"`, so a
+literal `–`, `’`, `§`, `−`, or `←` passes through to the output untouched.
+There is no escape-code table to remember and no build step in the way.
+
+Two entities are still worth writing as entities:
+
++ `&nbsp;` -- a non-breaking space is invisible in source, so the entity is
+  the only readable form.
++ `&amp;`, `&lt;`, `&gt;` -- required escapes, not typography.
+
+`src/cv.html` is generated from `~/Quarters/CV` and still uses entities; leave
+it alone, it round-trips fine either way.
+
+One thing to watch: `§` is both prose (section numbers) and the sub-template
+delimiter. `split_sections` only treats a line matching `^§[A-Z][A-Z0-9_]*§$`
+as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe, but do not put
+a bare `§WORD§` on a line of its own in body copy.
 
 ## Building
 ``` python src/make.py ```
