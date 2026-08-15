@@ -69,6 +69,7 @@ raw_content["comics"] = comics_html.format(body=parse_comics(comic_data, comic_t
 blog_parts      = split_sections(raw_content["blog"])
 blog_html       = blog_parts[""]
 entry_template  = blog_parts["ENTRY"]
+post_template   = blog_parts["POST"]
 grid_template   = blog_parts["GRID"]
 card_template   = blog_parts["CARD"]
 figure_template = blog_parts["FIGURE"]
@@ -152,16 +153,9 @@ def parse_blog(raw_entries, index_template):
             index_template.format(slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
         )
 
-        post_sections.append(f'''<div class="blog-post" id="blog-{slug}" data-blog-entry="true">
-    <a href="#blog" class="blog-back">&larr; All posts</a>
-    <div class="blog-post-header">
-        <h2 class="blog-post-title">{title}</h2>
-        <p class="blog-post-date">{date}</p>
-    </div>
-    <div class="blog-post-body">
-        {body}
-    </div>
-</div>''')
+        post_sections.append(
+            post_template.format(slug=slug, title=title, date=date, body=body).strip()
+        )
 
         feed_entries.append((slug, title, isodate, teaser, body))
 
