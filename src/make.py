@@ -10,7 +10,11 @@ BASE_URL = "https://haileyjay.net"
 
 tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
 unpublished = {"printlab", "links"}  # still built, but emitted as an empty section
-src = Path("src")
+
+# Everything is anchored to the repo root rather than the working directory,
+# so the script can be run from anywhere.
+root = Path(__file__).resolve().parent.parent
+src = root / "src"
 
 raw_content = {key: (src / f"{key}.html").read_text() for key in tabs}
 
@@ -30,7 +34,7 @@ def parse_comics(data, template):
     comics = []
     for i in range(0, len(lines), 3):
         src_file, alt, caption = lines[i], lines[i+1], lines[i+2]
-        w,h = get_size(f"comics/{src_file}.webp")
+        w,h = get_size(root / f"comics/{src_file}.webp")
         comics.append(template.format(src=f"comics/{src_file}.webp", alt=escape(alt), caption=escape(caption), w=w, h=h).strip())
     return "\n\n".join(comics)
 
@@ -66,7 +70,7 @@ def build_image(row, slug, template):
         img = f"images/blog/{slug}/{img}"
     if "." not in img.rsplit("/", 1)[-1]:
         img += ".webp"
-    assert Path(img).exists(), f"Image {img} (post: {slug}) does not exist"
+    assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
     return template.format(
         src     = img,
         alt     = escape(alt),
@@ -179,7 +183,7 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
     </channel>
 </rss>"""
 
-Path("rss.xml").write_text(feed)
+(root / "rss.xml").write_text(feed)
 
 # ── Parse print lab ──────────────────────────────────────────
 def parse_printlab(raw):
@@ -324,8 +328,8 @@ sections = {
 }
 
 
-css_raw = Path("src/main.css").read_text()
-js_raw  = Path("src/main.js").read_text()
+css_raw = (src / "main.css").read_text()
+js_raw  = (src / "main.js").read_text()
 
 aux = {
     "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
@@ -335,4 +339,4 @@ aux = {
 index_template = (src / "index.html").read_text()
 html = index_template.format(**sections, **aux)
 html = re.sub(r"<!--.*?-->", "", html, flags=re.S)  # comments (incl. blog drafts) stay out of prod
-Path("index.html").write_text(html)
+(root / "index.html").write_text(html)
