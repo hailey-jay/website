@@ -1,6 +1,7 @@
 from PIL import Image
 from pathlib import Path
 from datetime import datetime, timezone
+from dataclasses import dataclass, field
 import rcssmin, rjsmin
 import re
 import json
@@ -197,10 +198,27 @@ def load_blog_entries():
         entries.append((m["isodate"], m["slug"], f.read_text()))
     return entries
 
-def parse_blog(raw_entries, index_template):
+@dataclass
+class Post:
+    slug:    str
+    isodate: str
+    title:   str
+    teaser:  str
+    body:    str
+    images:  list = field(default_factory=list)
+
+    @property
+    def date(self):
+        return display_date(self.isodate)
+
+    @property
+    def url(self):
+        return f"{BASE_URL}/#blog-{self.slug}"
+
+def parse_blog(raw_entries):
     index_items   = []
     post_sections = []
-    feed_entries  = []  # list of (slug, title, isodate, teaser, body, images)
+    posts         = []
 
     for isodate, slug, raw in raw_entries:
         # Front matter is the leading key: value block, ended by a blank
@@ -217,40 +235,43 @@ def parse_blog(raw_entries, index_template):
 
         body = strip_comments(body).strip()
 
-        date   = display_date(isodate)
-        title  = meta["title"]
-        teaser = meta["teaser"]
+        post = Post(
+            slug    = slug,
+            isodate = isodate,
+            title   = meta["title"],
+            teaser  = meta["teaser"],
+            body    = "",
+        )
 
-        images = []  # every [gallery]/[image] image in this post, in source order
-
-        def expand(m, slug=slug, images=images):
+        # Images are collected as the directives expand, in source order.
+        def expand(m, post=post):
             if m.group("rows") is not None:
-                return build_gallery(m.group("rows"), slug, images)
-            return build_image(m.group("row"), slug, figure_template, images)
+                return build_gallery(m.group("rows"), post.slug, post.images)
+            return build_image(m.group("row"), post.slug, figure_template, post.images)
 
-        body  = DIRECTIVE_RE.sub(expand, body)
-        thumb = f'<img class="blog-entry-thumb" src="{images[0]["src"]}" alt="">' if images else ""
+        post.body = DIRECTIVE_RE.sub(expand, body)
+        thumb = f'<img class="blog-entry-thumb" src="{post.images[0]["src"]}" alt="">' if post.images else ""
 
-        index_items.append(
-            render(index_template, slug=slug, date=date, title=title, teaser=teaser, thumb=thumb).strip()
-        )
+        index_items.append(render(entry_template,
+            slug=post.slug, date=post.date, title=post.title,
+            teaser=post.teaser, thumb=thumb).strip())
 
-        post_sections.append(
-            render(post_template, slug=slug, title=title, date=date, body=body).strip()
-        )
+        post_sections.append(render(post_template,
+            slug=post.slug, title=post.title, date=post.date,
+            body=post.body).strip())
 
-        feed_entries.append((slug, title, isodate, teaser, body, images))
+        posts.append(post)
 
-    return "\n\n".join(index_items), "\n\n".join(post_sections), feed_entries
+    return "\n\n".join(index_items), "\n\n".join(post_sections), posts
 
-entries_html, posts_html, feed_entries = parse_blog(load_blog_entries(), entry_template)
+entries_html, posts_html, posts = parse_blog(load_blog_entries())
 raw_content["blog"] = render(blog_html, entries=entries_html, posts=posts_html)
 
 # ── Collect blog images for the homepage carousel ──────────────
 blog_images = []
-for slug, title, isodate, teaser, body, images in feed_entries:
-    for image in images:
-        blog_images.append({**image, "slug": slug, "title": title})
+for post in posts:
+    for image in post.images:
+        blog_images.append({**image, "slug": post.slug, "title": post.title})
 
 raw_content["about"] = render(raw_content["about"], blog_images_json=json.dumps(blog_images))
 
@@ -264,15 +285,15 @@ def cdata(text):
     return "<![CDATA[" + text.replace("]]>", "]]]]><![CDATA[>") + "]]>"
 
 items_xml = ""
-for slug, title, isodate, teaser, body, images in feed_entries:
+for post in posts:
     items_xml += f"""
     <item>
-        <title>{escape(title, quote=False)}</title>
-        <link>{BASE_URL}/#blog-{slug}</link>
-        <guid isPermaLink="true">{BASE_URL}/#blog-{slug}</guid>
-        <pubDate>{format_rfc2822(isodate)}</pubDate>
-        <description>{escape(teaser, quote=False)}</description>
-        <content:encoded>{cdata(body)}</content:encoded>
+        <title>{escape(post.title, quote=False)}</title>
+        <link>{post.url}</link>
+        <guid isPermaLink="true">{post.url}</guid>
+        <pubDate>{format_rfc2822(post.isodate)}</pubDate>
+        <description>{escape(post.teaser, quote=False)}</description>
+        <content:encoded>{cdata(post.body)}</content:encoded>
     </item>"""
 
 feed = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -282,7 +303,7 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
         <link>{BASE_URL}/</link>
         <description>Math, teaching, and whatever else is on my mind.</description>
         <language>en-us</language>
-        <lastBuildDate>{format_rfc2822(feed_entries[0][2]) if feed_entries else ""}</lastBuildDate>
+        <lastBuildDate>{format_rfc2822(posts[0].isodate) if posts else ""}</lastBuildDate>
         <atom:link href="{BASE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
 {items_xml}
     </channel>
