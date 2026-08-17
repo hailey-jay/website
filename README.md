@@ -60,6 +60,8 @@ no-op build is fast. They are committed alongside the other built output.
 + `src/formats.py`: the shared text helpers --- data-format parsing, template
   filling, markup checking. Pure text in, pure text out: nothing in it knows
   which section it is serving, reads a file, or touches an image.
++ `src/images.py`: image measurement and thumbnail generation, the only part
+  of the build that opens an image and so the only part that needs Pillow.
 + `index.html`, `rss.xml`, `images/thumbs/`: built output
 
 ## Data formats
