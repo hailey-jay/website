@@ -27,7 +27,10 @@ def strip_comments(markup):
     seen by this regex."""
     return COMMENT_RE.sub("", markup)
 
-raw_content = {key: strip_comments((src / f"{key}.html").read_text(encoding="utf-8")) for key in tabs}
+def load_partials():
+    """Read every section partial, comments stripped."""
+    return {key: strip_comments((src / f"{key}.html").read_text(encoding="utf-8"))
+            for key in tabs}
 
 def get_size(path):
     with Image.open(path) as im:
@@ -254,17 +257,17 @@ def parse_row(row):
 # Markup used by more than one section. The gallery card is identical
 # for comics and blog galleries apart from the thumb class, which picks
 # which lightbox instance claims it (see makeLightbox in main.js).
-shared_parts  = split_sections(strip_comments((src / "shared.html").read_text(encoding="utf-8")))
-card_template = shared_parts["CARD"]
+def load_shared():
+    """The §NAME§ sub-templates shared between sections."""
+    return split_sections(strip_comments((src / "shared.html").read_text(encoding="utf-8")))
 
 # ── Parse comics ─────────────────────────────────────────────
 # Data lives in src/data/comics.txt: one `stem | caption | alt` row per
 # comic, the same row format the blog uses. Blank lines are ignored.
-comic_parts    = split_sections(raw_content["comics"])
-comics_html    = comic_parts[""]
-comic_data     = (src / "data/comics.txt").read_text(encoding="utf-8")
+def parse_comics(raw, template):
+    parts = split_sections(raw)
+    data  = (src / "data/comics.txt").read_text(encoding="utf-8")
 
-def parse_comics(data, template):
     records = []
     for line in rows_of(data):
         stem, caption, alt = parse_row(line)
@@ -275,22 +278,14 @@ def parse_comics(data, template):
             "alt":       escape(alt),
             "caption":   escape(caption),
         })
-    return repeat(template, records,
+    body = repeat(template, records,
                   thumb_class="comic-thumb", label="View comic")
-
-raw_content["comics"] = render(comics_html, body=parse_comics(comic_data, card_template))
+    return render(parts[""], body=body)
 
 # ── Parse blog ───────────────────────────────────────────────
 # One file per post under src/data/blog/, named <isodate>-<slug>.html:
 # key: value meta lines, then the HTML body. Filename sort gives
 # newest-first order; an underscore prefix marks a draft (skipped).
-blog_parts      = split_sections(raw_content["blog"])
-blog_html       = blog_parts[""]
-entry_template  = blog_parts["ENTRY"]
-post_template   = blog_parts["POST"]
-grid_template   = blog_parts["GRID"]
-figure_template = blog_parts["FIGURE"]
-
 # A post body may contain image directives instead of hand-written markup:
 #
 #   [gallery]
@@ -336,9 +331,9 @@ def build_image(row, slug, template, collected, sizes=None):
         dims        = f' width="{w}" height="{h}"',
     ).strip()
 
-def build_gallery(rows, slug, collected):
-    cards = [build_image(line, slug, card_template, collected) for line in rows_of(rows)]
-    return render(grid_template, cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
+def build_gallery(rows, slug, collected, card_tmpl, grid_tmpl):
+    cards = [build_image(line, slug, card_tmpl, collected) for line in rows_of(rows)]
+    return render(grid_tmpl, cards="\n  ".join(c.replace("\n", "\n  ") for c in cards)).strip()
 
 # ── Feed rendering ───────────────────────────────────────────
 # The page markup is wrong for a feed twice over: it wraps every image
@@ -422,7 +417,13 @@ class Post:
     def url(self):
         return f"{BASE_URL}/#blog-{self.slug}"
 
-def parse_blog(raw_entries):
+def parse_blog(raw, raw_entries, card_tmpl):
+    parts           = split_sections(raw)
+    entry_template  = parts["ENTRY"]
+    post_template   = parts["POST"]
+    grid_template   = parts["GRID"]
+    figure_template = parts["FIGURE"]
+
     posts = []
 
     for isodate, slug, raw in raw_entries:
@@ -446,7 +447,8 @@ def parse_blog(raw_entries):
         # Images are collected as the directives expand, in source order.
         def expand(m, post=post):
             if m.group("rows") is not None:
-                return build_gallery(m.group("rows"), post.slug, post.images)
+                return build_gallery(m.group("rows"), post.slug, post.images,
+                                     card_tmpl, grid_template)
             return build_image(m.group("row"), post.slug, figure_template, post.images, FIGURE_SIZES)
 
         post.body = DIRECTIVE_RE.sub(expand, body)
@@ -472,22 +474,18 @@ def parse_blog(raw_entries):
         {"slug": p.slug, "title": p.title, "date": p.date, "body": p.body}
         for p in posts
     ])
-    return entries, sections, posts
+    return render(parts[""], entries=entries, posts=sections), posts
 
-entries_html, posts_html, posts = parse_blog(load_blog_entries())
-raw_content["blog"] = render(blog_html, entries=entries_html, posts=posts_html)
-
-# ── Collect blog images for the homepage carousel ──────────────
-blog_images = []
-for post in posts:
-    for image in post.images:
-        blog_images.append({**image, "slug": post.slug, "title": post.title})
+def carousel_images(posts):
+    """Every blog image, in post order, for the homepage carousel."""
+    return [{**image, "slug": post.slug, "title": post.title}
+            for post in posts for image in post.images]
 
 # ── Parse about ──────────────────────────────────────────────
 # Everything the page says lives in src/data/about.txt: the identity
 # fields, the labelled meta pairs, the bio prose, and the Lately note.
 # The partial is left holding only the shape.
-def parse_about(raw):
+def parse_about(raw, blog_images):
     parts    = split_sections(raw)
     data     = split_data((src / "data/about.txt").read_text(encoding="utf-8"))
     identity = parse_kv(data[""], "about",
@@ -499,13 +497,11 @@ def parse_about(raw):
     ], sep="\n")
 
     return render(parts[""], **identity,
-        meta   = indent(meta, "    "),
-        bio    = paragraphs(data["BIO"]),
-        lately = data["LATELY"],
+        meta             = indent(meta, "    "),
+        bio              = paragraphs(data["BIO"]),
+        lately           = data["LATELY"],
+        blog_images_json = json.dumps(blog_images),
     )
-
-raw_content["about"] = parse_about(raw_content["about"])
-raw_content["about"] = render(raw_content["about"], blog_images_json=json.dumps(blog_images))
 
 # ── Generate RSS feed ─────────────────────────────────────────
 def format_rfc2822(isodate):
@@ -516,9 +512,10 @@ def cdata(text):
     """Wrap text in CDATA, splitting any literal ]]> that would close it early."""
     return "<![CDATA[" + text.replace("]]>", "]]]]><![CDATA[>") + "]]>"
 
-items_xml = ""
-for post in posts:
-    items_xml += f"""
+def build_feed(posts):
+    items_xml = ""
+    for post in posts:
+        items_xml += f"""
     <item>
         <title>{escape(post.title, quote=False)}</title>
         <link>{post.url}</link>
@@ -528,7 +525,7 @@ for post in posts:
         <content:encoded>{cdata(post.feed_body)}</content:encoded>
     </item>"""
 
-feed = f"""<?xml version="1.0" encoding="UTF-8"?>
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>Hailey Jay Garcia</title>
@@ -541,10 +538,8 @@ feed = f"""<?xml version="1.0" encoding="UTF-8"?>
     </channel>
 </rss>"""
 
-(root / "rss.xml").write_text(feed, encoding="utf-8")
-
 # ── Parse print lab ──────────────────────────────────────────
-def parse_printlab(raw):
+def parse_printlab(raw, card_tmpl):
     parts = split_sections(raw)
 
     html_template     = parts[""]
@@ -594,7 +589,7 @@ def parse_printlab(raw):
             "alt":       escape(alt),
             "caption":   escape(caption),
         })
-    gallery_cards = repeat(card_template, gallery_records,
+    gallery_cards = repeat(card_tmpl, gallery_records,
                            thumb_class="gallery-thumb", label="View print")
 
     # ── Filament ──────────────────────────────────────────────
@@ -633,9 +628,6 @@ def parse_printlab(raw):
         filament      = filament,
     )
 
-if "printlab" not in unpublished:
-    raw_content["printlab"] = parse_printlab(raw_content["printlab"])
-
 # ── Parse links ──────────────────────────────────────────────
 # src/data/links.txt is heading-then-rows, the same shape as the
 # filament table: a bare line opens a group, and each `label | url`
@@ -657,32 +649,54 @@ def parse_links(raw):
 
     return render(parts[""], groups=repeat(parts["GROUP"], groups))
 
-if "links" not in unpublished:
-    raw_content["links"] = parse_links(raw_content["links"])
-
 # ── Assemble index.html ──────────────────────────────────────
 
-def wrap_section(key):
+def wrap_section(key, markup):
     # Checked here rather than at read time: a partial is only whole
     # once its sub-templates have been filled, and this is also where a
     # data file's inline markup (a bio paragraph's link, a meta value)
     # first meets the page.
-    check_balance(raw_content[key], f"Section {key}")
+    check_balance(markup, f"Section {key}")
     active = ' class="active"' if key == "about" else ""
-    return f'<section id="{key}"{active}>\n{raw_content[key]}\n</section>'
+    return f'<section id="{key}"{active}>\n{markup}\n</section>'
 
-sections = {key: "" if key in unpublished else wrap_section(key) for key in tabs}
+def build_index(raw_content):
+    sections = {key: "" if key in unpublished else wrap_section(key, raw_content[key])
+                for key in tabs}
 
+    css_raw = (src / "main.css").read_text(encoding="utf-8")
+    js_raw  = (src / "main.js").read_text(encoding="utf-8")
 
-css_raw = (src / "main.css").read_text(encoding="utf-8")
-js_raw  = (src / "main.js").read_text(encoding="utf-8")
+    aux = {
+        "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
+        "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
+    }
 
-aux = {
-    "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
-    "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
-}
+    index_template = strip_comments((src / "index.html").read_text(encoding="utf-8"))
+    check_balance(index_template, "src/index.html")
+    return render(index_template, **sections, **aux)
 
-index_template = strip_comments((src / "index.html").read_text(encoding="utf-8"))
-check_balance(index_template, "src/index.html")
-html = render(index_template, **sections, **aux)
-(root / "index.html").write_text(html, encoding="utf-8")
+# ── Build ────────────────────────────────────────────────────
+def main():
+    raw_content   = load_partials()
+    card_template = load_shared()["CARD"]
+
+    raw_content["comics"] = parse_comics(raw_content["comics"], card_template)
+
+    raw_content["blog"], posts = parse_blog(
+        raw_content["blog"], load_blog_entries(), card_template)
+
+    raw_content["about"] = parse_about(raw_content["about"], carousel_images(posts))
+
+    # Unpublished sections are emitted empty by build_index, so their
+    # data files need not exist and are not parsed.
+    if "printlab" not in unpublished:
+        raw_content["printlab"] = parse_printlab(raw_content["printlab"], card_template)
+    if "links" not in unpublished:
+        raw_content["links"] = parse_links(raw_content["links"])
+
+    (root / "rss.xml").write_text(build_feed(posts), encoding="utf-8")
+    (root / "index.html").write_text(build_index(raw_content), encoding="utf-8")
+
+if __name__ == "__main__":
+    main()
