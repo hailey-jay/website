@@ -9,9 +9,6 @@ Built with a small Python script.
   + `about.txt`: the identity fields, meta pairs, bio, and Lately note
   + `comics.txt`: one `stem | caption | alt` row per comic
   + `links.txt`: a bare heading line, then `label | url` rows under it
-  + `printlab.txt`: printer, gallery, and filament data for the 3D print lab.
-    Currently absent: the section is unpublished and its last contents were placeholders, archived to `~/Port/website-printlab-data-2026-08-15.tar.xz`.
-    The build asserts on the missing file, so restore it before taking `printlab` out of `unpublished`.
   + `blog/<isodate>-<slug>.html`: one file per post.
     Filename sort gives newest-first order.
     An underscore prefix (`_2026-...`) marks a draft; drafts are skipped by the build.
