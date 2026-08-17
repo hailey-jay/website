@@ -1,0 +1,5 @@
+# Only needed to regenerate images/wireframes/ with scripts/gen_wireframes.py,
+# which also requires ffmpeg on PATH (install it with your system package manager).
+-r requirements.txt
+matplotlib>=3.7
+numpy>=1.24

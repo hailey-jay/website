@@ -120,6 +120,23 @@ delimiter. `split_sections` only treats a line matching `^§[A-Z][A-Z0-9_]*§$`
 as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe, but do not put
 a bare `§WORD§` on a line of its own in body copy.
 
+## Setup
+The build needs Python and three packages:
+
+```
+pip install -r requirements.txt
+```
+
+Regenerating the sidebar wireframes needs more, including ffmpeg on PATH,
+and is only occasionally necessary:
+
+```
+pip install -r requirements-wireframes.txt
+```
+
+Requirements files rather than a `pyproject.toml`, because this repo is a
+site and not an installable package.
+
 ## Building
 ``` python src/make.py ```
 Paths are resolved relative to the repo root, so the script can be run from
