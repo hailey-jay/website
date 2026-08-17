@@ -138,9 +138,20 @@ Requirements files rather than a `pyproject.toml`, because this repo is a
 site and not an installable package.
 
 ## Building
-``` python src/make.py ```
-Paths are resolved relative to the repo root, so the script can be run from
-anywhere. Edit files in `src/`, run the script.
+```
+make
+```
+Edit files in `src/`, run the build. Paths are resolved relative to the repo
+root, so the underlying `python src/make.py` still runs from anywhere.
+
+`make check` rebuilds, then fails if the committed `index.html` or `rss.xml`
+differs from what the source produces. The build is deterministic --- the
+feed's `lastBuildDate` comes from the newest post's date, not the clock ---
+so a clean result means the committed output is current. Worth running before
+a push: Cloudflare serves the committed files, so stale output ships silently
+with no error anywhere.
+
+`make wireframes` regenerates `images/wireframes/`.
 
 Sections listed in `unpublished` in `make.py` are skipped and emitted empty
 (currently: printlab and links). HTML comments are stripped from the built output.
