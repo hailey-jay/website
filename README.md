@@ -103,7 +103,22 @@ shared pieces are `.section-intro` and `.section-note` for the paragraphs under
 a heading, `.eyebrow` for a small uppercase label, `.quick-links`,
 `.plain-list` for an unbulleted nested list, and `.reason-list` for a bulleted
 one. The two exceptions are a value the build computes (the filament swatch's
-`background`) and `src/cv.html`.
+`background`) and `src/cv.html`, which is generated outside this repo.
+
+## Typography
+Source files are UTF-8, the page and the feed both declare UTF-8, and every read and write in `make.py` pins `encoding="utf-8"`.
+A literal `–`, `’`, `§`, `−`, or `←` passes through to the output untouched, so type the character.
+
+Two kinds of entity are still written as entities:
+
++ `&nbsp;`, since a non-breaking space is invisible in source.
++ `&amp;`, `&lt;`, and `&gt;`, which are required escapes rather than typography.
+
+`src/cv.html` is generated outside this repo and still uses entities; leave it alone.
+
+One hazard is worth knowing: `§` is both prose (section numbers) and the sub-template delimiter.
+`split_sections` only treats a line matching `^§[A-Z][A-Z0-9_]*§$` as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe.
+Do not put a bare `§WORD§` on a line of its own in body copy.
 
 ## Setup
 The build needs Python and three packages:
@@ -128,7 +143,9 @@ root, so the underlying `python src/make.py` still runs from anywhere.
 
 `make check` rebuilds, then fails if the committed `index.html` or `rss.xml`
 differs from what the source produces. The build is deterministic so a clean
-result means the committed output is current.
+result means the committed output is current. Worth running before a push:
+Cloudflare serves the committed files, so stale output ships silently with no
+error anywhere.
 
 `make wireframes` regenerates `images/wireframes/`.
 
