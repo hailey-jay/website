@@ -57,11 +57,14 @@ lightbox opens. Thumbnails are rebuilt only when the source is newer, so a
 no-op build is fast. They are committed alongside the other built output.
 
 + `src/make.py`: builds `index.html`, `rss.xml`, and `images/thumbs/` from the source files
++ `src/formats.py`: the shared text helpers --- data-format parsing, template
+  filling, markup checking. Pure text in, pure text out: nothing in it knows
+  which section it is serving, reads a file, or touches an image.
 + `index.html`, `rss.xml`, `images/thumbs/`: built output
 
 ## Data formats
 Four shapes cover every section, and they are parsed by shared helpers in
-`make.py` rather than per-section code:
+`formats.py` rather than per-section code:
 
 + `---NAME---` on its own line splits a data file into blocks (`split_data`).
   Screaming case only, so a line of prose cannot open one. Markup uses `§NAME§`
@@ -81,7 +84,7 @@ markup inside a paragraph (a link, an `<em>`) is passed through as written.
 
 ## Templates
 Partials are split on `§NAME§` marker lines, and `{name}` placeholders are
-filled by `render()` in `make.py`. Braces that are not a known placeholder are
+filled by `render()` in `formats.py`. Braces that are not a known placeholder are
 left alone, so a partial can contain inline CSS or JS verbatim.
 
 Every emitted section is checked for unclosed tags before it is wrapped, which
