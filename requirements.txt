@@ -1,5 +1,5 @@
 # Build dependencies for src/make.py.
-# Lower bounds only: this is a static site, not a service, so newer is fine.
+# Lower bounds only.
 pillow>=10.0
 rcssmin>=1.2
 rjsmin>=1.2

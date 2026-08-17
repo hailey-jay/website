@@ -80,7 +80,7 @@ Four shapes cover every section, and they are parsed by shared helpers in
   (`group_rows`), which is how the filament table gets its diameters and the
   links list its categories.
 
-Prose in a data file needs no `<p>` boilerplate: blank-line-separated blocks
+Prose in a data file needs no `<p>` wrap: blank-line-separated blocks
 are wrapped by the build, and a block may be soft-wrapped across lines. Inline
 markup inside a paragraph (a link, an `<em>`) is passed through as written.
 
@@ -103,27 +103,7 @@ shared pieces are `.section-intro` and `.section-note` for the paragraphs under
 a heading, `.eyebrow` for a small uppercase label, `.quick-links`,
 `.plain-list` for an unbulleted nested list, and `.reason-list` for a bulleted
 one. The two exceptions are a value the build computes (the filament swatch's
-`background`) and `src/cv.html`, which is generated from `~/Quarters/CV`.
-
-## Typography
-Type the character. Source files are UTF-8, the page and the feed both declare
-UTF-8, and every read and write in `make.py` pins `encoding="utf-8"`, so a
-literal `–`, `’`, `§`, `−`, or `←` passes through to the output untouched.
-There is no escape-code table to remember and no build step in the way.
-
-Two entities are still worth writing as entities:
-
-+ `&nbsp;` -- a non-breaking space is invisible in source, so the entity is
-  the only readable form.
-+ `&amp;`, `&lt;`, `&gt;` -- required escapes, not typography.
-
-`src/cv.html` is generated from `~/Quarters/CV` and still uses entities; leave
-it alone, it round-trips fine either way.
-
-One thing to watch: `§` is both prose (section numbers) and the sub-template
-delimiter. `split_sections` only treats a line matching `^§[A-Z][A-Z0-9_]*§$`
-as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe, but do not put
-a bare `§WORD§` on a line of its own in body copy.
+`background`) and `src/cv.html`.
 
 ## Setup
 The build needs Python and three packages:
@@ -139,9 +119,6 @@ and is only occasionally necessary:
 pip install -r requirements-wireframes.txt
 ```
 
-Requirements files rather than a `pyproject.toml`, because this repo is a
-site and not an installable package.
-
 ## Building
 ```
 make
@@ -150,11 +127,8 @@ Edit files in `src/`, run the build. Paths are resolved relative to the repo
 root, so the underlying `python src/make.py` still runs from anywhere.
 
 `make check` rebuilds, then fails if the committed `index.html` or `rss.xml`
-differs from what the source produces. The build is deterministic --- the
-feed's `lastBuildDate` comes from the newest post's date, not the clock ---
-so a clean result means the committed output is current. Worth running before
-a push: Cloudflare serves the committed files, so stale output ships silently
-with no error anywhere.
+differs from what the source produces. The build is deterministic so a clean
+result means the committed output is current.
 
 `make wireframes` regenerates `images/wireframes/`.
 
