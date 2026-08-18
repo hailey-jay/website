@@ -1,32 +1,66 @@
+import sys
 from pathlib import Path
+
+# Everything is anchored to the repo root rather than the working directory,
+# so the script can be run from anywhere. The root is also where the vendored
+# sitekit package lives, so it goes on the path before sitekit is imported.
+root = Path(__file__).resolve().parent.parent
+src  = root / "src"
+sys.path.insert(0, str(root))
+
 from datetime import datetime, timezone
 from dataclasses import dataclass, field
-import rcssmin, rjsmin
 import re
 import json
 from html import escape
 
-from formats import (
-    check_balance, group_rows, indent, paragraphs, parse_fields, parse_kv,
-    parse_records, render, repeat, rows_of, split_data, split_sections,
-    strip_comments,
+from sitekit import assemble
+from sitekit.errors import BuildError, need
+from sitekit.images import Pipeline, mirrored
+from sitekit.markup import check_balance, require_listed
+from sitekit.text import (
+    group_rows, indent, paragraphs, parse_fields, parse_kv, parse_records,
+    render, repeat, rows_of, split_data, split_sections, strip_comments,
 )
-from images import FIGURE_SIZES, GRID_SIZES, get_size, img_attrs, thumb_for
 
 BASE_URL = "https://haileyjay.net"
 
 tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
 unpublished = {"printlab", "links"}  # still built, but emitted as an empty section
 
-# Everything is anchored to the repo root rather than the working directory,
-# so the script can be run from anywhere.
-root = Path(__file__).resolve().parent.parent
-src = root / "src"
+# The two partials that are not sections: the page shell and the shared
+# sub-templates. Listed so `require_listed` can tell a new section partial
+# that nobody wired up from one of these.
+EXTRA_PARTIALS = ["index.html", "shared.html"]
+
+# ── Images ───────────────────────────────────────────────────
+# Gallery originals are 1024-1600px but are displayed at ~200px in a grid and
+# capped at 640px in the lightbox, so the grid was pulling half-megabyte photos
+# to fill a thumbnail. One 640px copy is derived per image and offered first;
+# the original stays in the srcset for wide viewports and remains what the
+# lightbox opens. Derivatives mirror the source tree under images/thumbs/,
+# minus a leading "images/" so blog photos land at images/thumbs/blog/...
+# rather than images/thumbs/images/blog/...
+photos = Pipeline(
+    root      = root,
+    widths    = (640,),
+    out       = mirrored("images/thumbs", strip="images/"),
+    min_width = 640,
+)
+
+# Grid cards sit in a ~640px main column at three-up, and go roughly
+# half-width once the sidebar collapses. Layout, so it stays here.
+GRID_SIZES   = "(max-width: 640px) 45vw, 210px"
+FIGURE_SIZES = "(max-width: 480px) 100vw, 420px"
+
+def thumb_for(path):
+    """The narrowest derivative of `path`, or `path` itself if it has none."""
+    derivatives = photos.derivatives(path)
+    return derivatives[0][0] if derivatives else path
 
 def load_partials():
     """Read every section partial, comments stripped."""
-    return {key: strip_comments((src / f"{key}.html").read_text(encoding="utf-8"))
-            for key in tabs}
+    return {key: assemble.read(src / f"{key}.html") for key in tabs}
 
 def parse_row(row):
     """Split an `image | caption | alt` row.
@@ -42,7 +76,7 @@ def parse_row(row):
 # which lightbox instance claims it (see makeLightbox in main.js).
 def load_shared():
     """The §NAME§ sub-templates shared between sections."""
-    return split_sections(strip_comments((src / "shared.html").read_text(encoding="utf-8")))
+    return split_sections(assemble.read(src / "shared.html"))
 
 # ── Parse comics ─────────────────────────────────────────────
 # Data lives in src/data/comics.txt: one `stem | caption | alt` row per
@@ -55,9 +89,10 @@ def parse_comics(raw, template):
     for line in rows_of(data):
         stem, caption, alt = parse_row(line)
         path = f"comics/{stem}.webp"
+        photos.require(path, "comics")
         records.append({
             "src":       path,
-            "img_attrs": img_attrs(path, GRID_SIZES),
+            "img_attrs": photos.attrs(path, GRID_SIZES),
             "alt":       escape(alt),
             "caption":   escape(caption),
         })
@@ -97,21 +132,19 @@ def build_image(row, slug, template, collected, sizes=None):
         img = f"images/blog/{slug}/{img}"
     if "." not in img.rsplit("/", 1)[-1]:
         img += ".webp"
-    assert (root / img).exists(), f"Image {img} (post: {slug}) does not exist"
-    w, h = get_size(root / img)
+    photos.require(img, f"post: {slug}")
     # Recorded as raw text, in DOM order. The carousel assigns these to
     # img.alt as a property, so they must not be HTML-escaped. The
     # carousel wants the thumbnail; the lightbox wants the original.
-    thumb, _, _ = thumb_for(img)
-    collected.append({"src": img, "thumb": thumb, "alt": alt})
+    collected.append({"src": img, "thumb": thumb_for(img), "alt": alt})
     return render(template,
         thumb_class = "gallery-thumb",
         label       = "View image",
         src         = img,
-        img_attrs   = img_attrs(img, sizes or GRID_SIZES),
+        img_attrs   = photos.attrs(img, sizes or GRID_SIZES),
         alt         = escape(alt),
         caption     = escape(caption),
-        dims        = f' width="{w}" height="{h}"',
+        dims        = photos.dims_attr(img),
     ).strip()
 
 def build_gallery(rows, slug, collected, card_tmpl, grid_tmpl):
@@ -178,7 +211,7 @@ def load_blog_entries():
         if f.name.startswith("_"):
             continue
         m = POST_NAME_RE.match(f.stem)
-        assert m, f"Post {f.name} is not named <isodate>-<slug>.html"
+        need(m, f"Post {f.name} is not named <isodate>-<slug>.html")
         entries.append((m["isodate"], m["slug"], f.read_text(encoding="utf-8")))
     return entries
 
@@ -214,7 +247,7 @@ def parse_blog(raw, raw_entries, card_tmpl):
         # line. An explicit terminator means a body whose first line
         # happens to contain a colon cannot be swallowed as metadata.
         head, sep, body = raw.strip().partition("\n\n")
-        assert sep, f"Post {slug} has no blank line after its front matter"
+        need(sep, f"Post {slug} has no blank line after its front matter")
 
         meta = parse_kv(head, f"Post {slug} front matter", ("title", "teaser"))
         body = strip_comments(body).strip()
@@ -335,8 +368,8 @@ def parse_printlab(raw, card_tmpl):
     # placeholders and were archived off); restore it before removing
     # "printlab" from `unpublished`.
     data_file = src / "data/printlab.txt"
-    assert data_file.exists(), \
-        "src/data/printlab.txt is missing; printlab cannot be published without it"
+    need(data_file.exists(),
+         "src/data/printlab.txt is missing; printlab cannot be published without it")
     data = split_data(data_file.read_text(encoding="utf-8"))
     meta = parse_kv(data[""], "printlab meta")
 
@@ -365,10 +398,10 @@ def parse_printlab(raw, card_tmpl):
     gallery_records = []
     for line in rows_of(data["GALLERY"]):
         img, caption, alt = parse_row(line)
-        assert (root / img).exists(), f"Print gallery image {img} does not exist"
+        photos.require(img, "print gallery")
         gallery_records.append({
             "src":       img,
-            "img_attrs": img_attrs(img, GRID_SIZES),
+            "img_attrs": photos.attrs(img, GRID_SIZES),
             "alt":       escape(alt),
             "caption":   escape(caption),
         })
@@ -378,23 +411,19 @@ def parse_printlab(raw, card_tmpl):
     # ── Filament ──────────────────────────────────────────────
     # Rows are grouped under bare diameter headings ("1.75mm"), so a
     # heading is any non-row line; everything else is a filament row.
-    groups  = []
-    current = None
-    for line in rows_of(data["FILAMENT"]):
-        line = line.strip()
-        if "|" not in line:
-            current = (line, [])
-            groups.append(current)
-            continue
-        assert current, f"Filament row before any diameter heading: {line!r}"
-        material, color, hex_val, stock, blurb = parse_fields(line, 5)
-        current[1].append({
-            "material": material,
-            "color":    color,
-            "hex":      hex_val,
-            "stock":    f"{stock} spools",
-            "blurb":    f'<span class="filament-blurb">({blurb})</span>' if blurb else "",
-        })
+    groups = []
+    for diameter, rows in group_rows(data["FILAMENT"], "filament"):
+        records = []
+        for line in rows:
+            material, color, hex_val, stock, blurb = parse_fields(line, 5)
+            records.append({
+                "material": material,
+                "color":    color,
+                "hex":      hex_val,
+                "stock":    f"{stock} spools",
+                "blurb":    f'<span class="filament-blurb">({blurb})</span>' if blurb else "",
+            })
+        groups.append((diameter, records))
 
     filament = repeat(filament_template, [
         {
@@ -426,7 +455,7 @@ def parse_links(raw):
         for row in rows:
             label, url, variant = parse_fields(row, 3)
             key = f"LINK_{variant.upper()}" if variant else "LINK"
-            assert key in parts, f"links: no §{key}§ template for {label!r}"
+            need(key in parts, f"links: no §{key}§ template for {label!r}")
             links.append(render(parts[key], label=label, url=url).strip())
         groups.append({"title": title, "links": indent("\n".join(links), "        ")})
 
@@ -443,24 +472,38 @@ def wrap_section(key, markup):
     active = ' class="active"' if key == "about" else ""
     return f'<section id="{key}"{active}>\n{markup}\n</section>'
 
+# An unpublished section is emitted as an empty string, so its <section>
+# disappears from the page while anything linking to it stays and lands
+# nowhere.
+NAV_TARGET_RE = re.compile(r'href="#([\w-]+)"')
+
+def check_nav(template):
+    for target in NAV_TARGET_RE.findall(template):
+        need(target not in unpublished,
+             f"src/index.html links to #{target}, which is in `unpublished` "
+             "and is emitted as an empty section")
+
 def build_index(raw_content):
     sections = {key: "" if key in unpublished else wrap_section(key, raw_content[key])
                 for key in tabs}
 
-    css_raw = (src / "main.css").read_text(encoding="utf-8")
-    js_raw  = (src / "main.js").read_text(encoding="utf-8")
-
     aux = {
-        "css": "<style>"  + rcssmin.cssmin(css_raw) + "</style>",
-        "js" : "<script>" + rjsmin.jsmin(js_raw)   + "</script>",
+        "css": assemble.css_block(src, ["main.css"]),
+        "js":  assemble.js_block(src, ["main.js"]),
     }
 
-    index_template = strip_comments((src / "index.html").read_text(encoding="utf-8"))
+    index_template = assemble.read(src / "index.html")
     check_balance(index_template, "src/index.html")
-    return render(index_template, **sections, **aux)
+    check_nav(index_template)
+    return assemble.fill(index_template, **sections, **aux)
 
 # ── Build ────────────────────────────────────────────────────
 def main():
+    # The section list is hand-written, so a new src/foo.html would
+    # otherwise be built by nobody and noticed by no one.
+    require_listed(src, "*.html",
+                   [f"{key}.html" for key in tabs] + EXTRA_PARTIALS, "src")
+
     raw_content   = load_partials()
     card_template = load_shared()["CARD"]
 
@@ -478,8 +521,14 @@ def main():
     if "links" not in unpublished:
         raw_content["links"] = parse_links(raw_content["links"])
 
-    (root / "rss.xml").write_text(build_feed(posts), encoding="utf-8")
-    (root / "index.html").write_text(build_index(raw_content), encoding="utf-8")
+    assemble.write(root / "rss.xml", build_feed(posts))
+    assemble.write(root / "index.html", build_index(raw_content))
+    # One page, so one URL. The sections are hash fragments, which are the
+    # same document to a crawler and do not belong here.
+    assemble.sitemap([f"{BASE_URL}/"], root / "sitemap.xml")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BuildError as e:
+        raise SystemExit(f"build failed: {e}")

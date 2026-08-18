@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://haileyjay.net/sitemap.xml

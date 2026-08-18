@@ -1,4 +1,5 @@
 # Build dependencies for src/make.py.
+# sitekit is vendored at sitekit/ and needs no install.
 # Lower bounds only.
 pillow>=10.0
 rcssmin>=1.2

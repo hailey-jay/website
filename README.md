@@ -50,14 +50,15 @@ The thumbnail is what the grid, the blog index, and the homepage carousel load; 
 Thumbnails are rebuilt only when the source is newer, so a no-op build is fast.
 They are committed alongside the other built output.
 
-+ `src/make.py`: builds `index.html`, `rss.xml`, and `images/thumbs/` from the source files
-+ `src/formats.py`: the shared text helpers: data-format parsing, template filling, and markup checking.
-  Pure text in, pure text out: nothing in it knows which section it is serving, reads a file, or touches an image.
-+ `src/images.py`: image measurement and thumbnail generation, the only part of the build that opens an image and so the only part that needs Pillow.
-+ `index.html`, `rss.xml`, `images/thumbs/`: built output
++ `src/make.py`: builds `index.html`, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files
++ `sitekit/`: a vendored copy of the shared build library (upstream commit `fa89364`), used by all four of my site repos.
+  Text and data-format parsing, template filling, markup validation, the image pipeline, asset bundling, minification, and the post-build checker all live there.
+  Everything that knows this site is haileyjay.net stays in `src/make.py`: RSS, the `[gallery]`/`[image]` directives, draft-by-filename, comics, printlab, and links.
++ `scripts/check.py`, `scripts/verify.py`: the two checks, behind `make check` and `make verify`
++ `index.html`, `rss.xml`, `sitemap.xml`, `images/thumbs/`: built output
 
 ## Data formats
-Four shapes cover every section, and they are parsed by shared helpers in `formats.py` rather than per-section code:
+Four shapes cover every section, and they are parsed by shared helpers in `sitekit.text` rather than per-section code:
 
 + `---NAME---` on its own line splits a data file into blocks (`split_data`).
   Screaming case only, so a line of prose cannot open one.
@@ -73,11 +74,14 @@ Prose in a data file needs no `<p>` wrap: blank-line-separated blocks are wrappe
 Inline markup inside a paragraph (a link, an `<em>`) is passed through as written.
 
 ## Templates
-Partials are split on `§NAME§` marker lines, and `{name}` placeholders are filled by `render()` in `formats.py`.
+Partials are split on `§NAME§` marker lines, and `{name}` placeholders are filled by `render()` in `sitekit.text`.
 Braces that are not a known placeholder are left alone, so a partial can contain inline CSS or JS verbatim.
 
 Every emitted section is checked for unclosed tags before it is wrapped, which covers the markup a data file contributes.
 An unclosed `<a>` in a bio paragraph is invisible in the built page but swallows the prose after it, so the build fails instead.
+
+Every failure the build reports is a `BuildError` with a sentence, not an assertion, so `python -O src/make.py` still stops instead of emitting corrupt output.
+`src/*.html` is checked against the section list too, so a new partial cannot be silently ignored, and a nav link into a section listed in `unpublished` is an error rather than a link to a `<section>` that is not there.
 
 `src/about.html` keeps the photo's `srcset` and its 148x185 display size: those are layout, and swapping the photo means regenerating both widths anyway.
 The alt text and caption are in `about.txt`.
@@ -108,6 +112,9 @@ The build needs Python and three packages:
 pip install -r requirements.txt
 ```
 
+`sitekit/` is vendored rather than installed, so there is nothing else to set up here or on the server, and this site pins a version of it by simply not updating the directory.
+Changes belong upstream in the sitekit repo and are copied back in.
+
 Regenerating the sidebar wireframes needs more, including ffmpeg on PATH, and is only occasionally necessary:
 
 ```
@@ -121,9 +128,13 @@ make
 Edit files in `src/`, run the build.
 Paths are resolved relative to the repo root, so the underlying `python src/make.py` still runs from anywhere.
 
-`make check` rebuilds, then fails if the committed `index.html` or `rss.xml` differs from what the source produces.
+`make check` scans the built `index.html` for the problems that only show up in the finished page: a local `href` or `src` pointing at nothing, a duplicate id, an `<img>` missing its alt, dimensions, or `loading` hint, and the total weight of image one page pulls.
+
+`make verify` rebuilds, then fails if the committed `index.html`, `rss.xml`, or `sitemap.xml` differs from what the source produces, and restores the worktree either way.
 The build is deterministic so a clean result means the committed output is current.
 Worth running before a push: Cloudflare serves the committed files, so stale output ships silently with no error anywhere.
+
+`make links` checks every off-site URL. It needs the network and is slow, so it is separate from `make check`.
 
 `make wireframes` regenerates `images/wireframes/`.
 
