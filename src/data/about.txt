@@ -13,12 +13,16 @@ CV       | <a href="#cv">Web</a> · <a href="files/cv.pdf">PDF</a>
 
 ---BIO---
 
-Hello! I’m a PhD student at LSU studying mathematics. My research interests include topology and combinatorics, with a particular fondness for matroids.
+Hello! I’m a PhD student at LSU studying mathematics.
+I’m broadly interested in topology and combinatorics, with a particular fondness for arrangements.
+Additionally, I’m into graph theory and, every now and then, I’ve dabbled in knot theory.
 
-I like getting involved in my community. I currently serve as secretary and webmaster of <a href="https://www.math.lsu.edu/~awm/" target="_blank">LSU’s AWM chapter</a>, and as webmaster for <a href="https://www.math.lsu.edu/~trm-rtg/" target="_blank">LSU’s RTG</a>. I also participate in the informal geometry and topology seminar and the DTC/informal combinatorics seminar.
-
-I’m running the DTC this semester. More on that soon.
+I like getting involved in my community.
+I currently serve as secretary and webmaster of <a href="https://www.math.lsu.edu/~awm/" target="_blank">LSU’s AWM chapter</a>, and as webmaster for <a href="https://www.math.lsu.edu/~trm-rtg/" target="_blank">LSU’s RTG</a>.
+I also organise the Informal Combinatorics Seminar and regularly participate in the Informal Geometry and Topology seminar.
 
 ---LATELY---
 
-Working on a paper. Playing around with the websites I manage. Probably in my home office talking to my plants and reading.
+Working on another paper.
+Playing around with some coding projects.
+Probably in my home office talking to my plants and reading.
