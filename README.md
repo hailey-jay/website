@@ -101,8 +101,7 @@ Two kinds of entity are still written as entities:
 
 `src/cv.html` is generated outside this repo and still uses entities; leave it alone.
 
-One hazard is worth knowing: `§` is both prose (section numbers) and the sub-template delimiter.
-`split_sections` only treats a line matching `^§[A-Z][A-Z0-9_]*§$` as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe.
+`split_sections` treats a line matching `^§[A-Z][A-Z0-9_]*§$` as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe.
 Do not put a bare `§WORD§` on a line of its own in body copy.
 
 ## Setup
@@ -140,3 +139,34 @@ Worth running before a push: Cloudflare serves the committed files, so stale out
 
 Sections listed in `unpublished` in `make.py` are skipped and emitted empty (currently: printlab and links).
 HTML comments are stripped from the built output.
+
+## License
+Copyright © 2025-2026 Hailey Jay Garcia.
+This repository holds work under five different terms.
+
++ **Code: GPL-3.0-or-later.**
+  `src/make.py`, `sitekit/`, `scripts/`, `Makefile`, `src/main.css`, `src/main.js`, the HTML partials in `src/` (the templates and markup, not the prose inside them), and the wireframe videos in `images/wireframes/` that `scripts/gen_wireframes.py` renders are free software: you can redistribute and/or modify them under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License or (at your option) any later version.
+  They are distributed without any warranty; see [`LICENSE`](LICENSE) for the full text.
++ **Photographs without faces: CC BY 4.0.**
+  The photos under `images/blog/` are licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/), along with their thumbnails in `images/thumbs/`, with these exceptions, which are not covered:
+  + any image showing a person's face, unless this file names it as licensed (as it does the portrait below);
+  + `images/blog/dolomites/strudel.webp`, which shows no face but is reserved anyway.
+
+  Attribute as "Photo by Hailey Jay Garcia, haileyjay.net".
++ **Portrait and rose: CC BY-NC 4.0.**
+  `images/hailey-*.webp` and `images/rose.svg` are licensed under [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/).
+  Attribute as for the photos above.
++ **Fonts: SIL Open Font License 1.1.**
+  The EB Garamond files in `fonts/` keep their upstream license and are not relicensed here.
++ **Everything else: all rights reserved.**
+  This includes the writing (blog posts, `src/data/`, and the prose in the partials), the comics, the CV, and the photos excepted above.
+
+The built output (`index.html`, `rss.xml`, and `sitemap.xml`) combines all of the above, and each part keeps its own terms.
+
+## AI assistance
+Parts of this repository were written with Claude, an AI model by Anthropic, used as a coding assistant in Claude Code.
+
++ **Code and documentation:** much of `src/make.py`, `sitekit/`, `scripts/`, `src/main.css`, `src/main.js`, the makefile, and this README was drafted or refactored with AI assistance.
+  I directed, reviewed, and tested all of it, and I am responsible for it.
++ **Content:** the writing, photographs, and comics are my own.
+  AI edits to content files were limited to restructuring, repairing markup, and small copy-edits; none of the prose was AI-written.
