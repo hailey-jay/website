@@ -25,7 +25,7 @@ from sitekit.text import (
 
 BASE_URL = "https://haileyjay.net"
 
-tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab"]
+tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab", "colophon"]
 unpublished = {"printlab", "links"}  # still built, but emitted as an empty section
 
 # The two partials that are not sections: the page shell and the shared

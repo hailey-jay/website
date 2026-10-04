@@ -39,6 +39,7 @@
                     <li><a href="#teaching">Teaching</a></li>
                     <li><a href="#comics">Comics</a></li>
                     <li><a href="#blog">Blog</a></li>
+                    <li><a href="#colophon">Colophon</a></li>
                 </ul>
                 <div aria-label="Other Links">
                     <hr>
@@ -985,6 +986,81 @@ Her and her husband Kade have been beyond critical in getting the lab to where i
 
             
 
+            <section id="colophon">
+<div class="section-header">
+    <h1>Colophon</h1>
+</div>
+
+<p class="section-intro">  This page contains license information and an AI declaration. The site <a href="README.md">README</a> includes finer-grained license information.</p>
+
+<h2>Licenses</h2>
+
+<p>
+  The content in this repository is stratified by license.
+</p>
+
+<p>
+  The code generating and comprising the site, as well as the wireframes and the code generating them, is <a href="LICENSE">GPL v3 or later</a>.
+</p>
+
+<p>
+  Photos without faces are <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, so you can reuse them with attribution. Just say something like “Photo by Hailey Jay Garcia, haileyjay.net.”
+  One exception is the photo of the strudel that includes my hand, which is all rights reserved.
+</p>
+
+<p>
+  The rose icon and the portrait picture of myself are <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>.
+  You can use them with attribution, but as they carry personal meaning, they should not be used for commercial purposes.
+</p>
+
+<p>
+  Photos with people’s faces are, unless otherwise stated, <em>all rights reserved</em>.
+  Some of those images include people other than myself and are only posted with their explicit permission.
+  I am not at liberty to permit reuse of these photos.
+  Their likeness belongs to them and them alone.
+</p>
+
+<p>
+  Other content, including the prose, comics, CV, and blog posts, is all rights reserved.
+  <a href="mailto:jgarc86@lsu.edu">Email me</a> for permission to use this content elsewhere.
+</p>
+
+<p>
+  The exact, per-file license terms, which win in the case of any conflict, can be found in the site’s <a href="README.md">README</a>.
+  Download from <a href="https://github.com/hailey-jay/website/archive/refs/heads/main.zip">here</a> or check out the repository on <a href="https://github.com/hailey-jay/website">my GitHub</a>.
+</p>
+
+<h2>AI use</h2>
+<p>
+  This site was made with AI assistance.
+  I used Anthropic’s Claude (via Claude Code) to generate the build scripts, styling, wireframe script, and documentation.
+  It did not generate the photographs or comics.
+  The writing is my own beyond markup repair, restructuring, and proofreading.
+  As the author, I take full responsibility for this site and its content.
+  I directed, reviewed, and tested all generated content carefully.
+</p>
+<h3>Why disclose at all?</h3>
+<p>
+  I believe personal responsibility and human creativity are virtues.
+  I try to use AI tools to augment both, but I acknowledge that it would take significant time (if possible at all) for me to produce code of the same quality.
+  Transparency is another of these virtues, particularly in the modern age.
+  I do not wish to pretend that I am perfect beyond measure, only to show that I take careful measures to use modern tools to assist in my creativity and output.
+</p>
+
+<h2>How this site is made</h2>
+<p>
+  This site is assembled into a single static page by a small Python script (<code>make.py</code>) using <code>sitekit</code>, a library I share across my sites.
+  The page is hosted on Cloudflare.
+  I collect no personal data, run no analytics, and have Cloudflare’s web analytics disabled.
+  The EB Garamond typeface is licensed under the SIL OFL and self-hosted.
+  This site strives to meet WCAG 2.2 AA standards of accessibility.
+  Please <a href="mailto:jgarc86@lsu.edu?subject=jgarc86%20Website%20Feedback">contact me</a> if you face any accessibility challenges.
+</p>
+
+<p>Last updated: October 2026</p>
+
+</section>
+
         </main>
 
         
@@ -992,7 +1068,7 @@ Her and her husband Kade have been beyond critical in getting the lab to where i
             
             <img src="images/rose.svg" width="40" height="63" alt="" loading="lazy" decoding="async">
 
-            <p>Copyleft 2025–2026 Hailey Garcia. All wrongs reserved.</p>
+            <p>Copyleft 2025-2026 Hailey Jay Garcia. All wrongs reserved. See the <a href="#colophon">colophon</a> for licenses and AI use.</p>
             <p>The statements and opinions on these pages are my own only and not those of any institution I am a member of.</p>
             <p> This site aims to meet <a href="https://www.w3.org/WAI/WCAG2AA-Conformance">WCAG 2.2 Level AA.</a> Please <a href="mailto:jgarc86@lsu.edu?subject=jgarc86%20Website%20Feedback">email me</a> for feedback or if you encounter an accessibility barrier on any content served by this site.</p>
         </footer>
@@ -1006,7 +1082,7 @@ function updateBtn(){const btn=document.querySelector('.theme-toggle');if(!btn)r
 document.addEventListener('DOMContentLoaded',function(){updateBtn();const btn=document.querySelector('.theme-toggle');if(!btn)return;btn.addEventListener('click',function(){const next=effective()==='dark'?'light':'dark';root.setAttribute('data-theme',next);try{localStorage.setItem(KEY,next);}catch(e){}
 updateBtn();notifyChange();});});})();(function(){const sidebar=document.getElementById('sidebar');const backdrop=document.getElementById('sidebar-backdrop');const btn=document.getElementById('mobile-menu-btn');if(!sidebar||!backdrop||!btn)return;function openSidebar(){sidebar.classList.add('mobile-open');backdrop.classList.add('active');btn.classList.add('open');btn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}
 function closeSidebar(){sidebar.classList.remove('mobile-open');backdrop.classList.remove('active');btn.classList.remove('open');btn.setAttribute('aria-expanded','false');document.body.style.overflow='';}
-btn.addEventListener('click',function(){sidebar.classList.contains('mobile-open')?closeSidebar():openSidebar();});backdrop.addEventListener('click',closeSidebar);sidebar.addEventListener('click',function(e){if(e.target.closest('a'))closeSidebar();});document.addEventListener('keydown',function(e){if(e.key!=='Escape'||!sidebar.classList.contains('mobile-open'))return;closeSidebar();btn.focus();});})();const sections=['about','cv','teaching','printlab','comics','blog','links'].filter(function(s){return document.getElementById(s);});const subAnchors={'1431':'teaching','1431f25':'teaching','lab-status':'printlab','lab-request':'printlab','lab-gallery':'printlab','lab-filament':'printlab'};function showSection(id){let parentId=subAnchors[id]||id;if(!sections.includes(parentId))parentId='about';sections.forEach(function(s){document.getElementById(s).classList.toggle('active',s===parentId);});}
+btn.addEventListener('click',function(){sidebar.classList.contains('mobile-open')?closeSidebar():openSidebar();});backdrop.addEventListener('click',closeSidebar);sidebar.addEventListener('click',function(e){if(e.target.closest('a'))closeSidebar();});document.addEventListener('keydown',function(e){if(e.key!=='Escape'||!sidebar.classList.contains('mobile-open'))return;closeSidebar();btn.focus();});})();const sections=['about','cv','teaching','printlab','comics','blog','links','colophon'].filter(function(s){return document.getElementById(s);});const subAnchors={'1431':'teaching','1431f25':'teaching','lab-status':'printlab','lab-request':'printlab','lab-gallery':'printlab','lab-filament':'printlab'};function showSection(id){let parentId=subAnchors[id]||id;if(!sections.includes(parentId))parentId='about';sections.forEach(function(s){document.getElementById(s).classList.toggle('active',s===parentId);});}
 function navigate(hash,push){var bare=!hash;if(!hash)hash='about';if(!bare&&!sections.includes(hash)&&!subAnchors[hash])return;showSection(hash);if(!bare){if(push&&location.hash.slice(1)!==hash){history.pushState(null,'','#'+hash);}else{history.replaceState(null,'','#'+hash);}}
 if(subAnchors[hash]==='blog'){document.getElementById('blog-index').style.display='none';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display=el.id===hash?'':'none';});window.scrollTo({top:0});}else if(hash==='blog'){document.getElementById('blog-index').style.display='';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display='none';});window.scrollTo({top:0});}else if(subAnchors[hash]){const target=document.getElementById(hash);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}else{window.scrollTo({top:0});}}
 document.addEventListener('click',function(e){const a=e.target.closest('a[href]');if(!a)return;const url=new URL(a.href,location.href);if(url.pathname!==location.pathname)return;const hash=url.hash.slice(1);if(!hash)return;if(!sections.includes(hash)&&!subAnchors[hash])return;e.preventDefault();navigate(hash,true);});window.addEventListener('popstate',function(){navigate(location.hash.slice(1));});document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-blog-entry]').forEach(function(el){subAnchors[el.id]='blog';});var blogIndex=document.getElementById('blog-index');if(blogIndex)blogIndex.style.display='';document.querySelectorAll('.blog-post').forEach(function(el){el.style.display='none';});navigate(location.hash.slice(1));});function makeLightbox(opts){const overlay=document.createElement('div');overlay.className='lb-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label',opts.label);overlay.innerHTML=`

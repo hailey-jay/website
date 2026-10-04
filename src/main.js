@@ -96,7 +96,7 @@
 
 // ── Section registry ─────────────────────────────────────────
 // Filtered against the DOM so unpublished sections drop out cleanly.
-const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links']
+const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links', 'colophon']
   .filter(function (s) { return document.getElementById(s); });
 
 const subAnchors = {
