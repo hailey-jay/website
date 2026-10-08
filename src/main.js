@@ -96,16 +96,12 @@
 
 // ── Section registry ─────────────────────────────────────────
 // Filtered against the DOM so unpublished sections drop out cleanly.
-const sections = ['about', 'cv', 'teaching', 'printlab', 'comics', 'blog', 'links', 'colophon']
+const sections = ['about', 'cv', 'papers', 'teaching', 'comics', 'blog', 'colophon']
   .filter(function (s) { return document.getElementById(s); });
 
 const subAnchors = {
   '1431': 'teaching',
-  '1431f25': 'teaching',
-  'lab-status': 'printlab',
-  'lab-request': 'printlab',
-  'lab-gallery': 'printlab',
-  'lab-filament': 'printlab'
+  '1431f25': 'teaching'
 };
 
 // ── Navigation ───────────────────────────────────────────────
@@ -409,3 +405,23 @@ function autoScroll(container) {
   }
   requestAnimationFrame(step);
 }
+
+// ── Paper BibTeX (papers section) ────────────────────────────
+// The entry is in the page already (a hidden <pre> built by the CV
+// repo). Opening it also copies it, since copying is why anyone
+// clicks; the revealed text is the fallback when the clipboard is
+// unavailable (http, or a browser that refuses).
+document.querySelectorAll('.paper-bibtex').forEach(function (btn) {
+  const bib = document.getElementById(btn.getAttribute('aria-controls'));
+  const status = btn.nextElementSibling;
+  btn.addEventListener('click', function () {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    bib.hidden = !open;
+    status.textContent = '';
+    if (!open || !navigator.clipboard) return;
+    navigator.clipboard.writeText(bib.textContent).then(function () {
+      status.textContent = 'copied';
+    }, function () {});
+  });
+});

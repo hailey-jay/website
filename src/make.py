@@ -19,14 +19,14 @@ from sitekit.errors import BuildError, need
 from sitekit.images import Pipeline, mirrored
 from sitekit.markup import check_balance, require_listed
 from sitekit.text import (
-    group_rows, indent, paragraphs, parse_fields, parse_kv, parse_records,
+    expect_placeholders, indent, paragraphs, parse_fields, parse_kv,
     render, repeat, rows_of, split_data, split_sections, strip_comments,
 )
 
 BASE_URL = "https://haileyjay.net"
 
-tabs = ["about", "cv", "teaching", "comics", "blog", "links", "printlab", "colophon"]
-unpublished = {"printlab", "links"}  # still built, but emitted as an empty section
+tabs = ["about", "cv", "papers", "teaching", "comics", "blog", "colophon"]
+unpublished = set()  # built, but emitted as an empty section
 
 # The two partials that are not sections: the page shell and the shared
 # sub-templates. Listed so `require_listed` can tell a new section partial
@@ -346,120 +346,13 @@ def build_feed(posts):
     <channel>
         <title>Hailey Jay Garcia</title>
         <link>{BASE_URL}/</link>
-        <description>Math, teaching, and whatever else is on my mind.</description>
+        <description>Combinatorics, topology, comics, and whatever else is on my mind.</description>
         <language>en-us</language>
         <lastBuildDate>{format_rfc2822(posts[0].isodate) if posts else ""}</lastBuildDate>
         <atom:link href="{BASE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
 {items_xml}
     </channel>
 </rss>"""
-
-# ── Parse print lab ──────────────────────────────────────────
-def parse_printlab(raw, card_tmpl):
-    parts = split_sections(raw)
-
-    html_template     = parts[""]
-    printer_template  = parts["PRINTER"]
-    filament_template = parts["FILAMENT"]
-    filament_row_tmpl = parts["FILAMENT_ROW"]
-
-    # Data lives in src/data/printlab.txt, not in the partial. The file
-    # is absent while the section is unpublished (the last contents were
-    # placeholders and were archived off); restore it before removing
-    # "printlab" from `unpublished`.
-    data_file = src / "data/printlab.txt"
-    need(data_file.exists(),
-         "src/data/printlab.txt is missing; printlab cannot be published without it")
-    data = split_data(data_file.read_text(encoding="utf-8"))
-    meta = parse_kv(data[""], "printlab meta")
-
-    # ── Printers ──────────────────────────────────────────────
-    STATUS_LABELS = {
-        "idle":        "Idle",
-        "printing":    "Printing",
-        "offline":     "Offline",
-        "maintenance": "Maintenance",
-    }
-
-    printers = parse_records(data["PRINTERS"], "printlab printer", ("name", "status"))
-    printer_rows = repeat(printer_template, [
-        {
-            "name":         p["name"],
-            "status":       p["status"],
-            "status_label": STATUS_LABELS.get(p["status"], p["status"].title()),
-            "note":         p.get("note", ""),
-        }
-        for p in printers
-    ], sep="\n        ")
-
-    # ── Gallery ───────────────────────────────────────────────
-    # Same `image | caption | alt` rows and same shared card as the
-    # comics and blog galleries; only the aria-label verb differs.
-    gallery_records = []
-    for line in rows_of(data["GALLERY"]):
-        img, caption, alt = parse_row(line)
-        photos.require(img, "print gallery")
-        gallery_records.append({
-            "src":       img,
-            "img_attrs": photos.attrs(img, GRID_SIZES),
-            "alt":       escape(alt),
-            "caption":   escape(caption),
-        })
-    gallery_cards = repeat(card_tmpl, gallery_records,
-                           thumb_class="gallery-thumb", label="View print")
-
-    # ── Filament ──────────────────────────────────────────────
-    # Rows are grouped under bare diameter headings ("1.75mm"), so a
-    # heading is any non-row line; everything else is a filament row.
-    groups = []
-    for diameter, rows in group_rows(data["FILAMENT"], "filament"):
-        records = []
-        for line in rows:
-            material, color, hex_val, stock, blurb = parse_fields(line, 5)
-            records.append({
-                "material": material,
-                "color":    color,
-                "hex":      hex_val,
-                "stock":    f"{stock} spools",
-                "blurb":    f'<span class="filament-blurb">({blurb})</span>' if blurb else "",
-            })
-        groups.append((diameter, records))
-
-    filament = repeat(filament_template, [
-        {
-            "diameter": diameter,
-            "rows":     repeat(filament_row_tmpl, rows, sep="\n            "),
-        }
-        for diameter, rows in groups if rows
-    ])
-
-    return render(html_template,
-        printer_count = meta.get("printer_count", ""),
-        printers      = printer_rows,
-        gallery       = gallery_cards,
-        filament      = filament,
-    )
-
-# ── Parse links ──────────────────────────────────────────────
-# src/data/links.txt is heading-then-rows, the same shape as the
-# filament table: a bare line opens a group, and each `label | url`
-# row under it is one link. An optional third field names a variant
-# template, which is how the RSS entry gets its icon.
-def parse_links(raw):
-    parts = split_sections(raw)
-    data  = (src / "data/links.txt").read_text(encoding="utf-8")
-
-    groups = []
-    for title, rows in group_rows(data, "links"):
-        links = []
-        for row in rows:
-            label, url, variant = parse_fields(row, 3)
-            key = f"LINK_{variant.upper()}" if variant else "LINK"
-            need(key in parts, f"links: no §{key}§ template for {label!r}")
-            links.append(render(parts[key], label=label, url=url).strip())
-        groups.append({"title": title, "links": indent("\n".join(links), "        ")})
-
-    return render(parts[""], groups=repeat(parts["GROUP"], groups))
 
 # ── Assemble index.html ──────────────────────────────────────
 
@@ -495,6 +388,9 @@ def build_index(raw_content):
     index_template = assemble.read(src / "index.html")
     check_balance(index_template, "src/index.html")
     check_nav(index_template)
+    # A section with no {slot} in the shell is built and then dropped
+    # without a word; this is how Papers first went missing.
+    expect_placeholders(index_template, [*sections, *aux], "src/index.html")
     return assemble.fill(index_template, **sections, **aux)
 
 # ── Build ────────────────────────────────────────────────────
@@ -513,13 +409,6 @@ def main():
         raw_content["blog"], load_blog_entries(), card_template)
 
     raw_content["about"] = parse_about(raw_content["about"], carousel_images(posts))
-
-    # Unpublished sections are emitted empty by build_index, so their
-    # data files need not exist and are not parsed.
-    if "printlab" not in unpublished:
-        raw_content["printlab"] = parse_printlab(raw_content["printlab"], card_template)
-    if "links" not in unpublished:
-        raw_content["links"] = parse_links(raw_content["links"])
 
     assemble.write(root / "rss.xml", build_feed(posts))
     assemble.write(root / "index.html", build_index(raw_content))

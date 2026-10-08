@@ -6,8 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hailey Jay Garcia</title>
     <link rel="icon" href="images/rose.svg" />
-    <meta name="description" content="Welcome to my website! Here, you'll find math, comics, and info about Hailey!" />
+    <meta name="description" content="Hey yall! Welcome to my corner of the internet. I do combinatorics and topology at LSU, draw comics, and blog about whatever else is on my mind. ~HJG" />
     <link rel="canonical" href="https://haileyjay.net/" />
+    <!-- Link previews (Open Graph). Absolute URLs: a preview is fetched off-site. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://haileyjay.net/" />
+    <meta property="og:title" content="Hailey Jay Garcia" />
+    <meta property="og:description" content="Hey yall! Welcome to my corner of the internet. I do combinatorics and topology at LSU, draw comics, and blog about whatever else is on my mind. ~HJG" />
+    <meta property="og:image" content="https://haileyjay.net/images/hailey-500.webp" />
+    <meta property="og:image:width" content="500" />
+    <meta property="og:image:height" content="552" />
+    <meta property="og:image:alt" content="A woman in a button-down shirt and sidebag in front of a flower bush." />
+    <meta name="twitter:card" content="summary" />
     <link rel="alternate" type="application/rss+xml" title="Hailey Jay Garcia" href="https://haileyjay.net/rss.xml">
     <link rel="preload" href="fonts/eb-garamond-v32-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/eb-garamond-v32-latin-500.woff2" as="font" type="font/woff2" crossorigin>
@@ -36,15 +46,17 @@
                 <ul class="sidenav">
                     <li><a href="#about">About</a></li>
                     <li><a href="#cv">CV</a></li>
-                    <li><a href="#teaching">Teaching</a></li>
-                    <li><a href="#comics">Comics</a></li>
+                    <li><a href="#papers">Papers</a></li>
                     <li><a href="#blog">Blog</a></li>
-                    <li><a href="#colophon">Colophon</a></li>
+                    <li><a href="#comics">Comics</a></li>
                 </ul>
                 <div aria-label="Other Links">
                     <hr>
                     <span class="sidebar-meta">LSU</span>
                     <ul class="sidenav">
+                        <!-- Out of the main nav while I’m not teaching; the
+                             section stays live so students’ links still work. -->
+                        <li><a href="#teaching">Past Teaching</a></li>
                         <li><a href="https://www.math.lsu.edu/">Math Department</a></li>
                         <li><a href="https://www.math.lsu.edu/~awm/">AWM Chapter</a></li>
                         <li><a href="https://www.math.lsu.edu/~trm-rtg/">Research &amp; Training Group</a></li>
@@ -52,7 +64,9 @@
                     <hr>
                     <span class="sidebar-meta">Personal</span>
                     <ul class="sidenav">
-                        <li><a href="rss.xml" class="rss-link" aria-label="RSS feed">
+                        <li><a href="https://orcid.org/0009-0008-9436-2956" rel="me">ORCID</a></li>
+                        <li><a href="https://github.com/hailey-jay" rel="me">GitHub</a></li>
+                        <li><a href="rss.xml" class="rss-link">
                                 <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
                                     <circle cx="5" cy="19" r="2" />
                                     <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9" />
@@ -74,15 +88,13 @@
 
             {cv}
 
-            {teaching}
+            {papers}
 
-            {printlab}
+            {teaching}
 
             {comics}
 
             {blog}
-
-            {links}
 
             {colophon}
 
