@@ -5,9 +5,12 @@ Built with a small Python script.
 ## Structure
 + `src/`: source files (HTML partials, CSS, JS, build script)
 + `src/shared.html`: sub-templates used by more than one section (currently the gallery card)
++ `src/sagitta/`: the shell, partials, and stylesheet for the standalone Sagitta pages (see below)
 + `src/data/`: content data, kept separate from markup
   + `about.txt`: the identity fields, meta pairs, bio, and Lately note
   + `comics.txt`: one `stem | caption | alt` row per comic
+  + `sagitta.txt`: the Sagitta landing page's copy
+  + `sagitta-tutorial.html`: the Sagitta walkthrough, front matter then body, like a post
   + `links.txt`: a bare heading line, then `label | url` rows under it
   + `blog/<isodate>-<slug>.html`: one file per post.
     Filename sort gives newest-first order.
@@ -50,12 +53,47 @@ The thumbnail is what the grid, the blog index, and the homepage carousel load; 
 Thumbnails are rebuilt only when the source is newer, so a no-op build is fast.
 They are committed alongside the other built output.
 
-+ `src/make.py`: builds `index.html`, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files
++ `src/make.py`: builds `index.html`, the Sagitta pages, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files
 + `sitekit/`: a vendored copy of the shared build library (upstream commit `fa89364`), used by all four of my site repos.
   Text and data-format parsing, template filling, markup validation, the image pipeline, asset bundling, minification, and the post-build checker all live there.
   Everything that knows this site is haileyjay.net stays in `src/make.py`: RSS, the `[gallery]`/`[image]` directives, draft-by-filename, comics, and the about page.
 + `scripts/check.py`, `scripts/verify.py`: the two checks, behind `make check` and `make verify`
-+ `index.html`, `rss.xml`, `sitemap.xml`, `images/thumbs/`: built output
++ `scripts/app.py`: copies the Sagitta editor into `sagitta/app/`, behind `make app`
++ `index.html`, `sagitta/index.html`, `sagitta/tutorial/index.html`, `rss.xml`, `sitemap.xml`, `images/thumbs/`: built output
++ `sagitta/app/`: the Sagitta editor, copied in from its own repo and served as-is
+
+## The Sagitta pages
+The site proper is one document whose sections are hash fragments, and the sidebar tabs are all facets of me.
+[Sagitta](https://github.com/hailey-jay/sagitta) is not one of those: it has its own navigation, its own manual, and the editor itself served from `sagitta/app/`, so it is built as real files under `/sagitta/` with a shell of its own.
+The sidebar links out to it under `Projects` rather than adding a tab.
+
++ `sagitta/index.html`: the landing page, from `src/sagitta/landing.html` and `src/data/sagitta.txt`
++ `sagitta/tutorial/index.html`: the walkthrough, from `src/sagitta/tutorial.html` and `src/data/sagitta-tutorial.html`
++ `sagitta/app/`: the editor
+
+`sagitta_pages` in `make.py` lists them. Each page knows two prefixes, and both the shell and the partials use them rather than hard-coding a depth:
+
++ `{up}` reaches the site root, for assets: `../` for the landing page, `../../` for the tutorial.
++ `{base}` reaches `/sagitta/`, for links within the group: `./` and `../`.
+
+Both pages inline `src/main.css` and `src/main.js` in full, so the typography, the theme toggle, and the figure lightbox are the site's and stay in step with it; `src/sagitta/sagitta.css` adds only the page chrome, prefixed `sg-`.
+Relative `url()` references in the inlined stylesheet are rewritten with `{up}`, because an inlined stylesheet resolves them against the document rather than against itself.
+No bare `<section>` is used on these pages: `main.css` hides those until the single-page router marks one active.
+
+The walkthrough body takes the same `[image ...]` directives a post does, with bare stems resolving against `images/sagitta-tutorial/`.
+Those files are `.png` screenshots, so the rows name the extension; a stem without one is still taken as `.webp`.
+
+`make app` copies the editor in.
+Sagitta is a static page with relative paths and no bundler, so hosting it is a file copy: `scripts/app.py` brings over `index.html`, the stylesheets, `src/`, `web/`, `fonts/`, `icons/`, the manifest, the service worker, and the licences, and prunes anything that has left the source.
+The desktop shell's own half (`electron/`), the test suites, and the packaging output stay behind.
+The copy is tracked here, because the repo is what Cloudflare serves.
+
+The editor runs in a browser on its own: `web/host.js` stands in for the desktop shell, the manifest lets a browser install it as an app, and the service worker keeps it working offline.
+Both the manifest and the service worker use relative paths, so they are correct under `/sagitta/app/`.
+Chromium opens and saves the diagram file in place; Firefox reads a copy and saves by downloading one.
+
+The same sync copies the editor's `icon.svg` to `images/sagitta.svg`, which is what this site uses for Sagitta: the two pages' favicon, the landing page's wordmark, and the sidebar entry.
+One copy, kept in step with the app rather than drawn again.
 
 ## Data formats
 Three shapes cover every section, and they are parsed by shared helpers in `sitekit.text` rather than per-section code:
@@ -125,13 +163,19 @@ make
 Edit files in `src/`, run the build.
 Paths are resolved relative to the repo root, so the underlying `python src/make.py` still runs from anywhere.
 
-`make check` scans the built `index.html` for the problems that only show up in the finished page: a local `href` or `src` pointing at nothing, a duplicate id, an `<img>` missing its alt, dimensions, or `loading` hint, and the total weight of image one page pulls.
+`make check` scans the built pages (`index.html` and the two Sagitta pages; not the editor, which is not this build's to audit) for the problems that only show up in the finished page: a local `href` or `src` pointing at nothing, a duplicate id, an `<img>` missing its alt, dimensions, or `loading` hint, and the total weight of image one page pulls.
 
-`make verify` rebuilds, then fails if the committed `index.html`, `rss.xml`, or `sitemap.xml` differs from what the source produces, and restores the worktree either way.
+`make verify` rebuilds, then fails if the committed pages, `rss.xml`, or `sitemap.xml` differ from what the source produces, and restores the worktree either way.
 The build is deterministic so a clean result means the committed output is current.
 Worth running before a push: Cloudflare serves the committed files, so stale output ships silently with no error anywhere.
 
 `make links` checks every off-site URL. It needs the network and is slow, so it is separate from `make check`.
+
+`make app` refreshes `sagitta/app/` from a Sagitta checkout, `../sagitta` by default:
+
+```
+make app SAGITTA=~/Workshop/sagitta
+```
 
 `make wireframes` regenerates `images/wireframes/`.
 
@@ -154,12 +198,15 @@ This repository holds work under five different terms.
 + **Portrait and rose: CC BY-NC 4.0.**
   `images/hailey-*.webp` and `images/rose.svg` are licensed under [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/).
   Attribute as for the photos above.
++ **The editor: GPL-3.0-or-later, upstream.**
+  `sagitta/app/` is a copy of [Sagitta](https://github.com/hailey-jay/sagitta), which is itself a fork of [quiver](https://github.com/varkor/quiver) by varkor.
+  It keeps its own terms and its own `LICENSE` and `NOTICE`, and is not relicensed here.
 + **Fonts: SIL Open Font License 1.1.**
   The EB Garamond files in `fonts/` keep their upstream license and are not relicensed here.
 + **Everything else: all rights reserved.**
   This includes the writing (blog posts, `src/data/`, and the prose in the partials), the comics, the CV, and the photos excepted above.
 
-The built output (`index.html`, `rss.xml`, and `sitemap.xml`) combines all of the above, and each part keeps its own terms.
+The built output (`index.html`, the Sagitta pages, `rss.xml`, and `sitemap.xml`) combines all of the above, and each part keeps its own terms.
 
 ## AI assistance
 Parts of this repository were written with Claude, an AI model by Anthropic, used as a coding assistant in Claude Code.

@@ -1,0 +1,350 @@
+/* ── Sagitta pages ──────────────────────────────────────────── */
+/* Layered over main.css, which these pages inline in full: the fonts, the
+   tokens, the theme toggle, the figures, and the lightbox are the site's, so
+   only the page's own chrome is here. Everything is prefixed `sg-` so nothing
+   collides with the single-page site's classes, and no bare <section> is used
+   (main.css hides those until the SPA router marks one active). */
+
+.sg-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+/* Sticky, because the one action the page wants (open the editor) should stay
+   reachable from the bottom of a long tutorial. Opaque background: the page
+   scrolls underneath it. */
+.sg-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: .6rem 1.4rem;
+    padding: .9rem 0 .7rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+}
+
+.sg-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-decoration: none;
+}
+
+/* The icon is a disc of its own, dark in both themes, so it needs no variant. */
+.sg-wordmark img {
+    width: 1.25em;
+    height: 1.25em;
+}
+
+.sg-nav {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: .6rem 1.2rem;
+    margin-left: auto;
+    font-size: .95rem;
+}
+
+.sg-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.2rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* One button-shaped link per page, and it is always the same action. */
+.sg-button {
+    display: inline-block;
+    padding: .3em .9em;
+    border: 1px solid var(--pink);
+    border-radius: 2px;
+    background: rgba(var(--pink-rgb), .14);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .15s, border-color .15s;
+}
+
+.sg-button:hover,
+.sg-button:focus {
+    background: rgba(var(--pink-rgb), .3);
+    color: var(--ink);
+}
+
+.sg-button--primary {
+    background: var(--pink);
+    font-weight: 500;
+}
+
+.sg-button--primary:hover,
+.sg-button--primary:focus {
+    background: var(--pink-strong);
+    color: var(--paper);
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.sg-hero {
+    padding: 2.2rem 0 1rem;
+}
+
+.sg-title {
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: .01em;
+}
+
+.sg-tagline {
+    font-size: 1.3rem;
+    color: var(--muted);
+    margin: .3rem 0 1.2rem;
+    max-width: 40ch;
+}
+
+.sg-lede p {
+    max-width: 54ch;
+}
+
+.sg-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin: 1.4rem 0 .6rem;
+    max-width: none;
+}
+
+.sg-meta {
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+.sg-hero-figure {
+    margin: 1.6rem 0 0;
+    border: 1px solid var(--rule);
+    padding: .7rem;
+    background: rgba(var(--pink-rgb), .05);
+}
+
+.sg-hero-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.sg-hero-figure figcaption {
+    font-size: .82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: .5rem;
+    text-align: center;
+}
+
+/* ── Blocks ─────────────────────────────────────────────────── */
+.sg-block {
+    padding: 2rem 0 0;
+}
+
+.sg-heading {
+    font-size: 1.3rem;
+    font-weight: 500;
+    border-bottom: 1px solid var(--pink);
+    padding-bottom: .4rem;
+    margin-bottom: 1.2rem;
+}
+
+.sg-prose p {
+    max-width: 62ch;
+}
+
+.sg-more {
+    margin-top: 1.2rem;
+    font-size: .95rem;
+}
+
+/* ── Features ───────────────────────────────────────────────── */
+.sg-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1.6rem;
+}
+
+.sg-feature h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: .3rem;
+}
+
+.sg-feature p {
+    font-size: .95rem;
+    margin: 0;
+    max-width: 34ch;
+}
+
+/* ── Key table and its figure ───────────────────────────────── */
+.sg-keys {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.8rem;
+    align-items: start;
+}
+
+.sg-keytable,
+.sg-downloads {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .95rem;
+}
+
+.sg-caption {
+    text-align: left;
+    color: var(--muted);
+    font-size: .88rem;
+    padding-bottom: .6rem;
+}
+
+.sg-keytable th,
+.sg-keytable td,
+.sg-downloads th,
+.sg-downloads td {
+    text-align: left;
+    vertical-align: baseline;
+    padding: .4rem .8rem .4rem 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.sg-keytable th {
+    width: 1%;
+    white-space: nowrap;
+    font-weight: 400;
+}
+
+.sg-downloads thead th {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    border-bottom-color: var(--pink);
+}
+
+.sg-downloads tbody th {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.sg-keys-figure {
+    margin: 0;
+}
+
+.sg-keys-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+}
+
+.sg-keys-figure figcaption {
+    font-size: .82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: .4rem;
+}
+
+.sg-fineprint {
+    margin-top: 1rem;
+    font-size: .9rem;
+    color: var(--muted);
+}
+
+.sg-fineprint p {
+    max-width: 62ch;
+    margin-bottom: .6rem;
+}
+
+/* ── Tutorial ───────────────────────────────────────────────── */
+.sg-tutorial {
+    max-width: 62ch;
+    padding-bottom: 1rem;
+}
+
+.sg-tutorial-header {
+    margin: 2rem 0 1.6rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--pink);
+}
+
+.sg-tutorial-title {
+    font-size: 1.8rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.sg-standfirst {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--muted);
+    margin: .3rem 0 0;
+}
+
+/* The screenshots are wider than the measure the prose is set to, and the
+   detail in them is the point, so they break out of it. */
+.sg-tutorial-body .blog-figure {
+    max-width: 100%;
+    margin: 1.8rem 0;
+}
+
+.sg-tutorial-body .blog-figure figcaption {
+    text-align: left;
+}
+
+.sg-version-note {
+    margin-top: 2rem;
+    padding-top: .8rem;
+    border-top: 1px solid var(--rule);
+    font-size: .88rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* main.css puts the footer in the single-page grid; here it is the last flex
+   item and wants the space pushed above it instead. */
+.sg-page footer {
+    margin-top: auto;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .sg-page {
+        padding: 0 1rem;
+    }
+
+    .sg-title {
+        font-size: 2.1rem;
+    }
+
+    .sg-tagline {
+        font-size: 1.15rem;
+    }
+
+    .sg-keys {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* The toggle sits bottom-right over the content; the nav stays put. */
+    .sg-nav {
+        margin-left: 0;
+        width: 100%;
+    }
+}

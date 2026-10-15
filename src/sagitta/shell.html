@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- The shell for the standalone Sagitta pages. Unlike src/index.html, which is
+     one document with hash sections, these are real URLs under /sagitta/, so
+     every asset reference carries {up} (the prefix back to the site root) and
+     every in-project link carries {base} (the prefix back to /sagitta/).
+     Both are filled per page by build_standalone in src/make.py. -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <link rel="icon" href="{up}images/sagitta.svg" />
+    <meta name="description" content="{description}" />
+    <link rel="canonical" href="{canonical}" />
+    <!-- Link previews (Open Graph). Absolute URLs: a preview is fetched off-site. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{canonical}" />
+    <meta property="og:title" content="{title}" />
+    <meta property="og:description" content="{description}" />
+    <meta property="og:image" content="{og_image}" />
+    <meta property="og:image:alt" content="A commutative diagram of the snake lemma, drawn in Sagitta." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" href="{up}fonts/eb-garamond-v32-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{up}fonts/eb-garamond-v32-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+    <script>try{var t=localStorage.getItem('haileyjay-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    {css}
+</head>
+
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <button class="theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark"><span class="knob">☾</span></button>
+
+    <div class="sg-page">
+
+        <!--    Header    -->
+        <header class="sg-header">
+            <a class="sg-wordmark" href="{base}">
+                <img src="{up}images/sagitta.svg" alt="" width="24" height="24" loading="eager" decoding="async">
+                Sagitta</a>
+            <nav class="sg-nav" aria-label="Sagitta">
+                <ul>
+                    <li><a href="{base}tutorial/"{current_tutorial}>Tutorial</a></li>
+                    <li><a href="https://github.com/hailey-jay/sagitta/blob/main/docs/sagitta.md">Manual</a></li>
+                    <li><a href="https://github.com/hailey-jay/sagitta">GitHub</a></li>
+                </ul>
+                <a class="sg-button" href="{base}app/">Open editor</a>
+            </nav>
+        </header>
+
+        <!--    Main    -->
+        <main id="main-content">
+            {main}
+        </main>
+
+        <!--    Footer    -->
+        <footer>
+            <p>Sagitta is free software under the <a href="https://github.com/hailey-jay/sagitta/blob/main/LICENSE">GNU GPL v3</a>, grown from <a href="https://github.com/varkor/quiver">quiver</a> by varkor.</p>
+            <p><a href="mailto:jgarc86@lsu.edu?subject=Sagitta">Email me</a> about a bug, or open an <a href="https://github.com/hailey-jay/sagitta/issues">issue</a>.</p>
+            <p><a href="{up}">← haileyjay.net</a></p>
+        </footer>
+
+    </div><!-- /.sg-page -->
+    {js}
+</body>
+
+</html>

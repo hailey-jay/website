@@ -1,6 +1,6 @@
 """Rebuild, and fail if the committed output is not what the sources produce.
 
-`index.html`, `rss.xml`, and `sitemap.xml` are committed and served directly, so
+The built pages, `rss.xml`, and `sitemap.xml` are committed and served directly, so
 stale output ships silently with no error anywhere. The build is deterministic
 (the feed's lastBuildDate comes from the newest post's date, not the clock), so
 a rebuild that leaves these three unchanged means the committed output is
@@ -17,7 +17,8 @@ sys.path.insert(0, str(root))
 
 from sitekit.verify import verify
 
-OUTPUTS = ["index.html", "rss.xml", "sitemap.xml"]
+OUTPUTS = ["index.html", "rss.xml", "sitemap.xml",
+           "sagitta/index.html", "sagitta/tutorial/index.html"]
 
 if __name__ == "__main__":
     raise SystemExit(verify(OUTPUTS, [sys.executable, "src/make.py"], cwd=root))

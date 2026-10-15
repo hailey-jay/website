@@ -68,6 +68,7 @@
     --paper: #f9f6f1;
     --rule: #e8e0d8;
     --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
     --lh: 1.7;
     --body-weight: 400;
 }
@@ -352,6 +353,20 @@ hr {
     border-bottom-color: var(--pink);
 }
 
+/* A project's own mark beside its name. The icon carries its own dark disc,
+   so it reads in both themes without a theme-specific copy. */
+.sidenav-marked {
+    display: flex;
+    align-items: center;
+    gap: .45em;
+}
+
+.sidenav-icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
+
 /* ── Main content area ──────────────────────────────────────── */
 main {
     grid-column: 2;
@@ -438,6 +453,25 @@ a {
 a:hover,
 a:focus {
     color: var(--pink-strong);
+}
+
+/* ── Code and keys ──────────────────────────────────────────── */
+/* Keystrokes, file names, and commands, quoted exactly: in the blog, in the
+   Sagitta pages, anywhere prose has to name a key. <kbd> is <code> plus the
+   key outline, so a sentence can tell the two apart. */
+code,
+kbd {
+    font-family: var(--mono);
+    font-size: .88em;
+}
+
+kbd {
+    padding: .05em .4em;
+    border: 1px solid var(--rule);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    background: rgba(var(--pink-rgb), .12);
+    white-space: nowrap;
 }
 
 /* ── "Lately" blurb ─────────────────────────────────────────── */

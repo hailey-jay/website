@@ -1,0 +1,90 @@
+<!-- The landing page. Everything it says lives in src/data/sagitta.txt; this
+     partial holds only the shape. Image paths and the {up}/{base} prefixes are
+     filled by build_standalone in src/make.py. -->
+
+<div class="sg-hero">
+    <h1 class="sg-title">Sagitta</h1>
+    <p class="sg-tagline">{tagline}</p>
+    <div class="sg-lede">
+        {lede}
+    </div>
+    <p class="sg-cta">
+        <a class="sg-button sg-button--primary" href="{base}app/">Open in browser</a>
+        <a class="sg-button" href="https://github.com/hailey-jay/sagitta/releases/latest">Download</a>
+    </p>
+    <p class="sg-meta">{version} · GPLv3 · forked from <a href="https://github.com/varkor/quiver">quiver</a></p>
+    <figure class="sg-hero-figure">
+        <img {hero_attrs} alt="{hero_alt}" loading="eager" decoding="async">
+        <figcaption>{hero_caption}</figcaption>
+    </figure>
+</div>
+
+<div class="sg-block">
+    <h2 class="sg-heading">What it is</h2>
+    <div class="sg-features">
+        {features}
+    </div>
+</div>
+
+<div class="sg-block">
+    <h2 class="sg-heading">A diagram in five keys</h2>
+    <div class="sg-keys">
+        <table class="sg-keytable">
+            <caption class="sg-caption">{keys_lede}</caption>
+            <tbody>
+                {keys}
+            </tbody>
+        </table>
+        <figure class="sg-keys-figure">
+            <img {keys_attrs} alt="{keys_alt}" loading="lazy" decoding="async">
+            <figcaption>{keys_caption}</figcaption>
+        </figure>
+    </div>
+    <p class="sg-more"><a href="{base}tutorial/">Full walkthrough: the snake lemma →</a></p>
+</div>
+
+<div class="sg-block">
+    <h2 class="sg-heading">Get it</h2>
+    <table class="sg-downloads">
+        <thead>
+            <tr>
+                <th scope="col">Platform</th>
+                <th scope="col">Package</th>
+                <th scope="col">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {downloads}
+        </tbody>
+    </table>
+    <div class="sg-fineprint">
+        {install_note}
+    </div>
+</div>
+
+<div class="sg-block sg-prose">
+    <h2 class="sg-heading">Notes</h2>
+    {notes}
+</div>
+
+§FEATURE§
+
+<div class="sg-feature">
+    <h3>{title}</h3>
+    <p>{body}</p>
+</div>
+
+§KEYROW§
+
+<tr>
+    <th scope="row"><kbd>{key}</kbd></th>
+    <td>{what}</td>
+</tr>
+
+§DOWNLOAD§
+
+<tr>
+    <th scope="row">{platform}</th>
+    <td><a href="{url}">{package}</a></td>
+    <td>{note}</td>
+</tr>
