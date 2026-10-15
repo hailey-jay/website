@@ -1,0 +1,85 @@
+# Sagitta
+
+Hello yall!
+I figure it's about time to post about my first uploaded hobby project, sagitta.
+It started as a local copy of Varkor's Quiver that I edited by hand to make tweaks here and there; maybe a UI edit one day, a keybind tweak the next, wrap it in electron, etc.
+Eventually it became interesting enough to put a bit more time into, and with access to LLMs, I finally had the ability to make more substantial edits.
+Do note that I will never claim that Sagitta is in any way better than Quiver.
+I've used Quiver for years, and the community behind it is capable of amazing things.
+Put simply, Sagitta wouldn't exist if I didn't love Quiver first.
+
+## PH
+
+Sagitta is a graphical commutative diagram editor, forked from Varkor's Quiver. % link
+The name "sagitta" is Latin for arrow.
+It's a bit on the nose, but fitting nonetheless.
+
+The keybindings work vim-*ish*, with heavy emphasis on the ish.
+This is because I am an emacs user and only learned vim later.
+For detailed documentation, see the repository.
+
+## Tutorial through example
+
+I quite like the wikipedia snake lemma figure. % link
+Let's recreate it in Sagitta.
+
+I'd first start by making each row of the diagram.
+Space on an empty cell creates a vertex.
+If a vertex is already selected, an arrow is drawn from the previous vertex to the current cell.
+Pressing space and right alternately a few times gives a sequence of bullets.
+Let's make four:
+% INSERT
+We could either fill in their labels now or wait until later.
+One of the ways we could do this is to hit tab a bunch of times, which cycles through the unlabelled vertices and arrows so that you can edit their labels.
+If we didn't use the queue feature, we could select arrows for labelling by `/` plus whatever code the arrow got assigned (usually, the letters of their endpoints concatenated).
+Here, the code that got assigned to the arrow we need to label `g` got assigned CODE
+% INSERT
+After, let's escape out of the selection and build the rest of the objects in rows.
+When it's time to connect the rows together, we can just clear our selection, press space on the source vertex, and then space on the target.
+If we loaded a custom `macros.tex` file, we could've defined `\coker`, but for this quick example, something fast and dirty will do.
+With most everything but the connecting homomorphism done, we have:
+% INSERT
+Because we want our connecting homomorphism $d$ to cut right through the middle of the diagram, we should move half the diagram down to clear some space.
+The way I'm going to select the seven lower vertices is by rectangle select: C-<SPC> on one corner, C-<SPC> on another, everything in between collected:
+% INSERT
+You could, of course, use `/` with a space-separated list, or even hold shift and just move your cursor over each cell.
+Once everything is selected, holding control and pressing the down arrow moves the whole selection down:
+% INSERT
+Now, for the trickiest morphism of them all! Just creating an arrow the usual way between $\mathrm{ker} c$ and $\mathrm{coker} a$ isn't enough, as it'll just cut across the diagram centre inelegantly.
+Create the arrow and, with the arrow still selected, move the cursor two cells right of $\mathrm{ker} c$.
+Hitting `k` creates a control point for the arrow (pressing `k` again would remove it).
+I'll go ahead and create the rest of the control points we want:
+% INSERT
+In the original wikipedia image, the connecting morphism lies overtop the arrows in the middle.
+With the connecting morphism still selected, we can just hit `x` to let it cross over:
+% INSERT
+Nearly there, but the labels are all wonky: $a$, $b$, and $c$ are hidden underneath the connecting morphism!
+Select each arrow in turn, hit `P`, and shift the label position along the arrow using the arrow keys.
+Do the same for the connecting morphism, and make sure the label renders along the outside of the arrow by hitting `A` for label alignment and then `r` for right.
+Toggle the grid with `#` and enjoy!
+% INSERT
+I'll just save it to a file with `C-s` and put it in my very cool paper on the snake lemma.
+
+
+Keys in Sagitta may either perform an action or drop you into a submenu.
+For example, pressing the `d` key on the settings menu will toggle dark mode, but on the arrow menu, will enter the arrow body submenu.
+Submenu keys toggle that menu; pressing `d` back-to-back on the arrow menu opens and then closes the body submenu.
+Sliders behave like submenus, with left-right or up-down keys adjusting the level.
+Alternatively, the number keys allow direct entry.
+
+
+The mode is indicated by the icon on the bottom left.
+Here are the modes and their keys:
+
+SETTINGS
+- VIEW
+d - toggle dark mode
+z - zoom slider
+c - cell size (default:128px)
+l - label size (default:26px)
+- KEYS
+q - quiver mode (default:off) % change this for next release
+    When off, the canvas behaves like a spreadsheet would, and typing (besides for a few keys) drops you directly into editing the label.
+    On is equivalent to having the ; mode enabled by default.
+- COMMAND LIST
+w - delay for menu pop-up after entering a menu (default:300ms)
