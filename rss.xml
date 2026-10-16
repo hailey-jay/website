@@ -14,8 +14,9 @@
         <guid isPermaLink="true">https://haileyjay.net/#blog-sagitta</guid>
         <pubDate>Thu, 15 Oct 2026 00:00:00 +0000</pubDate>
         <description>My first public hobby project!</description>
-        <content:encoded><![CDATA[<p>Hey yall!
-  I figure it’s about time to post about my first public hobby project, <a href="https://haileyjay.net/sagitta/">Sagitta</a>.
+        <content:encoded><![CDATA[<p>Hey yall!</p>
+
+<p> I figure it’s about time to post about my first public hobby project, <a href="https://haileyjay.net/sagitta/">Sagitta</a>.
   It started as a local copy of <a href="https://github.com/varkor/quiver">varkor’s quiver</a> that I edited by hand to make tweaks here and there: maybe a UI edit one day, a keybinding tweak the next, an Electron wrapper after that, etc.
   Eventually it became interesting enough to put a bit more time into, and with access to LLMs, I could finally make more substantial edits.</p>
 
