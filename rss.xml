@@ -9,35 +9,57 @@
         <atom:link href="https://haileyjay.net/rss.xml" rel="self" type="application/rss+xml"/>
 
     <item>
-        <title>Sagitta, or how I learned to fork quiver</title>
+        <title>Sagitta, or: how I learned to stop worrying and love the keyboard</title>
         <link>https://haileyjay.net/#blog-sagitta</link>
         <guid isPermaLink="true">https://haileyjay.net/#blog-sagitta</guid>
         <pubDate>Thu, 15 Oct 2026 00:00:00 +0000</pubDate>
-        <description>My first uploaded hobby project: a commutative diagram editor grown out of years of hand-edited patches.</description>
-        <content:encoded><![CDATA[<p>Hey yall! I figure it's about time to post about my first uploaded hobby project, <a href="https://haileyjay.net/sagitta/">Sagitta</a>. It started as a local copy of <a href="https://github.com/varkor/quiver">Varkor's quiver</a> that I edited by hand to make tweaks here and there; maybe a UI edit one day, a keybind tweak the next, wrap it in electron, etc. Eventually it became interesting enough to put a bit more time into, and with access to LLMs, I finally had the ability to make more substantial edits.</p>
+        <description>My first public hobby project!</description>
+        <content:encoded><![CDATA[<p>Hey yall!
+  I figure it’s about time to post about my first public hobby project, <a href="https://haileyjay.net/sagitta/">Sagitta</a>.
+  It started as a local copy of <a href="https://github.com/varkor/quiver">varkor’s quiver</a> that I edited by hand to make tweaks here and there: maybe a UI edit one day, a keybinding tweak the next, an Electron wrapper after that, etc.
+  Eventually it became interesting enough to put a bit more time into, and with access to LLMs, I could finally make more substantial edits.</p>
 
-<p>Do note that I will never claim that Sagitta is in any way better than quiver. I've used quiver for years, and the community behind it is capable of amazing things. Put simply, Sagitta wouldn't exist if I didn't love quiver first.</p>
+<p>I won’t claim that Sagitta is in any way better than quiver.
+  I’ve used quiver for years, and the community behind it is capable of amazing things.
+  Put simply, Sagitta wouldn’t exist if I hadn’t loved quiver first.</p>
 
-<p>The name "sagitta" is Latin for arrow. It's a bit on the nose, but fitting nonetheless.</p>
+<p>The name “sagitta” is Latin for “arrow”.
+  It’s a bit on the nose, but fitting nonetheless.</p>
 
-<p>The keybindings work vim-<em>ish</em>, with heavy emphasis on the ish. This is because I am an emacs user and only learned vim later. The design aims to be rather fast to edit diagrams efficiently, but, because I'm just one person, I added settings to be able to customise the codes to your like.</p>
+<p>The keybindings work Vim-<em>ish</em>, with heavy emphasis on the ish.
+  This is because I am an Emacs user and only learned Vim later.
+  The design aims to be efficient at editing diagrams, but, because I’m just one person, my taste isn’t even close to universal.
+  So, there are settings to customise the keybindings to your liking.</p>
 
-<p>The biggest behaviour change you can make out-of-the-box is toggling quiver mode. By default (and I'm not sure I want to keep it this way), Sagitta's entry works like a spreadsheet. If you're not pressing a special key, keystrokes go directly to label edits and you have to press <code>;</code> to enter the command palette. In quiver mode, <code>;</code> is latched on and you have to press <code>RET</code> to enter label edits. One of my motivations for this mode toggle was my friend Peter Stringfield; he prefers quiver mode, even though I prefer spreadsheet mode, so why not support both?</p>
+<p>The biggest behaviour change you can make out of the box is toggling spreadsheet mode.
+  By default, the command layer is latched on and you have to press <kbd>RET</kbd> to enter label edits, as in quiver.
+  In spreadsheet mode, if you’re not pressing a special key, keystrokes go directly to label edits and you have to press <kbd>;</kbd> to enter the command menu.</p>
 
 <figure>
-  <img src="https://haileyjay.net/images/sagitta-tutorial/complete.png" alt="A commutative diagram of the snake lemma: two exact rows joined by three vertical maps, their kernels and cokernels in sequence, and a connecting morphism snaking through the centre." width="1091" height="815">
-  <figcaption>The snake lemma, drawn in Sagitta</figcaption>
+  <img src="https://haileyjay.net/images/sagitta/complete.png" alt="A commutative diagram of the snake lemma: two exact rows joined by three vertical maps, their kernels and cokernels in sequence, and a connecting morphism snaking through the centre." width="1091" height="815">
+  <figcaption>The snake lemma, drawn in Sagitta.</figcaption>
 </figure>
 
-<p>If you want to see it work rather than read about it, there's a <a href="https://haileyjay.net/sagitta/tutorial/">walkthrough of that diagram</a> key by key.</p>
+<p>If you want to see it work rather than read about it, there’s a <a href="https://haileyjay.net/sagitta/tutorial/">walkthrough of that diagram</a> key by key.</p>
 
 <h3>Future plans</h3>
 
-<p>The next update is going to be mostly ergonomic in nature. Now that it's functional and at least a few friends are interested in using it, I'm just going to keep my office door open in case anyone swings by to complain about it. If you have any complaints, big or small, do feel free to <a href="mailto:jgarc86@lsu.edu?subject=Sagitta">email me</a>!</p>
+<p>The next update is going to be mostly ergonomics and polish.
+  Now that it’s functional and at least a few friends are interested in using it, I’m just going to keep my office door open in case anyone swings by to complain about it.
+  If you have any complaints, big or small, do feel free to <a href="mailto:jgarc86@lsu.edu?subject=Sagitta">email me</a>!</p>
 
-<p>The next feature update will probably be presets and templates. I have to type spectral sequences every now and then, and quick setups for those, exact sequences, chain complexes, etc. would be nice. The command menu, accessed through <code>:</code>, could have commands like <code>:ss</code> or <code>:exact left</code> or <code>:cc</code>; maybe a few well-known lemmas and examples as well.</p>
+<p>The next feature update will probably be presets and templates.
+  I have to type spectral sequences every now and then, and quick setups for those, for exact sequences, and for chain complexes would be nice.
+  The command line, accessed through <kbd>:</kbd>, could have commands like <code>:ss</code>, <code>:exact left</code>, or <code>:cc</code>.
+  Maybe there’ll be a few well-known lemmas and examples as well.</p>
 
-<p>Bigger plans are in store. The general format is rather fun in my opinion, and I have an unreleased graph theory version that actually kinda works. It needs some tweaks, but eventually, I want to combine it and Sagitta into one engine with different programs lying overtop. I'd love to do a knot theory one and a more general purpose editor based on the same interface, but I'm working on my PhD. Projects come as I need them, so graphs and commutative diagrams are on my mind more often.</p>]]></content:encoded>
+<p>Bigger plans are in store.
+  The general format is rich with potential in my opinion, and I have an unreleased graph theory version that actually kinda works.
+  It needs some tweaks, but eventually, I want to combine it and Sagitta into one engine with different programs lying overtop.
+  I’d love to do a knot theory one and a more general-purpose editor based on the same interface, but I’m working on my PhD.
+  Projects come as I need them, so graphs and commutative diagrams are the first on the docket.</p>
+
+<p>Best,<br>Hailey</p>]]></content:encoded>
     </item>
     <item>
         <title>Arrangements in Oregon</title>
