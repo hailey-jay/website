@@ -1,0 +1,140 @@
+title: Sagitta
+description: A keyboard-driven tikz-cd editor.
+tagline: A keyboard-driven tikz-cd editor.
+
+---LEDE---
+
+Sagitta is a keyboard-driven tikz-cd editor that produces LaTeX-ready diagrams at speed.
+The syntax of tikz-cd is elegant, but it is not always the fastest to write, the easiest for complex diagrams, or the easiest to tweak afterwards.
+A hand-drawn diagram is quick and accurate, but it is not reproducible and is nearly impossible to edit after creation.
+Sagitta aspires to combine the benefits of both.
+
+---HERO---
+
+complete.png | The snake lemma, drawn in Sagitta. | A commutative diagram of the snake lemma: two exact rows joined by three vertical maps, their kernels and cokernels in sequence, and a connecting morphism snaking through the centre.
+
+---TRY---
+
+lede: The keys pressed and the file Sagitta saves.
+output_caption: The saved <code>.tikzcd</code>, ready for LaTeX to <code>\input</code>.
+
+---EXAMPLES---
+
+<!-- One row per example, in carousel order: `ID | title`. Each ID has three
+     blocks of its own: ---ID--- (image, caption, alt), ---ID_STEPS--- (`keys |
+     what they do`, keys separated by spaces, each its own <kbd>), and
+     ---ID_OUTPUT--- (the real export, verbatim). Screenshots are taken at 200%
+     zoom and cropped to 1024px squares on the grid. -->
+
+COMPOSABLE | A pair of morphisms
+CROSSING   | Crossing over
+BEND       | Smiley face
+
+---COMPOSABLE---
+
+<!-- Works verbatim in spreadsheet mode as well. -->
+
+image: composable.png
+caption: A composable pair of morphisms, labelled.
+alt: A Sagitta screenshot of A mapping by f to B, and B mapping down by g to C.
+
+---COMPOSABLE_STEPS---
+
+SPC                           | Create a vertex.
+→ SPC                         | Move right and create a second vertex, with an arrow to it.
+↓ SPC                         | Move down and create a third, with an arrow to it.
+TAB A TAB f TAB B TAB g TAB C | <kbd>TAB</kbd> cycles through the unlabelled vertices and arrows; type a label for each.
+
+---COMPOSABLE_OUTPUT---
+
+%#q=WzAsMyxbMCwwLCJBIl0sWzEsMCwiQiJdLFsxLDEsIkMiXSxbMCwxLCJmIl0sWzEsMiwiZyJdXQ==
+\[\begin{tikzcd}
+	A & B \\
+	& C
+	\arrow["f", from=1-1, to=1-2]
+	\arrow["g", from=1-2, to=2-2]
+\end{tikzcd}\]
+
+---CROSSING---
+
+image: crossing.png
+caption: One arrow crossing over another.
+alt: A Sagitta screenshot of four bullets in a cross: a horizontal arrow cuts over a vertical arrow.
+
+---CROSSING_STEPS---
+
+SPC → → SPC ESC | Create two vertices two cells apart, with an arrow between them, then clear the selection.
+↑ ← SPC ↓ ↓ SPC | Create two more above and below the gap, with an arrow down across the first.
+/ A S RET       | Select the first arrow by its code, <code>AS</code>.
+x               | Let it cross over the other.
+
+---CROSSING_OUTPUT---
+
+%#q=WzAsNCxbMCwxLCJcXGJ1bGxldCJdLFsyLDEsIlxcYnVsbGV0Il0sWzEsMCwiXFxidWxsZXQiXSxbMSwyLCJcXGJ1bGxldCJdLFswLDEsIiIsMCx7ImNyb3NzaW5nX292ZXIiOjF9XSxbMiwzXV0=
+\[\begin{tikzcd}
+	& \bullet \\
+	\bullet && \bullet \\
+	& \bullet
+	\arrow[from=1-2, to=3-2]
+	\arrow[crossing over, from=2-1, to=2-3]
+\end{tikzcd}\]
+
+---BEND---
+
+image: bend.png
+caption: An arrow routed down and back up.
+alt: A Sagitta screenshot of two bullets side by side, the arrow between them routed down below them in a U and back up.
+
+---BEND_STEPS---
+
+SPC → SPC | Create two vertices, with an arrow between them.
+/ A S RET | Select the arrow by its code, <code>AS</code>.
+← ↓ k     | Add the cell below the source to the arrow’s route as a checkpoint.
+→ k       | Add the cell below the target.
+b 8 RET   | Set the curve radius to maximum.
+
+---BEND_OUTPUT---
+
+%#q=WzAsMixbMCwwLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzAsMSwiIiwwLHsicm91dGUiOltbMCwxXSxbMSwxXV0sInJvdW5kaW5nIjo4fV1d
+\[\begin{tikzcd}[execute at empty cell={\node[name=\tikzmatrixname-\the\pgfmatrixcurrentrow-\the\pgfmatrixcurrentcolumn, inner sep=0pt]{};}]
+	\bullet & \bullet \\
+	&
+	\arrow[to path={[rounded corners=16pt] -- (\tikzcdmatrixname-2-1.center) -- (\tikzcdmatrixname-2-2.center) \tikztonodes -- (\tikztotarget) [sharp corners]}, from=1-1, to=1-2]
+\end{tikzcd}\]
+
+---MODES---
+
+<!-- The last paragraph is one sentence long, which is fine here. -->
+
+Sagitta supports the alternative spreadsheet mode.
+By default, with spreadsheet mode off, bare keys execute the commands associated with them, and <kbd>;</kbd> opens the command menu.
+Label editing requires first pressing <kbd>RET</kbd>.
+
+In spreadsheet mode, typing most keys drops directly into label editing.
+Pressing <kbd>;</kbd> enables commands and shows the command menu after a short delay.
+If the first character you want is otherwise bound, such as <kbd>;</kbd>, you must still first press <kbd>RET</kbd>.
+
+The command line <kbd>:</kbd> and search <kbd>/</kbd> function the same in both modes.
+
+---DOWNLOADS---
+
+Linux   | AppImage                   | I use this one! | https://github.com/hailey-jay/sagitta/releases/latest
+Windows | Installer or portable .exe | Tested by my friends. | https://github.com/hailey-jay/sagitta/releases/latest
+Browser | Webpage                    | No install, friendly for macOS. | app/
+
+---INSTALL_NOTE---
+
+In the browser, Sagitta needs HTTPS to open and save files and folders.
+Chromium opens and saves a file in place; Firefox reads a copy and saves by downloading one.
+Settings and the keybindings live in the browser’s storage.
+Keys the browser reserves are unavailable, so a new diagram is <code>:new</code> rather than <kbd>C-n</kbd>.
+
+---NOTES---
+
+Expect major changes until v1.0.0.
+
+Sagitta is a fork of varkor’s quiver and opens quiver <code>#q=</code> links.
+The <code>#q=</code> links Sagitta produces are mostly compatible with quiver, save for some constructions like checkpoint arrows and crossings.
+Many thanks to varkor for giving the world quiver.
+
+For the story of how Sagitta came to be, check out <a href="../#blog-sagitta">my blog</a>!

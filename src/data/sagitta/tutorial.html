@@ -1,0 +1,68 @@
+title: Drawing the snake lemma
+standfirst: A quick tutorial by example.
+description: The snake lemma in Sagitta, key by key: rows of objects, rectangle select, checkpoints, and an arrow that crosses over.
+
+<p>I quite like the <a href="https://en.wikipedia.org/wiki/Snake_lemma">Wikipedia snake lemma figure</a>.
+  Let’s recreate it in Sagitta.</p>
+
+<p>We’ll start by making each row of the diagram.
+  <kbd>SPC</kbd> on an empty cell creates a vertex.
+  If a vertex is already selected, <kbd>SPC</kbd> also draws an arrow from it to the new vertex.
+  Pressing <kbd>SPC</kbd> and <kbd>→</kbd> alternately a few times gives a sequence of bullets.
+  Let’s make four:</p>
+
+[image seq.png | Four bullets in a row. | A Sagitta screenshot of four bullets in a row, each mapping right to the next.]
+
+<p>We could either fill in their labels now or wait until later.
+  One way is to hit <kbd>TAB</kbd> repeatedly, which cycles through the unlabelled vertices and arrows so that we can edit their labels.
+  If we didn’t use <kbd>TAB</kbd> cycling, we could select arrows for labelling by <kbd>/</kbd> plus whatever code the arrow got assigned (usually, the letters of its endpoints concatenated).
+  Here, the arrow we need to label \(g\) got assigned <code>SD</code>.</p>
+
+[image search.png | Selecting an arrow by its code. | A Sagitta screenshot of search: the row A by f to B to C to 0, each vertex and arrow tagged with its code (A, S, D, and F for the vertices; AS, SD, and DF for the arrows).]
+
+<p>Next, <kbd>ESC</kbd> clears the selection, and we build the rest of the objects in rows.
+  When it’s time to connect the rows together, we clear our selection, press <kbd>SPC</kbd> on the source vertex, and then <kbd>SPC</kbd> on the target.
+  If we loaded a custom <code>macros.tex</code> file, we could’ve defined <code>\coker</code> as <code>\operatorname{coker}</code>, but for this quick example, we’ll write it directly.
+  With most everything but the connecting morphism done, we have:</p>
+
+[image grid.png | Both rows, joined, with the kernels and cokernels in sequence. | A Sagitta screenshot of a commutative diagram with two exact rows, A by f to B to C by g to 0, and 0 to A′ by f′ to B′ by g′ to C′. Vertical maps connect them: A by a to A′, B by b to B′, and C by c to C′. Each vertical map sits in a sequence: ker a to A to A′ to coker a, ker b to B to B′ to coker b, and ker c to C to C′ to coker c.]
+
+<p>Because we want our connecting morphism \(d\) to cut right through the middle of the diagram, we should move half the diagram down to clear some space.
+  We’ll select the seven lower vertices with rectangle select: <kbd>C-SPC</kbd> on one corner and <kbd>C-SPC</kbd> on the opposite corner collect everything in between:</p>
+
+[image select_bottom.png | Rectangle select, from corner to corner. | A Sagitta screenshot of the same diagram, with the second row and the cokernels selected.]
+
+<p>We could also use <kbd>/</kbd> with a space-separated list, or even hold <kbd>Shift</kbd> and move our cursor over each cell.
+  Once everything is selected, <kbd>C-↓</kbd> moves the whole selection down:</p>
+
+[image move_bottom.png | The lower half moved down, clearing a lane through the centre. | A Sagitta screenshot of the same diagram, with the second row and the cokernels moved down to make room.]
+
+<p>Now we’ll make the trickiest morphism of the diagram!
+  Creating an arrow the usual way between \(\ker c\) and \(\operatorname{coker} a\) isn’t enough, since it’ll cut across the diagram centre inelegantly.
+  We create the arrow, select it, and move the cursor two cells right of \(\ker c\).
+  Hitting <kbd>k</kbd> adds that cell to the arrow’s route as a checkpoint (pressing <kbd>k</kbd> again would remove it).</p>
+
+[image start_curve.png | The first checkpoint, bending the arrow out of the way. | A Sagitta screenshot of the same diagram, with an arrow from ker c to coker a partway around it.]
+
+<p>We add the rest of the checkpoints the same way.</p>
+
+[image curve_done.png | The connecting morphism, routed the long way round. | A Sagitta screenshot of the same diagram, with the arrow from ker c to coker a routed all the way around through its checkpoints.]
+
+<p>In the original Wikipedia image, the connecting morphism lies over the arrows in the middle.
+  With the connecting morphism still selected, we can just hit <kbd>x</kbd> to let it cross over:</p>
+
+[image curve_cut.png | Crossing over, cutting a gap in the arrows beneath. | A Sagitta screenshot of the same diagram, with the connecting morphism crossing over the arrows a, b, and c in the centre and hiding their labels.]
+
+<p>Nearly there, but the labels are all wonky: \(a\), \(b\), and \(c\) are hidden underneath the connecting morphism!
+  We select each arrow in turn, hit <kbd>P</kbd>, and shift the label position along the arrow using the arrow keys.
+  Let’s do the same for the connecting morphism, and make sure the label renders along the outside of the arrow by hitting <kbd>A</kbd> for label alignment and then <kbd>r</kbd> for right.
+  Finally, we hide the grid with <kbd>#</kbd> and enjoy!</p>
+
+[image complete.png | The finished diagram. | A Sagitta screenshot of the finished diagram, with two exact rows, A by f to B to C by g to 0, and 0 to A′ by f′ to B′ by g′ to C′. Vertical maps connect them: A by a to A′, B by b to B′, and C by c to C′. Each vertical map sits in a sequence: ker a to A to A′ to coker a, ker b to B to B′ to coker b, and ker c to C to C′ to coker c. A connecting morphism d snakes from ker c to coker a, crossing over the centre of the diagram.]
+
+<p>I’ll just save it to a file with <kbd>C-s</kbd> and put it in my very cool paper on the snake lemma.</p>
+
+<p>There’s more complete documentation in <a href="https://github.com/hailey-jay/sagitta/blob/main/docs/sagitta.md">the manual</a>.</p>
+
+<p class="sg-version-note">This walkthrough was written against Sagitta v0.4.1.
+  Expect major changes until v1.0.0.</p>

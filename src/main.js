@@ -425,3 +425,39 @@ document.querySelectorAll('.paper-bibtex').forEach(function (btn) {
     }, function () {});
   });
 });
+
+// ── Example carousel (Sagitta landing page) ─────────────────
+// The track is a scroll-snapping row that works by swiping or scrolling
+// alone; this unhides the tabs, points each at its slide, and marks the tab
+// of whichever slide is in view, however it got there.
+document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
+  const track = carousel.querySelector('.sg-carousel-track');
+  const slides = Array.from(track.children);
+  const tabs = Array.from(carousel.querySelectorAll('[data-slide]'));
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  carousel.querySelector('.sg-carousel-tabs').hidden = false;
+  carousel.classList.add('is-enhanced');
+
+  function mark(index) {
+    tabs.forEach(function (tab, i) {
+      tab.setAttribute('aria-pressed', String(i === index));
+    });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      track.scrollTo({ left: slides[i].offsetLeft - track.offsetLeft,
+                       behavior: smooth ? 'smooth' : 'auto' });
+      mark(i);
+    });
+  });
+
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) mark(slides.indexOf(entry.target));
+    });
+  }, { root: track, threshold: 0.6 });
+  slides.forEach(function (slide) { observer.observe(slide); });
+  mark(0);
+});

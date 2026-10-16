@@ -1,49 +1,47 @@
-<!-- The landing page. Everything it says lives in src/data/sagitta.txt; this
-     partial holds only the shape. Image paths and the {up}/{base} prefixes are
-     filled by build_standalone in src/make.py. -->
+<!-- The landing page. Everything it says lives in
+     src/data/sagitta/landing.txt, bar the version, which `make app` records;
+     this partial holds only the shape. Image paths and the {up}/{base}
+     prefixes are filled by build_standalone in src/make.py. -->
 
 <div class="sg-hero">
     <h1 class="sg-title">Sagitta</h1>
     <p class="sg-tagline">{tagline}</p>
-    <div class="sg-lede">
-        {lede}
-    </div>
     <p class="sg-cta">
         <a class="sg-button sg-button--primary" href="{base}app/">Open in browser</a>
-        <a class="sg-button" href="https://github.com/hailey-jay/sagitta/releases/latest">Download</a>
+        <a class="sg-button" href="#get-it">Download</a>
     </p>
     <p class="sg-meta">{version} · GPLv3 · forked from <a href="https://github.com/varkor/quiver">quiver</a></p>
     <figure class="sg-hero-figure">
         <img {hero_attrs} alt="{hero_alt}" loading="eager" decoding="async">
         <figcaption>{hero_caption}</figcaption>
     </figure>
-</div>
-
-<div class="sg-block">
-    <h2 class="sg-heading">What it is</h2>
-    <div class="sg-features">
-        {features}
+    <div class="sg-lede">
+        {lede}
     </div>
 </div>
 
 <div class="sg-block">
-    <h2 class="sg-heading">A diagram in five keys</h2>
-    <div class="sg-keys">
-        <table class="sg-keytable">
-            <caption class="sg-caption">{keys_lede}</caption>
-            <tbody>
-                {keys}
-            </tbody>
-        </table>
-        <figure class="sg-keys-figure">
-            <img {keys_attrs} alt="{keys_alt}" loading="lazy" decoding="async">
-            <figcaption>{keys_caption}</figcaption>
-        </figure>
+    <h2 class="sg-heading">Type it, get tikz-cd</h2>
+    <p class="sg-caption">{try_lede}</p>
+    <!-- Without JavaScript the track is a row that scrolls sideways, one
+         example per snap; main.js unhides the tabs and drives it. -->
+    <div class="sg-carousel" data-carousel>
+        <div class="sg-carousel-tabs" role="group" aria-label="Examples" hidden>
+            {tabs}
+        </div>
+        <div class="sg-carousel-track">
+            {slides}
+        </div>
     </div>
     <p class="sg-more"><a href="{base}tutorial/">Full walkthrough: the snake lemma →</a></p>
 </div>
 
-<div class="sg-block">
+<div class="sg-block sg-prose">
+    <h2 class="sg-heading">Two modes</h2>
+    {modes}
+</div>
+
+<div class="sg-block" id="get-it">
     <h2 class="sg-heading">Get it</h2>
     <table class="sg-downloads">
         <thead>
@@ -67,19 +65,34 @@
     {notes}
 </div>
 
-§FEATURE§
+§TAB§
 
-<div class="sg-feature">
-    <h3>{title}</h3>
-    <p>{body}</p>
+<button type="button" class="sg-carousel-tab" data-slide="{index}">{title}</button>
+
+§SLIDE§
+
+<div class="sg-slide" id="example-{id}">
+    <h3 class="sg-slide-title">{title}</h3>
+    <div class="sg-try">
+        <div class="sg-try-input">
+            <ol class="sg-steps">
+                {steps}
+            </ol>
+            <figure class="sg-try-figure">
+                <img {img_attrs} alt="{img_alt}" loading="lazy" decoding="async">
+                <figcaption>{img_caption}</figcaption>
+            </figure>
+        </div>
+        <figure class="sg-try-output">
+<pre><code>{output}</code></pre>
+            <figcaption>{output_caption}</figcaption>
+        </figure>
+    </div>
 </div>
 
-§KEYROW§
+§STEP§
 
-<tr>
-    <th scope="row"><kbd>{key}</kbd></th>
-    <td>{what}</td>
-</tr>
+<li><span class="sg-step-keys">{keys}</span> <span class="sg-step-what">{what}</span></li>
 
 §DOWNLOAD§
 

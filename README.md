@@ -4,13 +4,13 @@ Built with a small Python script.
 
 ## Structure
 + `src/`: source files (HTML partials, CSS, JS, build script)
-+ `src/shared.html`: sub-templates used by more than one section (currently the gallery card)
++ `src/shared.html`: sub-templates used by more than one section (the gallery card, the grid that holds cards, and the inline figure; the tutorial uses the last two as posts do)
 + `src/sagitta/`: the shell, partials, and stylesheet for the standalone Sagitta pages (see below)
 + `src/data/`: content data, kept separate from markup
   + `about.txt`: the identity fields, meta pairs, bio, and Lately note
   + `comics.txt`: one `stem | caption | alt` row per comic
-  + `sagitta.txt`: the Sagitta landing page's copy
-  + `sagitta-tutorial.html`: the Sagitta walkthrough, front matter then body, like a post
+  + `sagitta/landing.txt`: the Sagitta landing page's copy
+  + `sagitta/tutorial.html`: the Sagitta walkthrough, front matter then body, like a post
   + `links.txt`: a bare heading line, then `label | url` rows under it
   + `blog/<isodate>-<slug>.html`: one file per post.
     Filename sort gives newest-first order.
@@ -53,10 +53,13 @@ The thumbnail is what the grid, the blog index, and the homepage carousel load; 
 Thumbnails are rebuilt only when the source is newer, so a no-op build is fast.
 They are committed alongside the other built output.
 
-+ `src/make.py`: builds `index.html`, the Sagitta pages, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files
++ `src/make.py`: builds `index.html`, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files, and calls `src/sagitta_pages.py` for the Sagitta pages
++ `src/common.py`: the parts both builds share (the repo-root anchoring, the image pipeline, the `[gallery]`/`[image]` directives, front matter, and the KaTeX head)
++ `src/sagitta_pages.py`: builds the Sagitta pages (see below)
 + `sitekit/`: a vendored copy of the shared build library (upstream commit `fa89364`), used by all four of my site repos.
   Text and data-format parsing, template filling, markup validation, the image pipeline, asset bundling, minification, and the post-build checker all live there.
-  Everything that knows this site is haileyjay.net stays in `src/make.py`: RSS, the `[gallery]`/`[image]` directives, draft-by-filename, comics, and the about page.
+  Everything that knows this site is haileyjay.net stays in `src/`: RSS, the `[gallery]`/`[image]` directives, draft-by-filename, comics, and the about page.
++ `katex/`: a vendored copy of KaTeX 0.19.0, served as-is; see `katex/README.md`
 + `scripts/check.py`, `scripts/verify.py`: the two checks, behind `make check` and `make verify`
 + `scripts/app.py`: copies the Sagitta editor into `sagitta/app/`, behind `make app`
 + `index.html`, `sagitta/index.html`, `sagitta/tutorial/index.html`, `rss.xml`, `sitemap.xml`, `images/thumbs/`: built output
@@ -67,11 +70,11 @@ The site proper is one document whose sections are hash fragments, and the sideb
 [Sagitta](https://github.com/hailey-jay/sagitta) is not one of those: it has its own navigation, its own manual, and the editor itself served from `sagitta/app/`, so it is built as real files under `/sagitta/` with a shell of its own.
 The sidebar links out to it under `Projects` rather than adding a tab.
 
-+ `sagitta/index.html`: the landing page, from `src/sagitta/landing.html` and `src/data/sagitta.txt`
-+ `sagitta/tutorial/index.html`: the walkthrough, from `src/sagitta/tutorial.html` and `src/data/sagitta-tutorial.html`
++ `sagitta/index.html`: the landing page, from `src/sagitta/landing.html` and `src/data/sagitta/landing.txt`
++ `sagitta/tutorial/index.html`: the walkthrough, from `src/sagitta/tutorial.html` and `src/data/sagitta/tutorial.html`
 + `sagitta/app/`: the editor
 
-`sagitta_pages` in `make.py` lists them. Each page knows two prefixes, and both the shell and the partials use them rather than hard-coding a depth:
+`sagitta_pages` in `sagitta_pages.py` lists them. Each page knows two prefixes, and both the shell and the partials use them rather than hard-coding a depth:
 
 + `{up}` reaches the site root, for assets: `../` for the landing page, `../../` for the tutorial.
 + `{base}` reaches `/sagitta/`, for links within the group: `./` and `../`.
@@ -80,7 +83,7 @@ Both pages inline `src/main.css` and `src/main.js` in full, so the typography, t
 Relative `url()` references in the inlined stylesheet are rewritten with `{up}`, because an inlined stylesheet resolves them against the document rather than against itself.
 No bare `<section>` is used on these pages: `main.css` hides those until the single-page router marks one active.
 
-The walkthrough body takes the same `[image ...]` directives a post does, with bare stems resolving against `images/sagitta-tutorial/`.
+The walkthrough body takes the same `[image ...]` directives a post does, with bare stems resolving against `images/sagitta/`, which also holds the landing page's hero and examples.
 Those files are `.png` screenshots, so the rows name the extension; a stem without one is still taken as `.webp`.
 
 `make app` copies the editor in.
@@ -94,6 +97,7 @@ Chromium opens and saves the diagram file in place; Firefox reads a copy and sav
 
 The same sync copies the editor's `icon.svg` to `images/sagitta.svg`, which is what this site uses for Sagitta: the two pages' favicon, the landing page's wordmark, and the sidebar entry.
 One copy, kept in step with the app rather than drawn again.
+It also writes `sagitta/app/VERSION` from the checkout's `package.json`, which is where the landing page's version comes from, so the page cannot advertise a version other than the one it serves.
 
 ## Data formats
 Three shapes cover every section, and they are parsed by shared helpers in `sitekit.text` rather than per-section code:
@@ -127,7 +131,7 @@ The shared pieces are `.section-intro` and `.section-note` for the paragraphs un
 The exceptions are `src/cv.html` and `src/papers.html`, which are generated by `make install` in `~/Quarters/cv`.
 
 ## Typography
-Source files are UTF-8, the page and the feed both declare UTF-8, and every read and write in `make.py` pins `encoding="utf-8"`.
+Source files are UTF-8, the page and the feed both declare UTF-8, and every read and write in the build pins `encoding="utf-8"`.
 A literal `–`, `’`, `§`, `−`, or `←` passes through to the output untouched, so type the character.
 
 Two kinds of entity are still written as entities:
@@ -136,6 +140,11 @@ Two kinds of entity are still written as entities:
 + `&amp;`, `&lt;`, and `&gt;`, which are required escapes rather than typography.
 
 `src/cv.html` is generated outside this repo and still uses entities; leave it alone.
+
+Maths is TeX between `\(` `\)` (inline) or `\[` `\]` (display), rendered by KaTeX in the reader's browser.
+A page links KaTeX only when its prose holds one of those delimiters outside `<pre>` and `<code>`, so a page without maths loads none of it.
+There is no `$` delimiter.
+Alt text and captions in `[image ...]` directives are not rendered, so write their maths in words.
 
 `split_sections` treats a line matching `^§[A-Z][A-Z0-9_]*§$` as a delimiter, so `<li><strong>§7:</strong> ...</li>` is safe.
 Do not put a bare `§WORD§` on a line of its own in body copy.
@@ -171,6 +180,9 @@ Worth running before a push: Cloudflare serves the committed files, so stale out
 
 `make links` checks every off-site URL. It needs the network and is slow, so it is separate from `make check`.
 
+`make serve` hosts the repo at `http://localhost:8000/` for previewing the built pages (`PORT=9000` to move it).
+It serves the files on disk, so build first.
+
 `make app` refreshes `sagitta/app/` from a Sagitta checkout, `../sagitta` by default:
 
 ```
@@ -187,7 +199,7 @@ Copyright © 2025-2026 Hailey Jay Garcia.
 This repository holds work under five different terms.
 
 + **Code: GPL-3.0-or-later.**
-  `src/make.py`, `sitekit/`, `scripts/`, `Makefile`, `src/main.css`, `src/main.js`, the HTML partials in `src/` (the templates and markup, not the prose inside them), and the wireframe videos in `images/wireframes/` that `scripts/gen_wireframes.py` renders are free software: you can redistribute and/or modify them under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License or (at your option) any later version.
+  `src/make.py`, `src/common.py`, `src/sagitta_pages.py`, `sitekit/`, `scripts/`, `Makefile`, `src/main.css`, `src/main.js`, the HTML partials in `src/` (the templates and markup, not the prose inside them), and the wireframe videos in `images/wireframes/` that `scripts/gen_wireframes.py` renders are free software: you can redistribute and/or modify them under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License or (at your option) any later version.
   They are distributed without any warranty; see [`LICENSE`](LICENSE) for the full text.
 + **Photographs without faces: CC BY 4.0.**
   The photos under `images/blog/` are licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/), along with their thumbnails in `images/thumbs/`, with these exceptions, which are not covered:
@@ -199,8 +211,10 @@ This repository holds work under five different terms.
   `images/hailey-*.webp` and `images/rose.svg` are licensed under [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/).
   Attribute as for the photos above.
 + **The editor: GPL-3.0-or-later, upstream.**
-  `sagitta/app/` is a copy of [Sagitta](https://github.com/hailey-jay/sagitta), which is itself a fork of [quiver](https://github.com/varkor/quiver) by varkor.
+  `sagitta/app/` is a copy of [Sagitta](https://github.com/hailey-jay/sagitta), which is itself a fork of varkor’s [quiver](https://github.com/varkor/quiver).
   It keeps its own terms and its own `LICENSE` and `NOTICE`, and is not relicensed here.
++ **KaTeX: MIT, upstream.**
+  `katex/` keeps KaTeX's own `LICENSE` and is not relicensed here.
 + **Fonts: SIL Open Font License 1.1.**
   The EB Garamond files in `fonts/` keep their upstream license and are not relicensed here.
 + **Everything else: all rights reserved.**
@@ -211,7 +225,7 @@ The built output (`index.html`, the Sagitta pages, `rss.xml`, and `sitemap.xml`)
 ## AI assistance
 Parts of this repository were written with Claude, an AI model by Anthropic, used as a coding assistant in Claude Code.
 
-+ **Code and documentation:** much of `src/make.py`, `sitekit/`, `scripts/`, `src/main.css`, `src/main.js`, the makefile, and this README was drafted or refactored with AI assistance.
++ **Code and documentation:** much of `src/make.py`, `src/common.py`, `src/sagitta_pages.py`, `sitekit/`, `scripts/`, `src/main.css`, `src/main.js`, the makefile, and this README was drafted or refactored with AI assistance.
   I directed, reviewed, and tested all of it, and I am responsible for it.
 + **Content:** the writing, photographs, and comics are my own.
   AI edits to content files were limited to restructuring, repairing markup, and small copy-edits; none of the prose was AI-written.

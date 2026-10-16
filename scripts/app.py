@@ -17,6 +17,10 @@ The icon travels too, to `images/sagitta.svg`, which is what the site's own
 pages use for Sagitta: the landing page's favicon and wordmark, and the
 sidebar entry. One copy, kept in step with the app rather than drawn again.
 
+The version comes along as `VERSION`, read out of the checkout's
+package.json (which is the desktop build's and does not travel itself), so the
+landing page states the version of the editor it actually serves.
+
 The copy is tracked in this repo, because the repo is what gets served. It is
 pruned as well as written: a file that has left the source leaves the copy, or
 it would be served forever after it stopped existing.
@@ -28,6 +32,7 @@ machine that has no rsync, which is most Windows ones and some minimal Linux
 images.
 """
 import filecmp
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -42,6 +47,9 @@ DEST = root / "sagitta/app"
 FILES = ["index.html", "main.css", "katex.css", "icon.svg", "icon.png",
          "manifest.webmanifest", "service-worker.js", "LICENSE", "NOTICE"]
 DIRS  = ["src", "web", "fonts", "icons"]
+
+# Written into the copy rather than copied, from package.json's "version".
+VERSION = Path("VERSION")
 
 # Files copied out of the editor's copy and into the site proper, as
 # `source: destination` relative to the repo root.
@@ -77,6 +85,13 @@ def main(argv):
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+        copied += 1
+
+    version = json.loads((src / "package.json").read_text(encoding="utf-8"))["version"]
+    wanted.add(VERSION)
+    target = DEST / VERSION
+    if not (target.is_file() and target.read_text(encoding="utf-8") == version + "\n"):
+        target.write_text(version + "\n", encoding="utf-8")
         copied += 1
 
     removed = 0

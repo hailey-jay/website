@@ -20,12 +20,13 @@
     <meta property="og:title" content="{title}" />
     <meta property="og:description" content="{description}" />
     <meta property="og:image" content="{og_image}" />
-    <meta property="og:image:alt" content="A commutative diagram of the snake lemma, drawn in Sagitta." />
+    <meta property="og:image:alt" content="{og_image_alt}" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preload" href="{up}fonts/eb-garamond-v32-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{up}fonts/eb-garamond-v32-latin-500.woff2" as="font" type="font/woff2" crossorigin>
     <script>try{var t=localStorage.getItem('haileyjay-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     {css}
+    {math}
 </head>
 
 <body>
@@ -43,9 +44,11 @@
                 Sagitta</a>
             <nav class="sg-nav" aria-label="Sagitta">
                 <ul>
+                    <li><a href="{base}"{current_home}>Home</a></li>
                     <li><a href="{base}tutorial/"{current_tutorial}>Tutorial</a></li>
                     <li><a href="https://github.com/hailey-jay/sagitta/blob/main/docs/sagitta.md">Manual</a></li>
                     <li><a href="https://github.com/hailey-jay/sagitta">GitHub</a></li>
+                    <li><a href="{up}">haileyjay.net</a></li>
                 </ul>
                 <a class="sg-button" href="{base}app/">Open editor</a>
             </nav>
@@ -58,7 +61,7 @@
 
         <!--    Footer    -->
         <footer>
-            <p>Sagitta is free software under the <a href="https://github.com/hailey-jay/sagitta/blob/main/LICENSE">GNU GPL v3</a>, grown from <a href="https://github.com/varkor/quiver">quiver</a> by varkor.</p>
+            <p>Sagitta is free software under the <a href="https://github.com/hailey-jay/sagitta/blob/main/LICENSE">GNU GPL v3</a>, forked from varkor’s <a href="https://github.com/varkor/quiver">quiver</a>.</p>
             <p><a href="mailto:jgarc86@lsu.edu?subject=Sagitta">Email me</a> about a bug, or open an <a href="https://github.com/hailey-jay/sagitta/issues">issue</a>.</p>
             <p><a href="{up}">← haileyjay.net</a></p>
         </footer>

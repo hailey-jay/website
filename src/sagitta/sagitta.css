@@ -109,8 +109,12 @@
 .sg-tagline {
     font-size: 1.3rem;
     color: var(--muted);
-    margin: .3rem 0 1.2rem;
+    margin: .3rem 0 .4rem;
     max-width: 40ch;
+}
+
+.sg-lede {
+    margin-top: 1.4rem;
 }
 
 .sg-lede p {
@@ -173,61 +177,153 @@
     font-size: .95rem;
 }
 
-/* ── Features ───────────────────────────────────────────────── */
-.sg-features {
+/* ── Example carousel ───────────────────────────────────────── */
+/* One example per snap. Without JavaScript the row scrolls sideways with its
+   own scrollbar and each slide shows its title; main.js adds .is-enhanced,
+   which trades both for the tabs above. */
+.sg-carousel-track {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 1.6rem;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
 }
 
-.sg-feature h3 {
+.sg-slide {
+    scroll-snap-align: start;
+    min-width: 0;
+}
+
+.sg-slide-title {
     font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: .3rem;
+    font-weight: 500;
+    margin-bottom: .6rem;
 }
 
-.sg-feature p {
-    font-size: .95rem;
-    margin: 0;
-    max-width: 34ch;
+.sg-carousel.is-enhanced .sg-slide-title {
+    display: none;
 }
 
-/* ── Key table and its figure ───────────────────────────────── */
-.sg-keys {
+.sg-carousel.is-enhanced .sg-carousel-track {
+    scrollbar-width: none;
+}
+
+.sg-carousel.is-enhanced .sg-carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.sg-carousel-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.sg-carousel-tabs[hidden] {
+    display: none;
+}
+
+.sg-carousel-tab {
+    font: inherit;
+    font-size: .9rem;
+    color: inherit;
+    padding: .2em .8em;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: none;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.sg-carousel-tab:hover,
+.sg-carousel-tab:focus-visible {
+    border-color: var(--pink);
+}
+
+.sg-carousel-tab[aria-pressed="true"] {
+    border-color: var(--pink);
+    background: rgba(var(--pink-rgb), .14);
+}
+
+/* ── Type it, get tikz-cd ────────────────────────────────────── */
+/* Input on the left (the keys, then what they drew), output on the right
+   (the file). Stacks to one column on a phone. */
+.sg-try {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1.8rem;
     align-items: start;
 }
 
-.sg-keytable,
+.sg-caption {
+    color: var(--muted);
+    font-size: .88rem;
+    margin-bottom: .8rem;
+}
+
+.sg-steps {
+    margin: 0 0 1rem;
+    padding-left: 1.4rem;
+    font-size: .95rem;
+}
+
+.sg-steps li {
+    padding: .3rem 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.sg-step-keys {
+    white-space: nowrap;
+    margin-right: .5rem;
+}
+
+.sg-try-figure,
+.sg-try-output {
+    margin: 0;
+}
+
+.sg-try-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+}
+
+/* The output scrolls inside its own box rather than widening the page. */
+.sg-try-output pre {
+    margin: 0;
+    padding: .8rem 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    background: rgba(var(--pink-rgb), .05);
+    font-size: .85rem;
+    line-height: 1.45;
+    tab-size: 4;
+}
+
+.sg-try-figure figcaption,
+.sg-try-output figcaption {
+    font-size: .82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: .4rem;
+}
+
+/* ── Downloads ──────────────────────────────────────────────── */
 .sg-downloads {
     width: 100%;
     border-collapse: collapse;
     font-size: .95rem;
 }
 
-.sg-caption {
-    text-align: left;
-    color: var(--muted);
-    font-size: .88rem;
-    padding-bottom: .6rem;
-}
-
-.sg-keytable th,
-.sg-keytable td,
 .sg-downloads th,
 .sg-downloads td {
     text-align: left;
     vertical-align: baseline;
     padding: .4rem .8rem .4rem 0;
     border-bottom: 1px solid var(--rule);
-}
-
-.sg-keytable th {
-    width: 1%;
-    white-space: nowrap;
-    font-weight: 400;
 }
 
 .sg-downloads thead th {
@@ -244,24 +340,6 @@
     white-space: nowrap;
 }
 
-.sg-keys-figure {
-    margin: 0;
-}
-
-.sg-keys-figure img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--rule);
-}
-
-.sg-keys-figure figcaption {
-    font-size: .82rem;
-    color: var(--muted);
-    font-style: italic;
-    margin-top: .4rem;
-}
-
 .sg-fineprint {
     margin-top: 1rem;
     font-size: .9rem;
@@ -274,8 +352,11 @@
 }
 
 /* ── Tutorial ───────────────────────────────────────────────── */
+/* Narrower than the page column, so it is centred in it rather than left
+   hanging against the header's left edge. */
 .sg-tutorial {
     max-width: 62ch;
+    margin: 0 auto;
     padding-bottom: 1rem;
 }
 
@@ -338,7 +419,7 @@
         font-size: 1.15rem;
     }
 
-    .sg-keys {
+    .sg-try {
         grid-template-columns: minmax(0, 1fr);
     }
 
