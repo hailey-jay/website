@@ -520,22 +520,10 @@ QuiverImportExport.tikz_cd = new class extends QuiverImportExport {
                     }
                 }
             }
-            // The axes of a spectral sequence, drawn from its ticks (see `SpectralSequence`).
-            // (An empty diagram is written before its cells are laid out, and has no axes.)
-            const frame = quiver.is_empty() ? null : options.frame ?? null;
-            const axes = frame === null ? null : SpectralSequence.tikz(frame, offset,
-                (position) => rows.get(position.y)?.get(position.x) instanceof Vertex);
-            if (axes !== null) {
-                diagram_options.push(axes);
-            }
             // A route through a cell with no node to take its centre from (see `checkpoint`). It
             // goes last, as the longest.
             if (empty_cells) {
                 diagram_options.push(QuiverExport.EMPTY_CELLS);
-            }
-            // The frame is kept in a comment inside the environment, which TeX ignores.
-            if (frame !== null) {
-                output = `${SpectralSequence.directive(frame, offset)}\n${output}`;
             }
             // `tikzcd` environment.
             let tikzcd = `\\begin{tikzcd}${
@@ -1212,8 +1200,6 @@ QuiverImportExport.tikz_cd = new class extends QuiverImportExport {
 
         const parser = new Parser(ui, data);
         ui.add_cells(() => parser.parse_diagram(), false);
-        // The frame of a spectral sequence the file keeps, if any (see `SpectralSequence`).
-        ui.frame = parser.frame ?? null;
 
         this.end_import(ui, ui.quiver.all_cells());
 

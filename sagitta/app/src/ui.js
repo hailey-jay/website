@@ -120,14 +120,6 @@ class UI {
         this._format = "tikz-cd";
         this.amscd_ends = new Map();
 
-        // The frame of a spectral sequence, if the diagram has one (see `SpectralSequence`).
-        this.frame = null;
-
-        // Whether the view stays where it is as columns and rows resize, rather than moving to
-        // keep what is in it centred: while a preset's ghost is redrawn on every key press (see
-        // `Layer.Preset`), those moves would not cancel out, and would carry the view away.
-        this.pinned_view = false;
-
         // How many batches of cells are being added together, and the edges among them not yet
         // drawn (see `add_cells`).
         this.adding = 0;
@@ -175,11 +167,6 @@ class UI {
             return false;
         }
         const problems = Formats.problems(format, this.quiver);
-        // Only tikz-cd draws a spectral sequence's axes; its entries and ticks stay.
-        const frame = format !== "tikz-cd" && this.frame !== null;
-        if (frame) {
-            problems.push(["the axes of a spectral sequence", []]);
-        }
         if (problems.length > 0) {
             const selection = Array.from(this.selection);
             this.deselect();
@@ -194,11 +181,6 @@ class UI {
         }
         const since = this.history.present;
         const actions = format === "amscd" ? AmsCD.convert(this) : [];
-        if (frame) {
-            const dropped = { kind: "frame", from: this.frame, to: null };
-            this.history.effect(this, [dropped], false);
-            actions.push(dropped);
-        }
         const switched = { kind: "format", from: this.format, to: format };
         this.format = format;
         this.history.add(this, [...actions, switched]);
@@ -786,7 +768,6 @@ class UI {
         this._format = "tikz-cd";
         this.grid.fixed = null;
         this.amscd_ends = new Map();
-        this.frame = null;
         this.update_extent();
     }
 
@@ -802,7 +783,6 @@ class UI {
         return {
             dimensions: this.diagram_size(),
             sep: this.sep,
-            frame: this.frame,
         };
     }
 
@@ -1150,7 +1130,7 @@ class UI {
         }));
 
         // First, we reposition the grid and redraw it.
-        this.pan_view(this.pinned_view ? Offset.zero() : view_offset);
+        this.pan_view(view_offset);
         // Then, we rerender the cells that have moved, which `transitive_dependencies` orders so
         // that the cells on which others depend are rendered first.
         for (const cell of moved) {
@@ -1441,24 +1421,16 @@ class UI {
 
     /// Removes a cell.
     remove_cell(cell, when) {
-        this.remove_cells([cell], when);
-    }
-
-    /// Remove `cells` and their dependents from the quiver and then from the HTML, laying the
-    /// grid out, recoding, and gathering the diagram's colours once for them all, rather than
-    /// once for each, which made deleting many cells take time growing with their square.
-    remove_cells(cells, when) {
-        const update_positions = [];
-        for (const cell of cells) {
-            for (const removed of this.quiver.remove(cell, when)) {
-                if (removed.is_vertex()) {
-                    this.positions.delete(`${removed.position}`);
-                    this.grid.unconstrain(removed);
-                    update_positions.push(removed.position);
-                }
-                this.deselect(removed);
-                removed.element.remove();
+        // Remove this cell and its dependents from the quiver and then from the HTML.
+        const update_positions = new Set();
+        for (const removed of this.quiver.remove(cell, when)) {
+            if (removed.is_vertex()) {
+                this.positions.delete(`${removed.position}`);
+                this.grid.unconstrain(cell);
+                update_positions.add(removed.position);
             }
+            this.deselect(removed);
+            removed.element.remove();
         }
         this.update_col_row_size(...update_positions);
         this.recode();
@@ -1514,8 +1486,6 @@ class UI {
             transform: `translate(${-view.x}px, ${-view.y}px) scale(${2 ** this.scale})`,
         });
         this.update_grid();
-        // The axes of a spectral sequence follow its ticks wherever the layout puts them.
-        SpectralSequence.draw(this);
     }
 
     /// Repositions the view by a relative offset.

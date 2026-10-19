@@ -49,9 +49,7 @@ class Formats {
 /// `problems` (see `Formats.problems`) briefly, each with how many cells it holds, as
 /// `curves (2) and loops (1)`.
 Formats.describe = (problems) => {
-    // What is not a cell, as a spectral sequence's axes, is not counted.
-    const parts = problems.map(([description, cells]) => cells.length === 0 ? description
-        : `${description} (${cells.length})`);
+    const parts = problems.map(([description, cells]) => `${description} (${cells.length})`);
     return parts.length < 3 ? parts.join(" and ")
         : `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
 };

@@ -102,10 +102,6 @@ class DiagramFile {
     /// Recompute whether there are unsaved changes, telling the shell (which asks before closing)
     /// and the window title.
     update() {
-        // A preset's ghost is not part of the diagram (see `Layer.Preset`).
-        if (this.ui.keymap?.layers.preset.active) {
-            return;
-        }
         const dirty = this.text() !== this.saved;
         if (dirty !== this.dirty) {
             this.dirty = dirty;

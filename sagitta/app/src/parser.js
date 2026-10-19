@@ -423,9 +423,6 @@ class Parser {
         if (/^%/.test(this.code)) {
             const comment = this.code.match(/^%(.*)/)[1];
             this.code = this.code.replace(/^%(.*)/, "");
-            // A spectral sequence's frame, which Sagitta keeps in a comment (see
-            // `SpectralSequence`).
-            this.frame = SpectralSequence.read(comment) ?? this.frame ?? null;
             return comment;
         }
         return null;
@@ -507,23 +504,6 @@ class Parser {
         }
         if (this.eat("cramped")) {
             // We simply ignore this option.
-            return;
-        }
-        // The axes of a spectral sequence, which the export writes afresh from the frame kept
-        // in a comment (see `SpectralSequence`). Its braces hold commas, so it is read whole.
-        if (/^execute at end picture\s*=\s*\{/.test(this.code)) {
-            const start = this.position;
-            const open = this.code.indexOf("{");
-            const close = Index.closing(this.code, open);
-            if (close === -1) {
-                throw this.error("Unexpected end of diagram options.");
-            }
-            const body = this.code.slice(open + 1, close);
-            this.code = this.code.slice(close + 1);
-            if (!body.startsWith("\\coordinate (sagitta-corner)")) {
-                throw this.warn(["Unknown diagram option: ", new DOM.Code("execute at end picture"),
-                    "; only Sagitta's axes are read."], this.range_from(start));
-            }
             return;
         }
 

@@ -39,7 +39,7 @@ serve:
 #     make app SAGITTA=~/Workshop/sagitta
 #
 # The result is tracked in this repo, because that is what gets served.
-SAGITTA ?= ../sagitta
+SAGITTA ?= ~/Port/sagitta
 
 app:
 	python scripts/app.py $(SAGITTA)

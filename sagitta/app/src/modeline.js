@@ -205,19 +205,15 @@ class ModeLine {
             }, edges);
         }
 
-        // Clearing keeps the file, and undoes like any deletion. It takes a spectral sequence's
-        // frame with the cells, in the same step.
+        // Clearing keeps the file, and undoes like any deletion.
         this.add_action(ui, "clear", "Clear",
             () => {
                 ui.deselect();
-                const actions = [{ kind: "delete", cells: new Set(ui.quiver.all_cells()) }];
-                if (ui.frame !== null) {
-                    actions.push({ kind: "frame", from: ui.frame, to: null });
-                }
-                ui.history.add(ui, actions, true);
+                ui.history.add(ui, [{ kind: "delete", cells: new Set(ui.quiver.all_cells()) }],
+                    true);
                 ui.update_selection();
             },
-            () => ui.in_mode(...default_pan) && (any_cells() || ui.frame !== null),
+            () => ui.in_mode(...default_pan) && any_cells(),
         );
         // Deleting takes the selection, or, with nothing selected, the cell under the focus point,
         // so a lone cell needs no selecting first.
@@ -314,21 +310,6 @@ class ModeLine {
             }
         }, () => ui.element.query_selector(".focus-point.focused") !== null
             || ui.selection.size > 0 || any_cells());
-
-        // Home: the focus point to the diagram's first object, the top row's leftmost, (0, 0)
-        // without one, and the view centred there, for finding one's way back on a large canvas.
-        this.add_action(ui, "go-home", "Go home", () => {
-            const vertices = ui.quiver.all_cells().filter((cell) => cell.is_vertex());
-            const first = vertices.reduce((best, cell) => best === null
-                || cell.position.y < best.position.y
-                || (cell.position.y === best.position.y && cell.position.x < best.position.x)
-                ? cell : best, null);
-            const home = first === null ? Position.zero() : first.position;
-            ui.focus_point.class_list.remove("revealed", "pending", "active");
-            ui.focus_point.class_list.add("focused");
-            ui.reposition_focus_point(home);
-            ui.pan_to(ui.grid.centre_offset_from_position(home));
-        });
 
         this.add_action(ui, "zoom-out", "Zoom out",
             () => ui.pan_view(Offset.zero(), -0.25),
@@ -585,12 +566,9 @@ class ModeLine {
 
     /// A description of what typing would edit (mirroring `Keymap.edit_target`).
     target(ui) {
-        // Within a spectral sequence, a cell's bidegree too (see `SpectralSequence`).
-        const where = (position) => `(${position.x},${position.y})${ui.frame === null
-            ? "" : `  ${SpectralSequence.describe(ui.frame, position)}`}`;
         const describe = (cell) => {
             const label = cell.label.trim() === "" ? "∅" : cell.label;
-            return cell.is_vertex() ? `${label}  ${where(cell.position)}` : label;
+            return cell.is_vertex() ? `${label}  (${cell.position.x},${cell.position.y})` : label;
         };
         if (ui.focus_point.class_list.contains("focused")) {
             const cell = ui.cell_under_focus_point();
@@ -598,15 +576,12 @@ class ModeLine {
                 return describe(cell);
             }
             if (cell === null) {
-                return `new vertex  ${where(ui.focus_position)}`;
+                return `new vertex  (${ui.focus_position.x},${ui.focus_position.y})`;
             }
         }
         switch (ui.selection.size) {
             case 0:
-                // In a spectral sequence, where the focus point is, by bidegree, even while it is
-                // hidden.
-                return ui.frame === null ? ""
-                    : `focus  ${SpectralSequence.describe(ui.frame, ui.focus_position)}`;
+                return "";
             case 1:
                 return describe(ui.selection.values().next().value);
             default:

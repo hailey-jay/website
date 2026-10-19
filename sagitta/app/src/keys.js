@@ -125,15 +125,12 @@ class Keys {
     /// The queued cell Tab goes to next (going backwards when `sign` is -1): the first in the queue
     /// after any selected cell (queued or not), or `null` if no other cell is queued. Of the cell
     /// and arrows Space leaves selected, the cell is the one Tab goes on from, as RET labels it
-    /// (see `Keymap.drawn_to`). A selection of several cells, all queued, as a preset leaves (see
-    /// `Presets.stamp`), is where Tab goes, rather than what it goes on from.
+    /// (see `Keymap.drawn_to`).
     next_queued(sign = 1) {
         const ui = this.ui;
-        const queued = (cell) => cell.element.query_selector("kbd.queue") !== null;
         const drawn = Keymap.drawn_to(ui.selection);
-        const current = drawn !== null ? new Set([drawn])
-            : ui.selection.size > 1 && Array.from(ui.selection).every(queued) ? new Set()
-                : ui.selection;
+        const current = drawn !== null ? new Set([drawn]) : ui.selection;
+        const queued = (cell) => cell.element.query_selector("kbd.queue") !== null;
         const cells = Array.from(ui.codes.values());
         const waiting = cells.filter((cell) => !current.has(cell) && queued(cell));
         if (waiting.length === 0) {

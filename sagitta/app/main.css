@@ -1047,10 +1047,6 @@ body:has(.label-input-container:focus-within:not(.hidden)) .mode-line .message.e
     display: none;
 }
 
-.which-key.no-frame .needs-frame {
-    display: none;
-}
-
 .which-key.no-selection .needs-selection {
     opacity: var(--ui-disabled);
 }
@@ -1058,25 +1054,6 @@ body:has(.label-input-container:focus-within:not(.hidden)) .mode-line .message.e
 /* What amscd cannot draw, while the diagram is in amscd. */
 .which-key.amscd .not-amscd {
     opacity: var(--ui-disabled);
-}
-
-/* The axes of a spectral sequence (see `SpectralSequence.draw`). */
-svg.frame-axes {
-    position: absolute;
-    overflow: visible;
-
-    pointer-events: none;
-}
-svg.frame-axes polyline,
-svg.frame-axes line {
-    stroke: var(--ink);
-}
-
-/* A preset's ghost: what RET in its setup layer would stamp (see `Layer.Preset`). */
-.cell.ghost {
-    opacity: 0.4;
-
-    pointer-events: none;
 }
 
 /* A layer's line that would do nothing now (e.g. copying maths when the diagram is not a row). */
@@ -1094,8 +1071,7 @@ svg.frame-axes line {
 }
 
 /* After the layout above, which would otherwise override it. */
-.which-key.compact.no-edge .main .needs-edge,
-.which-key.compact.no-frame .main .needs-frame {
+.which-key.compact.no-edge .main .needs-edge {
     display: none;
 }
 
