@@ -62,6 +62,8 @@ class History {
         ui.update_extent?.();
         // Update the mode line (e.g. enabling Redo).
         ui.mode_line.update(ui);
+        // A format that cannot draw what was just done takes it back (see `UI.check_format`).
+        ui.check_format?.();
         return true;
     }
 
@@ -89,7 +91,10 @@ class History {
             case "edge_alignment":
                 return (action.cells.size ?? action.cells.length) > 0;
             case "connect":
+            case "format":
                 return action.from !== action.to;
+            case "frame":
+                return !same(action.from, action.to);
             case "move":
                 return action.displacements.some(({ from, to }) => !same(from, to))
                     || (action.routes ?? []).length > 0;
@@ -147,6 +152,7 @@ class History {
             if (unchanged) {
                 this.pop(ui);
             }
+            ui.check_format?.();
         } else {
             // If this is the start of our property modification, we need to add a new history
             // event.
@@ -258,16 +264,16 @@ class History {
                     update_selection = true;
                     break;
                 case "create":
-                    for (const cell of action.cells) {
-                        ui.quiver.add(cell);
-                        ui.add_cell(cell);
-                    }
+                    ui.add_cells(() => {
+                        for (const cell of action.cells) {
+                            ui.quiver.add(cell);
+                            ui.add_cell(cell);
+                        }
+                    });
                     update_selection = true;
                     break;
                 case "delete":
-                    for (const cell of action.cells) {
-                        ui.remove_cell(cell, this.present);
-                    }
+                    ui.remove_cells(action.cells, this.present);
                     update_selection = true;
                     break;
                 case "label":
@@ -419,6 +425,14 @@ class History {
                     }
                     update_selection = true;
                     break;
+                case "format":
+                    // The format lays the grid out afresh (see `UI.format`).
+                    ui.format = action[to];
+                    break;
+                case "frame":
+                    // A spectral sequence's frame (see `SpectralSequence`).
+                    ui.frame = action[to];
+                    break;
             }
             for (const cell of ui.quiver.transitive_dependencies(cells)) {
                 cell.render(ui);
@@ -435,6 +449,10 @@ class History {
         }
         if (update_colours) {
             ui.colour_picker.update_diagram_colours(ui);
+        }
+        // A spectral sequence's axes go with its frame and its ticks, which any step may change.
+        if (typeof SpectralSequence !== "undefined") {
+            SpectralSequence.draw(ui);
         }
         // Though we have already brought the selection in sync if `update_selection`, `undo`
         // and `redo` may want to do so again, if they change which cells are

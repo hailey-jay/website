@@ -12,17 +12,58 @@ class Commands {
         return Commands.ALIASES[name] || name;
     }
 
-    /// Run a command line: commands separated by `;`, which undo together. Returns whether every
-    /// command succeeded; an error banner explains the first failure.
+    /// Split a command line into its commands, each a list of words: commands are separated by
+    /// `;`, and words by spaces, except within double quotes, which hold both, as in
+    /// `cc 3 obj="H_#(A; B)"`. The quotes themselves are dropped, and `\"` is a quote within them.
+    /// Throws if a quote is left open.
+    static split(line) {
+        const statements = [[]];
+        // The word being read, or `null` between words.
+        let word = null;
+        let quoted = false;
+        const end_word = () => {
+            if (word !== null) {
+                statements[statements.length - 1].push(word);
+                word = null;
+            }
+        };
+        for (let i = 0; i < line.length; ++i) {
+            const c = line[i];
+            if (quoted) {
+                if (c === "\\" && line[i + 1] === "\"") {
+                    word += "\"";
+                    ++i;
+                } else if (c === "\"") {
+                    quoted = false;
+                } else {
+                    word += c;
+                }
+            } else if (c === "\"") {
+                quoted = true;
+                word ??= "";
+            } else if (c === ";") {
+                end_word();
+                statements.push([]);
+            } else if (/\s/.test(c)) {
+                end_word();
+            } else {
+                word = (word ?? "") + c;
+            }
+        }
+        if (quoted) {
+            throw new Error("A quote is left open: close it with another \".");
+        }
+        end_word();
+        return statements.filter((words) => words.length > 0);
+    }
+
+    /// Run a command line: commands separated by `;`, which undo together (see `split`). Returns
+    /// whether every command succeeded; an error banner explains the first failure.
     run(line) {
         const ui = this.ui;
         const since = ui.history.present;
         try {
-            for (const statement of line.split(";")) {
-                const [name, ...args] = statement.trim().split(/\s+/);
-                if (name === "") {
-                    continue;
-                }
+            for (const [name, ...args] of Commands.split(line)) {
                 const command = Commands.TABLE[Commands.canonical(name)];
                 if (command === undefined) {
                     throw new Error(`Unknown command "${name}". Press Tab for a list.`);
@@ -114,12 +155,19 @@ class Commands {
             from: vertex.position,
             to: move(vertex.position),
         }));
+        const refused = Formats.refuses_move(ui.format, ui.quiver, displacements);
+        if (refused !== null) {
+            throw new Error(`${ui.format} has no ${refused}.`);
+        }
+        // A spectral sequence's origin moves on with the cells beyond the gap.
+        const frame = ui.frame === null || ui.frame.origin[axis] < index ? []
+            : [{ kind: "frame", from: ui.frame, to: SpectralSequence.moved(ui.frame, delta) }];
         ui.history.add(ui, [{
             kind: "move",
             displacements,
             // A route's cells beyond the gap move on with the vertices there.
             routes: ui.quiver.moved_routes(displacements, move),
-        }], true);
+        }, ...frame], true);
     }
 
     /// The selected edges a route can be given: not loops, and only those with a vertex at each
@@ -422,6 +470,25 @@ for (const [name, axis, after] of [
     };
 }
 
+/// `format amscd` switches the diagram to another format (see `UI.switch_format`), asking first if
+/// that format cannot draw all of it; `format` alone says which it is in.
+Commands.TABLE["format"] = {
+    arguments: true,
+    completions: Formats.NAMES,
+    run: (commands, [format]) => {
+        const ui = commands.ui;
+        if (format === undefined) {
+            ui.mode_line.flash(`the diagram is in ${ui.format}`);
+            return;
+        }
+        if (!Formats.NAMES.includes(format.toLowerCase())) {
+            throw new Error(`"${format}" is not a format: format takes ${
+                Formats.NAMES.join(" or ")}.`);
+        }
+        ui.switch_format(format.toLowerCase());
+    },
+};
+
 /// `route x` and `route y` bend the selected arrows round one corner, going along a row or a column
 /// first, and `route none` straightens them. With nothing, it steps through those three.
 Commands.TABLE["route"] = {
@@ -544,7 +611,11 @@ for (const [name, end] of [["align-source", "source"], ["align-target", "target"
     };
 }
 
-/// Alternative names for commands (not offered by completion).
+/// Short names for commands that completion offers beside the full ones, as `cc` for
+/// `chain-complex`; each is an alias too. The presets add theirs (see `Presets.COMMANDS`).
+Commands.SHORT = {};
+
+/// Alternative names for commands (not offered by completion, unless `SHORT` has them).
 Commands.ALIASES = {
     "lvl": "level",
     "pos": "position",
@@ -564,6 +635,7 @@ Commands.ALIASES = {
     "deselect": "deselect-all",
     "centre": "centre-view",
     "center": "centre-view",
+    "home": "go-home",
     "grid": "hide-grid",
     "help": "shortcuts",
     "w": "save",

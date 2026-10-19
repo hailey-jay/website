@@ -34,6 +34,9 @@ class Layer {
     /// Called as the layer is entered, to reset its state.
     entered() {}
 
+    /// Called as the layer is left, however that happens, to tidy up after it.
+    left() {}
+
     /// Whether clicking a line of the key list presses its key.
     get clickable() {
         return true;
@@ -67,15 +70,15 @@ Layer.Import = class extends Layer {
     }
 
     describe() {
-        return ["IMPORT", "tikz-cd"];
+        return ["IMPORT", "tikz-cd or amscd"];
     }
 
     entered() {
         this.result = null;
     }
 
-    /// Replace the diagram with the tikz-cd `text`, as one undo step. Leaves the layer if the
-    /// import had no problems, and otherwise lists them.
+    /// Replace the diagram with the tikz-cd or amscd `text`, as one undo step, switching to the
+    /// format it is in. Leaves the layer if the import had no problems, and otherwise lists them.
     paste(text) {
         const ui = this.ui;
         if (text.trim() === "") {
@@ -88,8 +91,12 @@ Layer.Import = class extends Layer {
         if (existing.length > 0) {
             ui.history.add(ui, [{ kind: "delete", cells: new Set(existing) }], true);
         }
+        const format = Formats.detect(text);
+        if (format !== ui.format) {
+            ui.history.add(ui, [{ kind: "format", from: ui.format, to: format }], true);
+        }
         // Parse errors do not throw: they are reported in `diagnostics`.
-        const { diagnostics } = ui.quiver.import(ui, "tikz-cd", text, ui.settings);
+        const { diagnostics } = ui.quiver.import(ui, format, text, ui.settings);
         const cells = new Set(ui.quiver.all_cells());
         if (cells.size > 0) {
             ui.history.add(ui, [{ kind: "create", cells }]);
@@ -135,7 +142,7 @@ Layer.Import = class extends Layer {
     /// The layer's bindings, and the last import's problems, each with its line and column.
     groups() {
         const { result } = this;
-        const groups = [["Import tikz-cd", [
+        const groups = [["Import tikz-cd or amscd", [
             ["C-v", "paste"],
             ...(result !== null && this.keymap.combinations("undo").length > 0
                 ? [[this.keymap.describe_name("undo"), "undo the import"]] : []),
@@ -421,7 +428,7 @@ Layer.Export = class extends Layer {
     }
 
     describe() {
-        return ["EXPORT", this.saving ? "save as" : "tikz-cd"];
+        return ["EXPORT", this.saving ? "save as" : this.ui.format];
     }
 
     entered() {
@@ -439,20 +446,35 @@ Layer.Export = class extends Layer {
     /// The export options that differ from their defaults, briefly, for the mode line: what saving
     /// writes besides the plain diagram.
     static differences(ui) {
-        const toggles = Layer.Export.TOGGLES
+        const toggles = Layer.Export.toggles(ui)
             .filter(([, , setting]) => ui.settings.get(setting) !== SETTINGS.defaults[setting])
             .map(([, description, setting]) => SETTINGS.defaults[setting]
                 ? `no ${description.replace(/ diagram$/, "")}` : description);
-        const seps = Layer.Export.SEPS
+        const seps = Layer.Export.seps(ui)
             .filter(([, axis]) => ui.sep[axis] !== DiagramFile.SEPS.normal)
             .map(([, axis]) => `${axis} sep ${Layer.Export.describe_sep(ui.sep[axis])}`);
-        return [...toggles, ...seps];
+        // A spectral sequence's page and grading, which the file keeps (see `SpectralSequence`).
+        const frame = ui.frame === null || ui.frame === undefined ? []
+            : [`E_${ui.frame.page} ${ui.frame.grading}`];
+        return [...(ui.format === "tikz-cd" ? [] : [ui.format]), ...frame, ...toggles, ...seps];
     }
 
-    /// The diagram's tikz-cd encoding under the current export options: `{ data, metadata }`.
+    /// The toggles that mean something in the diagram's format: amscd has no ampersand
+    /// replacement, nor cramped, which are tikz-cd's.
+    static toggles(ui) {
+        return Layer.Export.TOGGLES.filter(([, , setting]) => ui.format === "tikz-cd"
+            || !["export.ampersand_replacement", "export.cramped"].includes(setting));
+    }
+
+    /// The separations, which only tikz-cd has: amscd's are its own.
+    static seps(ui) {
+        return ui.format === "tikz-cd" ? Layer.Export.SEPS : [];
+    }
+
+    /// The diagram in its format under the current export options: `{ data, metadata }`.
     export() {
         const ui = this.ui;
-        return ui.quiver.export("tikz-cd", ui.settings, ui.options(), ui.definitions());
+        return ui.quiver.export(ui.format, ui.settings, ui.options(), ui.definitions());
     }
 
     /// The layer's bindings, with the options' values, and notes on what the output needs
@@ -461,20 +483,33 @@ Layer.Export = class extends Layer {
         const ui = this.ui;
         const { data, metadata } = this.export();
         const lines = data.split("\n").length;
+        const next = Layer.Export.next_format(ui);
+        const formula = InlineMaths.export(ui.quiver);
         const groups = [
-            ["Toggles", Layer.Export.TOGGLES.map(([key, description, setting]) => [
+            ["Format", [
+                ["f", `switch to ${next}`, false, ui.format],
+            ]],
+            ["Toggles", Layer.Export.toggles(ui).map(([key, description, setting]) => [
                 key, description, false, ui.settings.get(setting) ? "on" : "off",
             ])],
-            ["Sep (shift: less)", Layer.Export.SEPS.map(([key, axis]) => [
-                key, `${axis} sep`, false, Layer.Export.describe_sep(ui.sep[axis]),
-            ])],
+            ...(Layer.Export.seps(ui).length > 0 ? [["Sep (shift: less)", Layer.Export.seps(ui)
+                .map(([key, axis]) => [
+                    key, `${axis} sep`, false, Layer.Export.describe_sep(ui.sep[axis]),
+                ])]] : []),
             ["Result", [
                 ...(this.saving ? [["RET", "save as, with these options"]] : []),
                 [this.saving ? "y" : "y RET", "copy to clipboard", false,
                     `${lines} line${lines === 1 ? "" : "s"}`],
+                ["m", "copy as inline maths", false,
+                    typeof formula === "string" ? "not a row" : "$ $", null, null,
+                    typeof formula === "string"],
+                ["M", "copy as display maths", false,
+                    typeof formula === "string" ? "not a row" : "\\[ \\]", null, null,
+                    typeof formula === "string"],
                 ["q", "copy the #q= hash"],
                 ["v", "save as SVG"],
-                [Keymap.describe(this.keymap.combinations("save").slice(0, 1)),
+                [["S", Keymap.describe(this.keymap.combinations("save").slice(0, 1))]
+                    .filter((key) => key !== "").join(" "),
                     "save, with these options"],
                 ["; ESC", "leave"],
             ]],
@@ -501,8 +536,8 @@ Layer.Export = class extends Layer {
     intercept(event) {
         const ui = this.ui;
         const key = event.key;
-        const toggle = Layer.Export.TOGGLES.find(([k]) => k === key);
-        const sep = Layer.Export.SEPS.find(([k]) => k === key.toLowerCase());
+        const toggle = Layer.Export.toggles(ui).find(([k]) => k === key);
+        const sep = Layer.Export.seps(ui).find(([k]) => k === key.toLowerCase());
         if (toggle !== undefined) {
             const setting = toggle[2];
             ui.settings.set(setting, !ui.settings.get(setting));
@@ -531,6 +566,18 @@ Layer.Export = class extends Layer {
                     break;
                 case "q":
                     this.copy_hash();
+                    break;
+                case "S":
+                    this.leave();
+                    this.ui.file.save();
+                    return true;
+                case "f":
+                    this.ui.switch_format(Layer.Export.next_format(this.ui))
+                        .then(() => this.keymap.render());
+                    break;
+                case "m":
+                case "M":
+                    this.copy_formula(key === "M");
                     break;
                 case "v":
                     this.leave();
@@ -572,7 +619,32 @@ Layer.Export = class extends Layer {
         const lines = data.split("\n").length;
         await host.write_clipboard(data);
         this.leave();
-        this.ui.mode_line.flash(`copied ${lines} line${lines === 1 ? "" : "s"} of tikz-cd`);
+        this.ui.mode_line.flash(`copied ${lines} line${lines === 1 ? "" : "s"} of ${
+            this.ui.format}`);
+    }
+
+    /// Copy the diagram as a formula (see `InlineMaths`), in `\[ \]` if `display`, leaving the
+    /// layer; or say why it is not one, staying.
+    async copy_formula(display) {
+        const ui = this.ui;
+        const formula = InlineMaths.export(ui.quiver, display);
+        if (typeof formula === "string") {
+            UI.display_error(`Not copied: ${formula}.`);
+            return;
+        }
+        await host.write_clipboard(formula.text);
+        this.leave();
+        const notes = [
+            ...(formula.needs.length > 0 ? [`needs ${formula.needs.join(", ")}`] : []),
+            ...(formula.dropped.length > 0 ? [`without ${formula.dropped.join(", ")}`] : []),
+        ];
+        ui.mode_line.flash(`copied ${display ? "display" : "inline"} maths${
+            notes.length > 0 ? ` (${notes.join("; ")})` : ""}`);
+    }
+
+    /// The format the export layer's `f` switches to: the next of `Formats.NAMES`.
+    static next_format(ui) {
+        return Formats.NAMES[(Formats.NAMES.indexOf(ui.format) + 1) % Formats.NAMES.length];
     }
 };
 
@@ -1035,3 +1107,339 @@ Layer.Colour.STEPS = [["h", "hue", 30], ["s", "saturation", 10], ["l", "lightnes
 
 /// The keys for the layer's LaTeX and diagram swatches: the letters not otherwise bound.
 Layer.Colour.SWATCH_LETTERS = "abdefgijkmnopqrtuvwyz";
+
+/// The setup layer of a preset (`:chain-complex`, `:ses`, and so on; see `Presets`): the preset's
+/// options, each on a key, with a ghost of what it would stamp drawn at the focus point, laid out
+/// as the diagram's format lays it out. The arrow keys move the focus point, and the ghost with
+/// it; RET stamps it, as one step to undo; `:` opens the command line on the options so far, for
+/// those that are text; and ESC or `;` leaves, stamping nothing.
+///
+/// The ghost is ordinary cells, outside the history, so that it is laid out as the real thing
+/// would be. The layer takes every key, those with Control too, so that nothing saves, copies,
+/// or undoes while the ghost is there, and a press on the canvas leaves it.
+Layer.Preset = class extends Layer {
+    constructor(keymap) {
+        super(keymap);
+        // The preset (one of `Presets.COMMANDS`), and its options.
+        this.name = null;
+        this.options = null;
+        // The cells of the ghost, and why there is none, if it would land on cells already there.
+        this.ghost = new Set();
+        this.problem = null;
+        // The frame the diagram had before a spectral sequence's ghost put its own in its place
+        // (see `SpectralSequence`), or `undefined` while there is no such ghost.
+        this.frame = undefined;
+        // Leave on a press outside the key list and the mode line, before the canvas sees it.
+        document.addEventListener("pointerdown", (event) => {
+            if (this.active && !event.target.closest?.(".which-key, .mode-line")) {
+                this.leave();
+            }
+        }, true);
+    }
+
+    /// Whether the layer takes keys with Control, Alt, or Command too (see `Keymap.intercept`).
+    get captures_all() {
+        return true;
+    }
+
+    /// Open the layer on the preset `name` with `options`.
+    open(name, options) {
+        this.name = name;
+        this.options = options;
+        this.enter();
+        this.preview();
+    }
+
+    describe() {
+        return ["PRESET", this.name];
+    }
+
+    entered() {
+        this.ui.pinned_view = true;
+    }
+
+    left() {
+        this.clear();
+        this.ui.pinned_view = false;
+    }
+
+    /// Take the ghost away.
+    clear() {
+        const ui = this.ui;
+        if (this.ghost.size === 0 && this.frame === undefined) {
+            return;
+        }
+        // Removed at no step of the history, so that nothing restores them, and then forgotten.
+        ui.remove_cells(Array.from(this.ghost).filter((cell) => ui.quiver.contains_cell(cell)),
+            Infinity);
+        ui.quiver.flush(Infinity);
+        this.ghost = new Set();
+        if (this.frame !== undefined) {
+            ui.frame = this.frame;
+            this.frame = undefined;
+        }
+        ui.update_extent?.();
+        SpectralSequence.draw(ui);
+        // Once the layer is left, whether the file has changes is asked again (see
+        // `DiagramFile.update`).
+        ui.mode_line.update(ui);
+    }
+
+    /// Draw the ghost afresh, for the options and the focus point as they are now.
+    preview() {
+        const ui = this.ui;
+        this.clear();
+        this.problem = null;
+        try {
+            const spec = Presets.build[this.name](this.options);
+            if (spec.frame !== undefined && ui.format !== "tikz-cd") {
+                throw new Error(`${ui.format} has no axes for a spectral sequence: try :format tikz-cd`);
+            }
+            this.ghost = Presets.place(ui, spec);
+            for (const cell of this.ghost) {
+                cell.element.class_list.add("ghost");
+            }
+            // A spectral sequence's ghost shows its axes, as its own frame would draw them.
+            if (spec.frame !== undefined) {
+                this.frame = ui.frame;
+                ui.frame = Presets.frame(ui, spec.frame);
+                SpectralSequence.draw(ui);
+            }
+            // What the diagram's format cannot draw is shown as not here, rather than stamped and
+            // then taken back (see `UI.check_format`).
+            const problem = Formats.problems(ui.format, ui.quiver)
+                .find(([, cells]) => cells.some((cell) => this.ghost.has(cell)));
+            if (problem !== undefined) {
+                this.clear();
+                // The options amscd can draw, of those set to what it cannot.
+                const schema = Presets.schema(this.name);
+                const fixes = Object.entries(schema).filter(([name, option]) =>
+                    option.amscd !== undefined && this.options[name] !== option.amscd)
+                    .map(([name, option]) => Presets.amscd(name, option));
+                this.problem = `${ui.format} has no ${problem[0]}: try ${
+                    ui.format === "amscd" ? `${fixes.length > 0 ? `${Presets.or(fixes)}, or `
+                        : ""}:format tikz-cd` : "other options"}`;
+            }
+        } catch (error) {
+            this.problem = error.message;
+        }
+        this.keymap.render();
+        ui.mode_line.update(ui);
+    }
+
+    /// Leave, and stamp the preset for real, once the layer no longer holds the file's changes
+    /// back (see `DiagramFile.update`). If it cannot land here, stay, saying why.
+    commit() {
+        const ui = this.ui;
+        if (this.problem !== null) {
+            UI.display_error(this.problem);
+            return;
+        }
+        this.leave();
+        try {
+            Presets.stamp(ui, Presets.build[this.name](this.options));
+        } catch (error) {
+            UI.display_error(error.message);
+        }
+        ui.update_selection();
+    }
+
+    groups() {
+        const schema = Presets.schema(this.name);
+        const amscd = this.ui.format === "amscd";
+        const options = Object.entries(schema).map(([key, option]) => {
+            const value = this.options[key] ?? option.resolve?.(this.options) ?? null;
+            const shown = option.kind === "flag" ? (value ? "on" : "off")
+                : value === null || value === "" ? "default" : Presets.show(option, value);
+            const keys = option.key === undefined ? ":"
+                : ["integer", "range"].includes(option.kind)
+                    ? `${option.key} ${option.key.toUpperCase()}`
+                    : option.key;
+            // In amscd, an option at the one value amscd can draw, whose keys could only step
+            // away from it, is dimmed; and a spectral sequence's, which amscd cannot draw at all.
+            const disabled = amscd && (this.name === "spectral-sequence"
+                || (option.amscd !== undefined && value === option.amscd
+                    && Presets.steps(option, value).every((next) => next !== option.amscd)));
+            return [keys, option.title ?? key, false, shown, null, null, disabled];
+        });
+        return [
+            ["Options (capitals step down)", options],
+            ["Result", [
+                ...(this.problem !== null ? [["", "not here", false, this.problem]] : []),
+                ["RET", "stamp it"],
+                ["←↑→↓", "move it"],
+                [":", "edit as a command"],
+                ["; ESC", "leave"],
+            ]],
+        ];
+    }
+
+    intercept(event) {
+        const ui = this.ui;
+        const key = event.key;
+        if (event.ctrlKey || event.metaKey || event.altKey) {
+            // Nothing else may act on the diagram while the ghost is in it.
+            return true;
+        }
+        const schema = Presets.schema(this.name);
+        const lower = key.toLowerCase();
+        const entry = Object.entries(schema).find(([, option]) => option.key === lower);
+        if (entry !== undefined) {
+            const [name, option] = entry;
+            const value = this.options[name] ?? option.resolve?.(this.options) ?? null;
+            switch (option.kind) {
+                case "range": {
+                    // The key reaches a step further, and the capital a step less, never below the
+                    // low end.
+                    const [low, high] = value;
+                    this.options[name] = [low, Math.max(low, high + (key === lower ? 1 : -1))];
+                    break;
+                }
+                case "integer": {
+                    const next = value + (key === lower ? 1 : -1);
+                    this.options[name] = Math.max(next, option.min ?? -Infinity);
+                    break;
+                }
+                case "choice": {
+                    const values = option.values;
+                    const step = key === lower ? 1 : values.length - 1;
+                    this.options[name] = values[(values.indexOf(value) + step) % values.length];
+                    // A choice that sets others, as a quadrant sets the ranges, starts them afresh.
+                    for (const reset of option.resets ?? []) {
+                        this.options[reset] = schema[reset].default;
+                    }
+                    break;
+                }
+                case "flag":
+                    this.options[name] = !value;
+                    break;
+            }
+            this.preview();
+            return true;
+        }
+        const arrows = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1],
+            ArrowDown: [0, 1] };
+        if (arrows[key] !== undefined) {
+            this.clear();
+            ui.reposition_focus_point(ui.focus_position.add(new Position(...arrows[key])));
+            this.preview();
+            return true;
+        }
+        switch (key) {
+            case "Enter":
+                this.commit();
+                break;
+            case ":": {
+                const line = [Presets.short(this.name),
+                    ...Presets.words(this.name, this.options)].join(" ");
+                this.leave();
+                ui.prompt.open("Command");
+                ui.label_input.element.value = `${line} `;
+                ui.prompt.input?.();
+                break;
+            }
+            case "Escape":
+                if (!UI.dismiss_error()) {
+                    this.leave();
+                }
+                break;
+            case ";":
+                this.leave();
+                break;
+        }
+        return true;
+    }
+};
+
+/// The frame layer (`:frame`): what the diagram's spectral sequence is, as the file keeps it (see
+/// `SpectralSequence`), with a key for each thing about it that can change, each change a step to
+/// undo: its grading, its page (which `; D` draws the differential of), its axes, and how far each
+/// range reaches.
+Layer.Frame = class extends Layer {
+    describe() {
+        const frame = this.ui.frame;
+        return ["FRAME", frame === null ? "none" : `E_${frame.page} ${frame.grading}`];
+    }
+
+    groups() {
+        const frame = this.ui.frame;
+        if (frame === null) {
+            return [["Frame", [["", "none: :ss stamps one"], ["; ESC", "leave"]]]];
+        }
+        const range = ([low, high]) => `${low}..${high}`;
+        const [x, y] = SpectralSequence.names(frame);
+        return [
+            ["Frame (capitals step down)", [
+                ["g", "grading", false, frame.grading],
+                ["r R", "page", false, `${frame.page}`],
+                ["p P", `${x} up to`, false, range(frame.p)],
+                ["q Q", `${y} up to`, false, range(frame.q)],
+                ["x X", `${x} from`, false, `${frame.p[0]}`],
+                ["y Y", `${y} from`, false, `${frame.q[0]}`],
+                ["a", "axes", false, frame.axes],
+                ["", "dashed diagonals (:diagonal n line)", false,
+                    (frame.lines ?? []).join(",") || "none"],
+                ["", "origin, where (0,0) is", false, `(${frame.origin.x},${frame.origin.y})`],
+            ]],
+            ["Leave", [["RET ; ESC", "leave"]]],
+        ];
+    }
+
+    intercept(event) {
+        const ui = this.ui;
+        const key = event.key;
+        if (event.ctrlKey || event.metaKey || event.altKey) {
+            return false;
+        }
+        const frame = ui.frame;
+        try {
+            switch (key) {
+                case "g": {
+                    const gradings = ["coh", "hom", "adams"];
+                    SpectralSequence.change(ui, { ...frame,
+                        grading: gradings[(gradings.indexOf(frame.grading) + 1) % 3] });
+                    break;
+                }
+                case "r":
+                case "R":
+                    SpectralSequence.change(ui, { ...frame,
+                        page: Math.max(0, frame.page + (key === "r" ? 1 : -1)) });
+                    break;
+                case "a":
+                    SpectralSequence.change(ui, { ...frame,
+                        axes: frame.axes === "edge" ? "none" : "edge" });
+                    break;
+                case "p":
+                case "P":
+                case "q":
+                case "Q":
+                    SpectralSequence.resize(ui, key.toLowerCase(), key === key.toLowerCase() ? 1 : -1);
+                    break;
+                case "x":
+                case "X":
+                case "y":
+                case "Y":
+                    SpectralSequence.shift_low(ui, key.toLowerCase() === "x" ? "p" : "q",
+                        key === key.toLowerCase() ? 1 : -1);
+                    break;
+                case "Escape":
+                    if (!UI.dismiss_error()) {
+                        this.leave();
+                    }
+                    return true;
+                case "Enter":
+                case ";":
+                    this.leave();
+                    return true;
+                default:
+                    // The arrow keys still move the focus point.
+                    return !key.startsWith("Arrow");
+            }
+        } catch (error) {
+            UI.display_error(error.message);
+        }
+        this.keymap.render();
+        ui.mode_line.update(ui);
+        return true;
+    }
+};
