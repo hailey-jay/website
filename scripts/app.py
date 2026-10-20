@@ -17,7 +17,7 @@ The icon travels too, to `images/sagitta.svg`, which is what the site's own
 pages use for Sagitta: the landing page's favicon and wordmark, and the
 sidebar entry. One copy, kept in step with the app rather than drawn again.
 
-The version comes along as `VERSION`, read out of the checkout's
+The version comes along as `VERSION`, read out of the clone's
 package.json (which is the desktop build's and does not travel itself), so the
 landing page states the version of the editor it actually serves.
 
@@ -25,7 +25,13 @@ The copy is tracked in this repo, because the repo is what gets served. It is
 pruned as well as written: a file that has left the source leaves the copy, or
 it would be served forever after it stopped existing.
 
-    python scripts/app.py [SAGITTA_CHECKOUT]     (default: ../sagitta)
+    python scripts/app.py [REPO [REF]]
+
+The source is always a fresh clone of REF (default: main) from REPO (default:
+the public GitHub repo), made into a temporary directory and thrown away
+afterwards. Copying out of a working checkout served whatever branch it
+happened to be on, test branches included. REPO may be a local path; it is
+still cloned, so only committed work on REF travels.
 
 Written in Python rather than as an rsync line in the Makefile so it runs on a
 machine that has no rsync, which is most Windows ones and some minimal Linux
@@ -34,12 +40,19 @@ images.
 import filecmp
 import json
 import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
 
 DEST = root / "sagitta/app"
+
+# Where the editor comes from. scripts/check.py reads UPSTREAM too, to tell
+# whether the copy here is behind the latest release.
+UPSTREAM = "https://github.com/hailey-jay/sagitta.git"
+REF = "main"
 
 # Everything index.html pulls in, plus the licences that have to travel with a
 # GPL program. Hand-listed, like every other manifest in this build: a glob
@@ -66,10 +79,37 @@ def sources(src):
                 yield path, path.relative_to(src)
 
 
+def clone(repo, ref, into):
+    """Shallow-clone `ref` of `repo` into `into`; return the commit, or None."""
+    local = Path(repo).expanduser()
+    if local.is_dir():
+        # A plain path ignores --depth; a file:// URL honours it.
+        repo = local.resolve().as_uri()
+    result = subprocess.run(
+        ["git", "clone", "--quiet", "--depth", "1", "--branch", ref, repo, str(into)],
+        capture_output=True, text=True)
+    if result.returncode:
+        print(result.stderr.strip() or f"git clone of {repo} failed")
+        return None
+    return subprocess.run(["git", "-C", str(into), "rev-parse", "--short", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+
+
 def main(argv):
-    src = Path(argv[1]).expanduser().resolve() if len(argv) > 1 else root.parent / "sagitta"
+    repo = argv[1] if len(argv) > 1 and argv[1] else UPSTREAM
+    ref = argv[2] if len(argv) > 2 and argv[2] else REF
+    with tempfile.TemporaryDirectory(prefix="sagitta-") as tmp:
+        src = Path(tmp) / "sagitta"
+        commit = clone(repo, ref, src)
+        if commit is None:
+            return 1
+        print(f"cloned {repo} at {ref} ({commit})")
+        return copy(src)
+
+
+def copy(src):
     if not (src / "index.html").is_file():
-        print(f"no Sagitta checkout at {src}; pass the path as an argument")
+        print(f"no Sagitta editor in {src}")
         return 1
 
     wanted, copied = set(), 0

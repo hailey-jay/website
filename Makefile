@@ -32,14 +32,18 @@ serve:
 	python -m http.server $(PORT) --bind 127.0.0.1
 
 # `app` copies the Sagitta editor into sagitta/app/, so this site serves it:
-# the files the browser needs and nothing of the desktop shell. See
-# scripts/app.py. SAGITTA is the checkout to copy from; override it if yours
-# lives elsewhere:
+# the files the browser needs and nothing of the desktop shell. It clones
+# SAGITTA_REF of SAGITTA fresh into a temporary directory every time, so
+# whatever branch a working copy is on never leaks in. See scripts/app.py.
+# They default to the public repo and its main branch; override either, e.g.
+# to serve a release tag:
 #
-#     make app SAGITTA=~/Workshop/sagitta
+#     make app SAGITTA_REF=v0.6.0
 #
 # The result is tracked in this repo, because that is what gets served.
-SAGITTA ?= ../sagitta
+# `make check` reports when it is behind upstream's newest release.
+SAGITTA ?=
+SAGITTA_REF ?=
 
 app:
-	python scripts/app.py $(SAGITTA)
+	python scripts/app.py "$(SAGITTA)" "$(SAGITTA_REF)"

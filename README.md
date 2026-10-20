@@ -97,7 +97,7 @@ Chromium opens and saves the diagram file in place; Firefox reads a copy and sav
 
 The same sync copies the editor's `icon.svg` to `images/sagitta.svg`, which is what this site uses for Sagitta: the two pages' favicon, the landing page's wordmark, and the sidebar entry.
 One copy, kept in step with the app rather than drawn again.
-It also writes `sagitta/app/VERSION` from the checkout's `package.json`, which is where the landing page's version comes from, so the page cannot advertise a version other than the one it serves.
+It also writes `sagitta/app/VERSION` from the clone's `package.json`, which is where the landing page's version comes from, so the page cannot advertise a version other than the one it serves.
 
 ## Data formats
 Three shapes cover every section, and they are parsed by shared helpers in `sitekit.text` rather than per-section code:
@@ -183,10 +183,11 @@ Worth running before a push: Cloudflare serves the committed files, so stale out
 `make serve` hosts the repo at `http://localhost:8000/` for previewing the built pages (`PORT=9000` to move it).
 It serves the files on disk, so build first.
 
-`make app` refreshes `sagitta/app/` from a Sagitta checkout, `../sagitta` by default:
+`make app` refreshes `sagitta/app/` from a fresh clone of [Sagitta](https://github.com/hailey-jay/sagitta)'s `main`, made in a temporary directory and deleted afterwards.
+`SAGITTA` overrides the repo (a URL or a local path) and `SAGITTA_REF` the branch or tag:
 
 ```
-make app SAGITTA=~/Workshop/sagitta
+make app SAGITTA_REF=v0.6.0
 ```
 
 `make wireframes` regenerates `images/wireframes/`.
