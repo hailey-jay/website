@@ -173,6 +173,7 @@ Edit files in `src/`, run the build.
 Paths are resolved relative to the repo root, so the underlying `python src/make.py` still runs from anywhere.
 
 `make check` scans the built pages (`index.html` and the two Sagitta pages; not the editor, which is not this build's to audit) for the problems that only show up in the finished page: a local `href` or `src` pointing at nothing, a duplicate id, an `<img>` missing its alt, dimensions, or `loading` hint, and the total weight of image one page pulls.
+It also fails if `sagitta/app/` is older than Sagitta's newest release tag; that step needs the network and is skipped offline.
 
 `make verify` rebuilds, then fails if the committed pages, `rss.xml`, or `sitemap.xml` differ from what the source produces, and restores the worktree either way.
 The build is deterministic so a clean result means the committed output is current.
