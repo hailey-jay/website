@@ -84,8 +84,10 @@ APP_URL = f"{BASE_URL}/sagitta/app/"
 # A relative url() in the stylesheet resolves against the document, so the
 # fonts are at fonts/ for the root page and ../fonts/ one directory down. The
 # stylesheet is inlined, so there is no stylesheet URL to resolve against and
-# nothing else fixes this.
-CSS_URL_RE = re.compile(r"""url\(\s*(['"]?)(?!https?:|data:|/|\#)""")
+# nothing else fixes this. The quote is excluded in the lookahead too:
+# otherwise, for a quoted absolute URL, the optional quote group backtracks
+# to empty and the prefix lands before the quote (url(../"data:...)).
+CSS_URL_RE = re.compile(r"""url\(\s*(['"]?)(?!['"]|https?:|data:|/|\#)""")
 
 def relocate_css(css, up):
     return CSS_URL_RE.sub(lambda m: f"url({m.group(1)}{up}", css)
