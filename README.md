@@ -159,7 +159,7 @@ pip install -r requirements.txt
 `sitekit/` is vendored rather than installed, so there is nothing else to set up here or on the server, and this site pins a version of it by simply not updating the directory.
 Changes belong upstream in the sitekit repo and are copied back in.
 
-Regenerating the sidebar wireframes needs more, including ffmpeg on PATH, and is only occasionally necessary:
+Regenerating the footer wireframes needs more, including ffmpeg on PATH, and is only occasionally necessary:
 
 ```
 pip install -r requirements-wireframes.txt
@@ -219,6 +219,9 @@ This repository holds work under five different terms.
   `katex/` keeps KaTeX's own `LICENSE` and is not relicensed here.
 + **Fonts: SIL Open Font License 1.1.**
   The EB Garamond files in `fonts/` keep their upstream license and are not relicensed here.
++ **Other people's marks: theirs.**
+  The logos in `images/links/` (LSU, AWM, the RTG, and ORCID) belong to their owners and are used only to mark links to them.
+  The 88x31 buttons `images/buttons/clairebutton.gif` and `jambutton.png` are Claire's and Jamie's own, shown as they made them.
 + **Everything else: all rights reserved.**
   This includes the writing (blog posts, `src/data/`, and the prose in the partials), the comics, the CV, and the photos excepted above.
 

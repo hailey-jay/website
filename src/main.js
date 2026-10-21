@@ -105,11 +105,24 @@ const subAnchors = {
 };
 
 // ── Navigation ───────────────────────────────────────────────
+// Fires `sectionchange` on document when the visible section changes (not on
+// the first one shown, and not between a blog post and the blog index).
+let currentSection = null;
+
 function showSection(id) {
   let parentId = subAnchors[id] || id;
   if (!sections.includes(parentId)) parentId = 'about';
+  if (currentSection && currentSection !== parentId) {
+    document.dispatchEvent(new CustomEvent('sectionchange', { detail: parentId }));
+  }
+  currentSection = parentId;
   sections.forEach(function (s) {
     document.getElementById(s).classList.toggle('active', s === parentId);
+  });
+  // Mark the current section in the main nav (see .mainnav in main.css).
+  document.querySelectorAll('.mainnav a').forEach(function (a) {
+    if (a.getAttribute('href') === '#' + parentId) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
   });
 }
 
@@ -300,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (el) el.textContent = aboutQuotes[Math.floor(Math.random() * aboutQuotes.length)];
 });
 
-// ── Sidebar wireframe animation ─────────────────────────────
+// ── Wireframe animation (footer) ────────────────────────────
 // Shape list mirrors SHAPES in scripts/gen_wireframes.py.
 const wireframeShapes = [
   'tetrahedron', 'cube', 'octahedron', 'dodecahedron', 'icosahedron',
@@ -317,6 +330,10 @@ document.addEventListener('DOMContentLoaded', function () {
     video.remove();
     return;
   }
+  // The footer rose stands in until now; the video takes its place.
+  const rose = video.parentNode.querySelector('img');
+  if (rose) rose.remove();
+  video.hidden = false;
   const pick = wireframeShapes[Math.floor(Math.random() * wireframeShapes.length)];
 
   function setVariant(theme) {
@@ -406,12 +423,12 @@ function autoScroll(container) {
   requestAnimationFrame(step);
 }
 
-// ── Paper BibTeX (papers section) ────────────────────────────
-// The entry is in the page already (a hidden <pre> built by the CV
-// repo). Opening it also copies it, since copying is why anyone
+// ── Copy toggles (paper BibTeX, my button's code) ────────────
+// The text is in the page already (a hidden <pre>; for papers, built by
+// the CV repo). Opening it also copies it, since copying is why anyone
 // clicks; the revealed text is the fallback when the clipboard is
 // unavailable (http, or a browser that refuses).
-document.querySelectorAll('.paper-bibtex').forEach(function (btn) {
+document.querySelectorAll('.paper-bibtex, .code-toggle').forEach(function (btn) {
   const bib = document.getElementById(btn.getAttribute('aria-controls'));
   const status = btn.nextElementSibling;
   btn.addEventListener('click', function () {
@@ -461,3 +478,136 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   slides.forEach(function (slide) { observer.observe(slide); });
   mark(0);
 });
+
+// ── Backdrop arrangement ─────────────────────────────────────
+// Random lines across the window behind the page; each region they cut out
+// gets a tint, chosen by hashing which side of every line it is on, plus a
+// little grain. A new arrangement on every load and, fading in, on every
+// change of section (not under reduced motion). Redrawn on a theme switch.
+// Decoration only: no hover, no clicks.
+(function () {
+  const first = document.querySelector('canvas.backdrop');
+  if (!first) return;
+  const LINES = 10, GRAIN = 6;
+  // Two stacked canvases: a new arrangement is drawn on the hidden one, which
+  // is then moved on top and faded in over the old.
+  const second = first.cloneNode();
+  second.style.opacity = '0';
+  first.after(second);
+  let front = first, back = second;
+
+  // Lines are a·x + b·y + c = 0 with (a, b) a unit normal. They pass through
+  // random points of the whole screen rather than the window, so resizing the
+  // window (or a phone's address bar sliding away) never moves them.
+  let lines;
+  function roll() {
+    const sw = screen.width || 1920, sh = screen.height || 1080;
+    lines = [];
+    for (let i = 0; i < LINES; i++) {
+      const x = Math.random() * sw, y = Math.random() * sh, t = Math.random() * Math.PI;
+      const a = Math.sin(t), b = -Math.cos(t);
+      lines.push([a, b, -(a * x + b * y)]);
+    }
+  }
+
+  const rgb = function (s) {
+    s = s.trim().replace('#', '');
+    return [0, 2, 4].map(function (i) { return parseInt(s.substr(i, 2), 16); });
+  };
+  const mix = function (p, q, t) { return p.map(function (v, i) { return Math.round(v + (q[i] - v) * t); }); };
+  const hex = function (c) { return '#' + c.map(function (v) { return v.toString(16).padStart(2, '0'); }).join(''); };
+
+  // Tints are the paper mixed with pink, rule, and two soft accents. The
+  // line is --arr-line in main.css: muted, 55% of the way from the paper.
+  let tints, line;
+  function colours() {
+    const cs = getComputedStyle(document.documentElement);
+    const paper = rgb(cs.getPropertyValue('--paper'));
+    const pink = rgb(cs.getPropertyValue('--pink'));
+    const rule = rgb(cs.getPropertyValue('--rule'));
+    tints = [mix(paper, pink, .12), mix(paper, pink, .26), mix(paper, pink, .42),
+             mix(paper, rule, .6), mix(paper, rgb('#b9a7e6'), .28), mix(paper, rgb('#a9cf9f'), .25)];
+    line = hex(mix(paper, rgb(cs.getPropertyValue('--muted')), .55));
+  }
+
+  // Region tint from its sign vector. The bits are mixed before the modulus;
+  // a bare multiply-and-mod would only see the first few lines.
+  const pick = function (k) {
+    k = Math.imul(k ^ (k >>> 16), 0x45d9f3b);
+    k = Math.imul(k ^ (k >>> 16), 0x45d9f3b);
+    return ((k ^ (k >>> 16)) >>> 0) % tints.length;
+  };
+
+  // Regions are filled per CSS pixel, then scaled up to the device's pixels;
+  // the lines are stroked at full resolution on top, covering the seams.
+  let W = 0, H = 0, keys = null, noise = null;
+  const off = document.createElement('canvas');
+  const octx = off.getContext('2d');
+
+  function measure() {
+    W = Math.max(1, Math.round(innerWidth)); H = Math.max(1, Math.round(innerHeight));
+    keys = new Uint32Array(W * H);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let k = 0;
+      for (let i = 0; i < LINES; i++) {
+        const l = lines[i];
+        if (l[0] * x + l[1] * y + l[2] > 0) k |= 1 << i;
+      }
+      keys[y * W + x] = k;
+    }
+    if (!noise || noise.length !== W * H) {
+      noise = new Int8Array(W * H);
+      for (let i = 0; i < noise.length; i++) noise[i] = Math.round((Math.random() * 2 - 1) * GRAIN);
+    }
+  }
+  const resized = function () { return Math.round(innerWidth) !== W || Math.round(innerHeight) !== H; };
+
+  function paint(canvas) {
+    off.width = W; off.height = H;
+    const img = octx.createImageData(W, H), d = img.data;
+    for (let p = 0; p < keys.length; p++) {
+      const c = tints[pick(keys[p])], n = noise[p];
+      d[p * 4] = c[0] + n; d[p * 4 + 1] = c[1] + n; d[p * 4 + 2] = c[2] + n; d[p * 4 + 3] = 255;
+    }
+    octx.putImageData(img, 0, 0);
+
+    const ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    lines.forEach(function (l) {
+      const a = l[0], b = l[1], c = l[2];
+      ctx.beginPath();
+      if (Math.abs(b) > Math.abs(a)) { ctx.moveTo(0, -c / b); ctx.lineTo(W, -(a * W + c) / b); }
+      else { ctx.moveTo(-c / a, 0); ctx.lineTo(-(b * H + c) / a, H); }
+      ctx.stroke();
+    });
+  }
+
+  roll(); colours(); measure(); paint(front);
+
+  let timer = 0;
+  addEventListener('resize', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () { if (resized()) { measure(); paint(front); } }, 150);
+  });
+  if (window.haileyjayTheme) window.haileyjayTheme.onChange(function () { colours(); paint(front); });
+
+  const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.addEventListener('sectionchange', function () {
+    if (still && still.matches) return;
+    roll(); measure();
+    // The hidden canvas goes on top at opacity 0, then fades in.
+    back.style.transition = 'none';
+    back.style.opacity = '0';
+    front.after(back);
+    paint(back);
+    back.getBoundingClientRect();   // commit opacity 0 before the transition
+    back.style.transition = '';
+    back.style.opacity = '1';
+    const t = front; front = back; back = t;
+  });
+})();

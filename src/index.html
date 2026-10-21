@@ -28,6 +28,9 @@
 
 <body>
 
+    <!-- A random line arrangement behind the page, drawn by main.js. -->
+    <canvas class="backdrop" aria-hidden="true"></canvas>
+
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar">
@@ -44,7 +47,7 @@
             <p class="sidebar-name">Hailey Jay Garcia</p>
             <hr>
             <nav aria-label="Navigation">
-                <ul class="sidenav">
+                <ul class="sidenav mainnav">
                     <li><a href="#about">About</a></li>
                     <li><a href="#cv">CV</a></li>
                     <li><a href="#papers">Papers</a></li>
@@ -53,40 +56,49 @@
                 </ul>
                 <div aria-label="Other Links">
                     <hr>
+                    <!-- Outbound links are colour swatches, each in its
+                         site's colours with its logo bleeding off the edge.
+                         Colours are .sw-NAME in main.css. -->
                     <span class="sidebar-meta">Projects</span>
-                    <ul class="sidenav">
+                    <div class="sw-list">
                         <!-- A real page, not a tab: Sagitta has its own
                              navigation and serves the editor itself from
                              sagitta/app/. See `sagitta_pages` in src/make.py. -->
-                        <li><a href="sagitta/" class="sidenav-marked">
-                                <img class="sidenav-icon" src="images/sagitta.svg" alt="" width="16" height="16" loading="lazy" decoding="async">
-                                Sagitta</a></li>
-                    </ul>
+                        <a class="sw sw-sagitta" href="sagitta/"><span class="sw-logo" aria-hidden="true"><img src="images/sagitta.svg" alt="" width="46" height="46" loading="lazy" decoding="async"></span><span>Sagitta</span></a>
+                    </div>
                     <hr>
                     <span class="sidebar-meta">LSU</span>
-                    <ul class="sidenav">
+                    <div class="sw-list">
                         <!-- Out of the main nav while I’m not teaching; the
-                             section stays live so students’ links still work. -->
-                        <li><a href="#teaching">Past Teaching</a></li>
-                        <li><a href="https://www.math.lsu.edu/">Math Department</a></li>
-                        <li><a href="https://www.math.lsu.edu/~awm/">AWM Chapter</a></li>
-                        <li><a href="https://www.math.lsu.edu/~trm-rtg/">Research &amp; Training Group</a></li>
-                    </ul>
+                             section stays live so students’ links still work.
+                             My own pages carry the rose. -->
+                        <a class="sw sw-teaching" href="#teaching"><span class="sw-logo" aria-hidden="true"><img src="images/rose.svg" alt="" width="29" height="46" loading="lazy" decoding="async"></span><span>Past Teaching</span></a>
+                        <a class="sw sw-seminar" href="https://www.math.lsu.edu/~jgarc86/seminar"><span class="sw-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 2.5 21.5 9.4 17.9 20.5H6.1L2.5 9.4Z M12 2.5 17.9 20.5 2.5 9.4H21.5L6.1 20.5Z"/><g fill="currentColor" stroke="none"><circle cx="12" cy="2.5" r="2"/><circle cx="21.5" cy="9.4" r="2"/><circle cx="17.9" cy="20.5" r="2"/><circle cx="6.1" cy="20.5" r="2"/><circle cx="2.5" cy="9.4" r="2"/></g></svg></span><span>Combinatorics Seminar</span></a>
+                        <a class="sw sw-lsu" href="https://www.math.lsu.edu/"><span class="sw-logo" aria-hidden="true"><img src="images/links/lsu-math.png" alt="" width="41" height="46" loading="lazy" decoding="async"></span><span>Math Department</span></a>
+                        <a class="sw sw-awm" href="https://www.math.lsu.edu/~awm/"><span class="sw-logo" aria-hidden="true"><img src="images/links/awm.svg" alt="" width="46" height="46" loading="lazy" decoding="async"></span><span>AWM Chapter</span></a>
+                        <a class="sw sw-rtg" href="https://www.math.lsu.edu/~trm-rtg/"><span class="sw-logo" aria-hidden="true"><img src="images/links/rtg.svg" alt="" width="46" height="46" loading="lazy" decoding="async"></span><span>Research &amp; Training Group</span></a>
+                    </div>
                     <hr>
                     <span class="sidebar-meta">Personal</span>
-                    <ul class="sidenav">
-                        <li><a href="https://orcid.org/0009-0008-9436-2956" rel="me">ORCID</a></li>
-                        <li><a href="https://github.com/hailey-jay" rel="me">GitHub</a></li>
-                        <li><a href="rss.xml" class="rss-link">
-                                <svg class="rss-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                    <circle cx="5" cy="19" r="2" />
-                                    <path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9" />
-                                </svg>
-                                Blog RSS</a></li>
-                    </ul>
+                    <div class="sw-list">
+                        <a class="sw sw-orcid" href="https://orcid.org/0009-0008-9436-2956" rel="me"><span class="sw-logo" aria-hidden="true"><img src="images/links/orcid.svg" alt="" width="46" height="46" loading="lazy" decoding="async"></span><span>ORCID</span></a>
+                        <a class="sw sw-github" href="https://github.com/hailey-jay" rel="me"><span class="sw-logo" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span><span>GitHub</span></a>
+                        <a class="sw sw-rss" href="rss.xml"><span class="sw-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="5" cy="19" r="2"/><path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9"/></svg></span><span>Blog RSS</span></a>
+                    </div>
                     <hr>
-                    <div class="wireframe-slot" aria-hidden="true">
-                        <video id="wireframe-video" autoplay muted loop playsinline></video>
+                    <span class="sidebar-meta">Friends</span>
+                    <!-- Their own 88x31 buttons, shown as they made them. -->
+                    <div class="friend-buttons">
+                        <a href="https://claire.monster/"><img src="images/buttons/clairebutton.gif" width="88" height="31" alt="Claire’s website" loading="lazy" decoding="async"></a>
+                        <a href="https://jamie.monster/"><img src="images/buttons/jambutton.png" width="88" height="31" alt="Jamie’s website" loading="lazy" decoding="async"></a>
+                    </div>
+                    <hr>
+                    <!-- My own 88x31 button, with the code for anyone who wants to link
+                         back. The toggle copies it, as BibTeX does. -->
+                    <div class="my-button">
+                        <img src="images/buttons/haileyjay.png" width="88" height="31" alt="My button: haileyjay over a line arrangement" loading="lazy" decoding="async">
+                        <p><button type="button" class="code-toggle" aria-expanded="false" aria-controls="my-button-code">Link to me</button><span class="code-toggle-status" role="status"></span></p>
+                        <pre class="my-button-code" id="my-button-code" hidden>&lt;a href="https://haileyjay.net/"&gt;&lt;img src="https://haileyjay.net/images/buttons/haileyjay.png" width="88" height="31" alt="Hailey Jay Garcia’s website"&gt;&lt;/a&gt;</pre>
                     </div>
                 </div>
             </nav>
@@ -113,8 +125,13 @@
 
         <!--    Footer    -->
         <footer>
-            <!-- Rose SVG ornament -->
-            <img src="images/rose.svg" width="40" height="63" alt="" loading="lazy" decoding="async">
+            <!-- A rotating wireframe, picked at random per visit. The rose
+                 is the fallback: main.js swaps it for the video, except under
+                 reduced motion or without JS. -->
+            <div class="wireframe-slot" aria-hidden="true">
+                <img src="images/rose.svg" width="40" height="63" alt="" loading="lazy" decoding="async">
+                <video id="wireframe-video" autoplay muted loop playsinline hidden></video>
+            </div>
 
             <p>Copyleft 2025-2026 Hailey Jay Garcia. All wrongs reserved. See the <a href="#colophon">colophon</a> for licenses and AI use.</p>
             <p>The statements and opinions on these pages are my own only and not those of any institution I am a member of.</p>
