@@ -1381,7 +1381,7 @@ footer a {
 
 /* ── Main nav ───────────────────────────────────────────────── */
 /* The sections of this site, so the first thing in the sidebar: larger and
-   heavier than the link groups below, with the rose marking where you are. */
+   heavier than the link groups below, with a sparkle marking where you are. */
 .mainnav a {
     position: relative;
     font-size: 1.12rem;
@@ -1392,13 +1392,17 @@ footer a {
     color: var(--pink-strong);
 }
 
+/* A curved four-point star, drawn as a mask so it takes the link's colour */
 .mainnav a[aria-current="page"]::before {
     content: "";
     position: absolute;
-    left: -1.05em;
+    left: -1em;
     top: 50%;
-    width: .62em;
-    height: .98em;
+    width: .66em;
+    height: .66em;
     translate: 0 -50%;
-    background: url('images/rose.svg') center / contain no-repeat;
+    background: currentColor;
+    -webkit-mask: var(--sparkle) center / contain no-repeat;
+    mask: var(--sparkle) center / contain no-repeat;
+    --sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z'/%3E%3C/svg%3E");
 }
