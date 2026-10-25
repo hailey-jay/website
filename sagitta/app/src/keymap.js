@@ -58,6 +58,8 @@ class Keymap {
             export: new Layer.Export(this),
             settings: new Layer.Settings(this),
             colour: new Layer.Colour(this),
+            preset: new Layer.Preset(this),
+            frame: new Layer.Frame(this),
         };
         this.layer = null;
 
@@ -378,6 +380,10 @@ class Keymap {
             this.paste();
             return true;
         }
+        // A layer may take keys with modifiers too, as the setup layer of a preset does.
+        if (this.layer?.captures_all && !ui.in_mode(UIMode.Command)) {
+            return this.layer.intercept(event);
+        }
         if (event.ctrlKey || event.metaKey || event.altKey) {
             return false;
         }
@@ -585,6 +591,8 @@ class Keymap {
         this.which_key.class_list.toggle("no-selection", ui.selection.size === 0);
         // What amscd cannot draw is dimmed while the diagram is in it (see `AmsCD.slot`).
         this.which_key.class_list.toggle("amscd", ui.format === "amscd");
+        // What only a spectral sequence has a use for is hidden without one.
+        this.which_key.class_list.toggle("no-frame", ui.frame === null);
         // The compact list shows only the keys and their values, and what each does on hovering.
         const compact = ui.settings.get("ui.which_key_compact");
         this.which_key.class_list.toggle("compact", compact);
@@ -677,9 +685,10 @@ class Keymap {
                 .add(new DOM.Element("h3").add(title))
                 .add_to(submenu);
             for (const [key, description, current = false, value = "", swatch = null, steps = null,
-                disabled = false] of entries) {
+                disabled = false, wide = false] of entries) {
                 const entry = new DOM.Div({ class: `entry${current ? " current" : ""}${
-                    clickable && key !== "" ? " clickable" : ""}${disabled ? " disabled" : ""}` })
+                    clickable && key !== "" ? " clickable" : ""}${disabled ? " disabled" : ""}${
+                    wide ? " wide" : ""}` })
                     .add(new DOM.Element("kbd").add(key))
                     .add_to(group);
                 if (swatch !== null) {
@@ -756,7 +765,8 @@ class Keymap {
                 const chords = Object.hasOwn(Keymap.FIXED_KEYS, name)
                     ? "" : this.describe_name(name, ({ modifier }) => modifier);
                 const entry = new DOM.Div({
-                    class: `entry clickable${needs !== null ? ` needs-${needs}` : ""}${
+                    class: `entry clickable${needs !== null
+                        ? needs.split(" ").map((need) => ` needs-${need}`).join("") : ""}${
                         Keymap.NOT_AMSCD.has(name) ? " not-amscd" : ""}`,
                 })
                     .add(new DOM.Element("kbd").add(key))
@@ -909,18 +919,19 @@ class Keymap {
         this.render();
     }
 
-    /// The property a slider's key sets for the selection: a loop's radius, or a route's rounding,
-    /// in place of the curve it does not take, while only loops or only routes are selected, as
-    /// the arrow keys do.
+    /// The property a slider's key sets for the selection: a loop's radius and angle in place of
+    /// the curve and offset, while only loops are selected, and a route's rounding in place of the
+    /// curve, while only routes are, as the arrow keys do.
     slider_property(property) {
         const edges = ArrowOptions.edges(this.ui);
-        if (property !== "curve" || edges.length === 0) {
+        if (!["curve", "offset"].includes(property) || edges.length === 0) {
             return property;
         }
         if (edges.every((edge) => edge.is_loop())) {
-            return "radius";
+            return property === "curve" ? "radius" : "angle";
         }
-        return edges.every((edge) => edge.is_routed()) ? "rounding" : property;
+        return property === "curve" && edges.every((edge) => edge.is_routed())
+            ? "rounding" : property;
     }
 
     /// Whether the list of `component` has anything to act on: the selected arrows, but for
@@ -1035,10 +1046,10 @@ class Keymap {
         if (this.property === null) {
             return false;
         }
-        const { step } = ArrowOptions.PROPERTIES[this.property];
         const current = this.ui.arrow_options.value(this.ui, this.property)
             ?? ArrowOptions.PROPERTIES[this.property].default;
-        const value = (Array.isArray(current) ? current[this.thumb] : current) + step * delta;
+        const value = ArrowOptions.stepped(this.property,
+            Array.isArray(current) ? current[this.thumb] : current, delta);
         this.set_property(this.property, value);
         this.render();
         return true;
@@ -1060,7 +1071,9 @@ class Keymap {
         ui.colour_picker.close();
         this.active = false;
         this.count = "";
+        const left = this.layer;
         this.layer = null;
+        left?.left();
     }
 
     /// Enter `layer`, leaving whatever else had the keys.
@@ -1075,6 +1088,7 @@ class Keymap {
     leave_layer(layer) {
         if (this.layer === layer) {
             this.layer = null;
+            layer.left();
         }
         this.render();
     }
@@ -1231,8 +1245,9 @@ Keymap.HELP_ELSEWHERE = {
 
 /// The command layer's bindings, as listed while it is active: `[title, [name, description, needs,
 /// value]]`, where `name` names a binding (see `Bindings`) or one of `Keymap.FIXED_KEYS`, `needs` is
-/// `"edge"` or `"selection"` for bindings that only apply to those, and `value` names the state the
-/// binding changes, to show alongside it (see `update_which_key`).
+/// `"edge"`, `"selection"`, or `"frame"` (or several, space-separated) for bindings that only apply
+/// to those, and `value` names the state the binding changes, to show alongside it (see
+/// `update_which_key`). Bindings needing a frame are hidden without one; the others are dimmed.
 Keymap.WHICH_KEY = [
     ["Arrow", [
         ["tail", "tail", "edge", "style:tail"],
@@ -1252,7 +1267,7 @@ Keymap.WHICH_KEY = [
     ["Sliders (-0-9 RET)", [
         ["level", "level", "edge", "slider:level"],
         ["curve", "curve (loops: radius, routes: rounding)", "edge", "slider:curve"],
-        ["offset", "offset", "edge", "slider:offset"],
+        ["offset", "offset (loops: angle)", "edge", "slider:offset"],
         ["length", "length (again: end)", "edge", "slider:length"],
     ]],
     // A preset needs no selection: with none, it sets the preset new arrows take, and the list
@@ -1271,6 +1286,7 @@ Keymap.WHICH_KEY = [
     ]],
     ["Grid", [
         ["insert", "insert a row or column (arrows)"],
+        ["differential", "differential d_r of the page", "frame selection"],
     ]],
     ["Select", [
         ["toggle-selection", "select or deselect, by code"],
@@ -1287,6 +1303,7 @@ Keymap.WHICH_KEY = [
     ["View", [
         ["find", "search"],
         ["centre-view", "centre"],
+        ["go-home", "home: the first object"],
         ["hide-grid", "grid"],
         ["command-line", "command line"],
         ["hide-list", "hide this list"],

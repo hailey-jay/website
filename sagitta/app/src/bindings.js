@@ -266,6 +266,8 @@ Bindings.DEFAULTS = {
     "flip-ver": [],
     "rotate": [],
     "centre-view": ["; z"],
+    // The focus point to the diagram's first object, and the view to it.
+    "go-home": ["; g"],
     "zoom-out": ["C--"],
     "zoom-in": ["C-="],
     "reset-zoom": ["C-0"],
@@ -284,8 +286,8 @@ Bindings.DEFAULTS = {
     "paste": ["C-v"],
 
     // The selected arrows' numeric properties, then the components whose styles to list. `curve`
-    // sets a loop's radius instead when only loops are selected, so `radius` needs no key of its
-    // own. In the layer, capitals act on the label.
+    // and `offset` set a loop's radius and angle instead when only loops are selected, so `radius`
+    // and `angle` need no keys of their own. In the layer, capitals act on the label.
     "level": ["; n"],
     "curve": ["; b"],
     "offset": ["; o"],
@@ -307,6 +309,9 @@ Bindings.DEFAULTS = {
 
     // A gap for a row or a column at the focus point, chosen from a list as the styles are.
     "insert": ["; i"],
+    // The differential of a spectral sequence's page from the selected entries (see
+    // `SpectralSequence.differential`).
+    "differential": ["; D"],
 
     // Presets (see `Commands.PRESETS`).
     "plain": ["; !"],
