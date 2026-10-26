@@ -21,7 +21,17 @@
   };
 
   function notifyChange() {
+    syncThemeColor();
     changeListeners.forEach(function (cb) { cb(effective()); });
+  }
+
+  // Both theme-color tags (one per OS scheme) take the current paper, so a
+  // hand-picked theme wins over the OS's.
+  function syncThemeColor() {
+    const paper = getComputedStyle(root).getPropertyValue('--paper').trim();
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+      m.setAttribute('content', paper);
+    });
   }
 
   if (window.matchMedia) {
@@ -42,6 +52,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     updateBtn();
+    syncThemeColor();
     const btn = document.querySelector('.theme-toggle');
     if (!btn) return;
     btn.addEventListener('click', function () {
@@ -383,6 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const a = document.createElement('a');
     a.className = 'blog-carousel-item';
     a.href = '#blog-' + entry.slug;
+    if (entry.colour) a.style.setProperty('--post', entry.colour);
 
     const img = document.createElement('img');
     img.src = entry.thumb;

@@ -81,6 +81,7 @@
     --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
     --lh: 1.7;
     --body-weight: 400;
+    --photo-shadow: rgba(0, 0, 0, .28);
     /* Section accents. Text colours, so each clears
        4.5:1 against --paper; the dark values clear it against dark paper. */
     --accent-cv: #2c6e74;      /* teal */
@@ -102,6 +103,7 @@
     --paper: #171421;
     --rule: #3a332b;
     --body-weight: 500;
+    --photo-shadow: rgba(0, 0, 0, .7);
     --accent-cv: #7fc6cb;
     --accent-papers: #a9adf2;
     --accent-blog: #e3a95e;
@@ -119,6 +121,7 @@
         --paper: #171421;
         --rule: #3a332b;
         --body-weight: 500;
+        --photo-shadow: rgba(0, 0, 0, .7);
         --accent-cv: #7fc6cb;
         --accent-papers: #a9adf2;
         --accent-blog: #e3a95e;
@@ -406,6 +409,11 @@ hr {
     text-underline-offset: 2px;
 }
 
+.about-meta a:hover,
+.about-meta a:focus {
+    color: var(--pink-strong);
+}
+
 /* Sidebar nav */
 .sidenav {
     list-style: none;
@@ -622,9 +630,10 @@ kbd {
     border: 1px solid var(--rule);
 }
 
+/* Each item carries its post's --post, set by main.js */
 .blog-carousel-item:hover img,
 .blog-carousel-item:focus img {
-    border-color: var(--pink);
+    border-color: var(--post, var(--pink));
 }
 
 .blog-carousel-caption {
@@ -658,6 +667,11 @@ kbd {
 
 .cv-head a {
     color: inherit;
+}
+
+.cv-head a:hover,
+.cv-head a:focus {
+    color: var(--pink-strong);
 }
 
 .cv-sep {
@@ -754,10 +768,6 @@ kbd {
     font-size: .9rem;
 }
 
-.paper-links li {
-    display: inline;
-}
-
 /* Paper links as small swatches in each site's colours, like the sidebar's.
    papers.html comes from the CV repo, so they are told apart by href. */
 .paper-links {
@@ -847,6 +857,13 @@ kbd {
 .course {
     margin-bottom: 1.6rem;
     max-width: 62ch;
+}
+
+/* The Colophon's subheadings, at the course headings' size */
+#colophon h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1.8rem 0 .4rem;
 }
 
 .course h2 {
@@ -1029,7 +1046,7 @@ footer a {
        block offset behind it like a print slightly out of register. The
        shadow is listed first so it falls across the block too. The figure's
        margin leaves room for both. */
-    box-shadow: 0 3px 10px rgba(0, 0, 0, .28), 7px 7px 0 var(--pink);
+    box-shadow: 0 3px 10px var(--photo-shadow), 7px 7px 0 var(--pink);
 }
 
 .about-photo figcaption {
@@ -1126,9 +1143,6 @@ footer a {
 .thumb:hover img,
 .thumb:focus img {
     border-color: var(--post, var(--accent));
-}
-
-.thumb:focus {
 }
 
 /* ── Lightbox overlay ───────────────────────────────────────── */
@@ -1288,9 +1302,6 @@ footer a {
 .blog-entry-link:focus .blog-entry-thumb {
     border-color: var(--post, var(--accent));
     box-shadow: 0 0 0 1px var(--post, var(--accent));
-}
-
-.blog-entry-link:focus {
 }
 
 .blog-entry-title {
@@ -1563,16 +1574,16 @@ footer a {
     image-rendering: pixelated;
 }
 
-/* My own button, under Personal, at double size like the friends' buttons,
-   and the code to link to it */
+/* My own button, at the friends' buttons' size, and the code to link to it */
 .my-button {
     margin: .55rem 0 .3rem;
 }
 
 .my-button img {
     display: block;
-    width: 176px;
-    height: 62px;
+    width: calc((100% - 5px) / 2);   /* one cell of .friend-buttons */
+    height: auto;
+    aspect-ratio: 88 / 31;
     image-rendering: pixelated;
 }
 

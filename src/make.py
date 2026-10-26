@@ -214,12 +214,12 @@ def parse_blog(raw, raw_entries):
 
 def carousel_images(posts):
     """Every blog image, in post order, for the homepage carousel."""
-    return [{**image, "slug": post.slug, "title": post.title}
+    return [{**image, "slug": post.slug, "title": post.title, "colour": post.colour}
             for post in posts for image in post.images]
 
 # ── Parse about ──────────────────────────────────────────────
 # Everything the page says lives in src/data/about.txt: the identity
-# fields, the labelled meta pairs, the bio prose, and the Lately note.
+# fields, the meta lines under the name, the bio prose, and the Lately note.
 # The partial is left holding only the shape.
 def parse_about(raw, blog_images):
     parts    = split_sections(raw)
