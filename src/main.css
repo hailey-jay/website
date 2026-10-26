@@ -81,6 +81,12 @@
     --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
     --lh: 1.7;
     --body-weight: 400;
+    /* Section accents. Text colours, so each clears
+       4.5:1 against --paper; the dark values clear it against dark paper. */
+    --accent-cv: #2c6e74;      /* teal */
+    --accent-papers: #4a4fa0;  /* indigo */
+    --accent-blog: #8f5510;    /* ochre */
+    --accent-comics: #85407f;  /* plum */
 }
 
 /* Dark palette. Applied when the user's OS prefers dark (and they haven't
@@ -96,6 +102,10 @@
     --paper: #171421;
     --rule: #3a332b;
     --body-weight: 500;
+    --accent-cv: #7fc6cb;
+    --accent-papers: #a9adf2;
+    --accent-blog: #e3a95e;
+    --accent-comics: #e09bd9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -109,6 +119,10 @@
         --paper: #171421;
         --rule: #3a332b;
         --body-weight: 500;
+        --accent-cv: #7fc6cb;
+        --accent-papers: #a9adf2;
+        --accent-blog: #e3a95e;
+        --accent-comics: #e09bd9;
     }
 }
 
@@ -121,6 +135,51 @@
     outline: 2px solid var(--focus);
     outline-offset: 2px;
     border-radius: 1px;
+}
+
+/* ── Accents ────────────────────────────────────────────────── */
+/* Selected text, native controls, scrollbars, and list bullets take the pink
+   too, so none of them fall back to the browser's blue or black. */
+::selection {
+    background: rgba(var(--pink-rgb), .45);
+    color: var(--ink);
+}
+
+html {
+    accent-color: var(--pink-strong);
+    scrollbar-color: var(--pink) transparent;
+}
+
+li::marker,
+summary::marker {
+    color: var(--accent);
+}
+
+/* Each section has its own accent, used by its header rules, its dates,
+   its list bullets, and its link in the main nav. About and Teaching
+   keep the pink; links stay pink everywhere. */
+:root, section {
+    --accent: var(--pink-strong);
+}
+
+#cv,     .mainnav a[href="#cv"]     { --accent: var(--accent-cv); }
+#papers, .mainnav a[href="#papers"] { --accent: var(--accent-papers); }
+/* On a post, the Blog header rule and nav link take the post's own colour:
+   main.js copies its --post onto <html>. */
+#blog,   .mainnav a[href="#blog"]   { --accent: var(--post, var(--accent-blog)); }
+#comics, .mainnav a[href="#comics"] { --accent: var(--accent-comics); }
+
+/* The same accent on <html>, for what sits outside the sections: the theme
+   toggle, the lightbox, and the backdrop, which main.js tints from it. */
+:root:has(#cv.active)     { --accent: var(--accent-cv); }
+:root:has(#papers.active) { --accent: var(--accent-papers); }
+:root:has(#blog.active)   { --accent: var(--post, var(--accent-blog)); }
+:root:has(#comics.active) { --accent: var(--accent-comics); }
+
+/* A curved four-point star, drawn as a mask so it takes the text's colour.
+   The main nav uses it to mark the current section. */
+:root {
+    --sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z'/%3E%3C/svg%3E");
 }
 
 /* ── Skip link ──────────────────────────────────────────────── */
@@ -266,8 +325,8 @@ hr {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: var(--pink);
-    color: var(--ink);
+    background: var(--accent);
+    color: var(--paper);
     font-size: .78rem;
     line-height: 1;
     transition: transform .2s;
@@ -389,7 +448,7 @@ section.active {
     align-items: baseline;
     gap: .7em;
     margin-bottom: 1.4rem;
-    border-bottom: 1px solid var(--pink);
+    border-bottom: 1px solid var(--accent);
     padding-bottom: .5rem;
 }
 
@@ -413,7 +472,7 @@ section.active {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: var(--muted);
+    color: var(--ink);
     margin-bottom: .5rem;
 }
 
@@ -487,7 +546,7 @@ kbd {
     font-size: .78rem;
     text-transform: uppercase;
     letter-spacing: .1em;
-    color: var(--muted);
+    color: var(--ink);
     margin-bottom: .3em;
     font-weight: 500;
 }
@@ -552,9 +611,9 @@ kbd {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: var(--muted);
+    color: var(--ink);
     margin-bottom: .6rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--accent);
     padding-bottom: .3rem;
 }
 
@@ -568,7 +627,7 @@ kbd {
 }
 
 .cv-entry .year {
-    color: var(--muted);
+    color: var(--accent);
     font-style: italic;
     white-space: nowrap;
     font-size: .9rem;
@@ -630,10 +689,41 @@ kbd {
     display: inline;
 }
 
-.paper-links li + li::before {
-    content: " · ";
-    color: var(--muted);
+/* Paper links as small swatches in each site's colours, like the sidebar's.
+   papers.html comes from the CV repo, so they are told apart by href. */
+.paper-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
 }
+
+.paper-links a,
+.paper-links .paper-bibtex {
+    --c: var(--rule);
+    --on: var(--ink);
+    display: inline-block;
+    padding: .05em .55em;
+    border-radius: 3px;
+    background: var(--c);
+    color: var(--on);
+    font-size: .85rem;
+    line-height: 1.55;
+    text-decoration: none;
+}
+
+.paper-links a:hover,
+.paper-links a:focus,
+.paper-links .paper-bibtex:hover,
+.paper-links .paper-bibtex:focus {
+    color: var(--on);
+    filter: brightness(1.1);
+}
+
+.paper-links a[href*="arxiv.org/abs"] { --c: #b31b1b; --on: #fff; }   /* arXiv red */
+.paper-links a[href*="arxiv.org/pdf"] { --c: #5c5c5c; --on: #fff; }
+.paper-links a[href*="doi.org"]       { --c: #fcb426; --on: #2a1d00; }   /* DOI yellow */
+.paper-links a[href*="github.com"]    { --c: #24292f; --on: #fff; }
 
 /* Styled as a link so it sits in the arXiv · PDF · DOI row unnoticed.
    .code-toggle is the same thing for the sidebar's button code. */
@@ -711,7 +801,7 @@ kbd {
     text-transform: uppercase;
     letter-spacing: .09em;
     font-weight: 600;
-    color: var(--muted);
+    color: var(--ink);
     margin-top: 1.2rem;
     margin-bottom: .3rem;
 }
@@ -749,6 +839,48 @@ kbd {
 .gallery-title {
     font-size: .88rem;
     color: var(--muted);
+}
+
+/* Comics as prints taped to a wall: each card tilts a little, a different
+   way by position, under a strip of translucent tape, and straightens on
+   hover. Comics only; blog galleries share these cards and stay square. */
+#comics .gallery-card {
+    position: relative;
+    background: var(--paper);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+    rotate: -1.2deg;
+    transition: rotate .2s;
+}
+
+#comics .gallery-card:nth-child(3n + 2) { rotate: .9deg; }
+#comics .gallery-card:nth-child(3n + 3) { rotate: -.5deg; }
+#comics .gallery-card:nth-child(4n + 1) { rotate: 1.4deg; }
+
+#comics .gallery-card:hover,
+#comics .gallery-card:focus-within {
+    rotate: 0deg;
+}
+
+#comics .gallery-card::before {
+    content: "";
+    position: absolute;
+    top: -.55rem;
+    left: 50%;
+    width: 4.5rem;
+    height: 1.1rem;
+    translate: -50% 0;
+    rotate: -3deg;
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    z-index: 1;
+}
+
+#comics .gallery-card:nth-child(2n)::before {
+    rotate: 4deg;
+    background: rgba(var(--pink-rgb), .55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #comics .gallery-card { transition: none; }
 }
 
 /* A single image set inline in a post, via [image ...] */
@@ -824,13 +956,18 @@ footer a {
     height: 185px;
     object-fit: cover;
     border: 1px solid var(--rule);
+    /* A soft drop shadow, so the photo sits above the page, over a pink
+       block offset behind it like a print slightly out of register. The
+       shadow is listed first so it falls across the block too. The figure's
+       margin leaves room for both. */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .28), 7px 7px 0 var(--pink);
 }
 
 .about-photo figcaption {
     font-size: .78rem;
     color: var(--muted);
     font-style: italic;
-    margin-top: .35rem;
+    margin-top: .7rem;
     line-height: 1.4;
 }
 
@@ -842,7 +979,7 @@ footer a {
     }
 
     .about-photo img {
-        width: 100%;
+        width: calc(100% - 7px);   /* room for the offset block */
         height: auto;
         aspect-ratio: 4/5;
     }
@@ -919,7 +1056,7 @@ footer a {
 
 .thumb:hover img,
 .thumb:focus img {
-    border-color: var(--pink);
+    border-color: var(--post, var(--accent));
 }
 
 .thumb:focus {
@@ -931,7 +1068,8 @@ footer a {
     position: fixed;
     inset: 0;
     z-index: 200;
-    background: rgba(44, 37, 32, .88);
+    /* The usual dark ink, with a fifth of the section's accent mixed in. */
+    background: color-mix(in srgb, var(--accent) 20%, rgba(44, 37, 32, .9));
     align-items: center;
     justify-content: center;
 }
@@ -1036,6 +1174,9 @@ footer a {
 
 
 /* ── Blog index ─────────────────────────────────────────────── */
+/* Blog colours all come from the post: its --post, else the Blog accent.
+   Dates mix 30% ink into it, which keeps every post colour above 4.5:1 as
+   text in both themes. */
 .blog-list {
     max-width: 62ch;
 }
@@ -1074,6 +1215,12 @@ footer a {
     color: var(--pink-strong);
 }
 
+.blog-entry-link:hover .blog-entry-thumb,
+.blog-entry-link:focus .blog-entry-thumb {
+    border-color: var(--post, var(--accent));
+    box-shadow: 0 0 0 1px var(--post, var(--accent));
+}
+
 .blog-entry-link:focus {
 }
 
@@ -1083,7 +1230,7 @@ footer a {
     font-size: 1rem;
     font-weight: 500;
     text-decoration: underline;
-    text-decoration-color: var(--pink);
+    text-decoration-color: var(--post, var(--accent));
     text-underline-offset: 3px;
     transition: color .15s;
 }
@@ -1093,7 +1240,7 @@ footer a {
     grid-row: 1;
     font-style: italic;
     font-size: .88rem;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--post, var(--accent)) 70%, var(--ink));
     white-space: nowrap;
     padding-top: .1em;
 }
@@ -1131,7 +1278,7 @@ footer a {
 .blog-post-header {
     margin-bottom: 1.6rem;
     padding-bottom: .6rem;
-    border-bottom: 1px solid var(--pink);
+    border-bottom: 2px solid var(--post, var(--accent));
 }
 
 .blog-post-title {
@@ -1144,7 +1291,7 @@ footer a {
 .blog-post-date {
     font-size: .88rem;
     font-style: italic;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--post, var(--accent)) 70%, var(--ink));
     margin: 0;
 }
 
@@ -1326,6 +1473,7 @@ footer a {
 }
 
 .sw-sagitta { --c: #1d1a2b; --on: #f8a7b6; }
+.sw-arithmat { --c: #7f9c74; --on: #142010; }   /* sage green, for a Sage package */
 .sw-lsu { --c: #461d7c; --on: #fdd023; }
 .sw-teaching { --c: #ad4a66; --on: #fff; }   /* the site's --pink-strong, under the pink rose */
 .sw-seminar { --c: #fdd023; --on: #461d7c; }   /* LSU gold; the logo is K5 */
@@ -1335,20 +1483,42 @@ footer a {
 .sw-github { --c: #24292f; --on: #fff; }
 .sw-rss { --c: #f26522; --on: #2a1203; }   /* white on this orange is under 4.5:1 */
 
-/* Friends' own 88x31 buttons, at double size, one per row */
+/* Friends' own 88x31 buttons, two to a row, together as wide as the
+   swatches above. They scale a little past 1x, so pixelated keeps them crisp. */
 .friend-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
     margin: .55rem 0 .3rem;
 }
 
 .friend-buttons img {
     display: block;
-    width: 176px;
-    height: 62px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 88 / 31;
     image-rendering: pixelated;
+}
+
+/* A button for a friend without one, in the same 88x31 cell, in their site's
+   own colours and font: lightseagreen and lightblue, Verdana, black rules. */
+.friend-faux {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 88 / 31;
+    border: 1px solid #000;
+    box-shadow: inset 0 0 0 2px lightblue;
+    background: lightseagreen;
+    color: #000;
+    font: bold 11px/1 verdana, arial, helvetica, sans-serif;
+    text-decoration: none;
+}
+
+.friend-faux:hover,
+.friend-faux:focus {
+    color: #000;
+    filter: brightness(1.08);
 }
 
 /* My own button, under Personal, at double size like the friends' buttons,
@@ -1389,10 +1559,10 @@ footer a {
 }
 
 .mainnav a[aria-current="page"] {
-    color: var(--pink-strong);
+    color: var(--accent);
 }
 
-/* A curved four-point star, drawn as a mask so it takes the link's colour */
+/* The sparkle (--sparkle, on :root) in the link's colour */
 .mainnav a[aria-current="page"]::before {
     content: "";
     position: absolute;
@@ -1404,5 +1574,4 @@ footer a {
     background: currentColor;
     -webkit-mask: var(--sparkle) center / contain no-repeat;
     mask: var(--sparkle) center / contain no-repeat;
-    --sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z'/%3E%3C/svg%3E");
 }

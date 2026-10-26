@@ -25,6 +25,9 @@ teaser: Public transit? What's that?
 <p>Hey yall!</p>
 ```
 
+An optional `colour: #rrggbb` line gives the post its own colour: its rules, its date, its underline and date in the blog list, and the backdrop while it is open.
+Without one, the post takes the Blog section's ochre.
+
 A post body can use a gallery block instead of hand-written card markup:
 
 ```

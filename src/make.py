@@ -68,6 +68,9 @@ def parse_comics(raw, template):
 # newest-first order; an underscore prefix marks a draft (skipped).
 # Image directives in a body are expanded by common.expand_directives, with
 # bare stems resolving to images/blog/<slug>/.
+# An optional `colour: #rrggbb` line gives the post its own colour (as --post,
+# see main.css); without one it takes the Blog accent. Dates use it mixed 30%
+# toward the ink, so any mid-tone stays readable as text in both themes.
 
 # ── Feed rendering ───────────────────────────────────────────
 # The page markup is wrong for a feed twice over: it wraps every image
@@ -104,6 +107,8 @@ def build_feed_body(body, slug):
         return build_image(m.group("row"), base, FEED_FIGURE, throwaway)
 
     return absolutize(DIRECTIVE_RE.sub(expand, body))
+
+COLOUR_RE = re.compile(r"#[0-9a-fA-F]{6}")
 
 POST_NAME_RE = re.compile(r"^(?P<isodate>\d{4}-\d{2}-\d{2})-(?P<slug>.+)$")
 
@@ -144,6 +149,11 @@ class Post:
     body:      str
     feed_body: str = ""
     images:    list = field(default_factory=list)
+    colour:    str = ""
+
+    @property
+    def style(self):
+        return f' style="--post: {self.colour}"' if self.colour else ""
 
     @property
     def date(self):
@@ -170,7 +180,10 @@ def parse_blog(raw, raw_entries):
             title   = meta["title"],
             teaser  = meta["teaser"],
             body    = "",
+            colour  = meta.get("colour", ""),
         )
+        need(not post.colour or COLOUR_RE.fullmatch(post.colour),
+             f"Post {slug}: colour must be #rrggbb, not {post.colour!r}")
 
         # Images are collected as the directives expand, in source order.
         post.body = expand_directives(body, f"images/blog/{slug}", post.images)
@@ -189,11 +202,12 @@ def parse_blog(raw, raw_entries):
 
     entries = repeat(entry_template, [
         {"slug": p.slug, "date": p.date, "title": p.title,
-         "teaser": p.teaser, "thumb": thumb_for_post(p)}
+         "teaser": p.teaser, "thumb": thumb_for_post(p), "style": p.style}
         for p in posts
     ])
     sections = repeat(post_template, [
-        {"slug": p.slug, "title": p.title, "date": p.date, "body": p.body}
+        {"slug": p.slug, "title": p.title, "date": p.date, "body": p.body,
+         "style": p.style}
         for p in posts
     ])
     return render(parts[""], entries=entries, posts=sections), posts

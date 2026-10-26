@@ -105,16 +105,13 @@ const subAnchors = {
 };
 
 // ── Navigation ───────────────────────────────────────────────
-// Fires `sectionchange` on document when the visible section changes (not on
-// the first one shown, and not between a blog post and the blog index).
+// Fires `accentchange` on document when the accent colour changes; see navigate.
 let currentSection = null;
+let accentKey = null;
 
 function showSection(id) {
   let parentId = subAnchors[id] || id;
   if (!sections.includes(parentId)) parentId = 'about';
-  if (currentSection && currentSection !== parentId) {
-    document.dispatchEvent(new CustomEvent('sectionchange', { detail: parentId }));
-  }
   currentSection = parentId;
   sections.forEach(function (s) {
     document.getElementById(s).classList.toggle('active', s === parentId);
@@ -139,6 +136,22 @@ function navigate(hash, push) {
     } else {
       history.replaceState(null, '', '#' + hash);
     }
+  }
+
+  // A post's own colour (--post, set inline by the build) tints the whole
+  // Blog section while it is open; see #blog in main.css.
+  const post = subAnchors[hash] === 'blog' && document.getElementById(hash);
+  const postColour = post ? post.style.getPropertyValue('--post') : '';
+  if (postColour) document.documentElement.style.setProperty('--post', postColour);
+  else document.documentElement.style.removeProperty('--post');
+
+  // Fires `accentchange` when the page's accent colour changes: a new section,
+  // or a post with a colour of its own. `first` marks the initial navigation.
+  const key = currentSection + postColour;
+  if (key !== accentKey) {
+    const first = accentKey === null;
+    accentKey = key;
+    document.dispatchEvent(new CustomEvent('accentchange', { detail: { first: first } }));
   }
 
   if (subAnchors[hash] === 'blog') {
@@ -482,8 +495,10 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
 // ── Backdrop arrangement ─────────────────────────────────────
 // Random lines across the window behind the page; each region they cut out
 // gets a tint, chosen by hashing which side of every line it is on, plus a
-// little grain. A new arrangement on every load and, fading in, on every
-// change of section (not under reduced motion). Redrawn on a theme switch.
+// little grain. The tints come from the page's accent, so they follow the
+// section and a blog post's own colour. A new arrangement on every load and,
+// fading in, on every change of accent (under reduced motion, only recoloured).
+// Redrawn on a theme switch.
 // Decoration only: no hover, no clicks.
 (function () {
   const first = document.querySelector('canvas.backdrop');
@@ -517,16 +532,22 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   const mix = function (p, q, t) { return p.map(function (v, i) { return Math.round(v + (q[i] - v) * t); }); };
   const hex = function (c) { return '#' + c.map(function (v) { return v.toString(16).padStart(2, '0'); }).join(''); };
 
-  // Tints are the paper mixed with pink, rule, and two soft accents. The
-  // line is --arr-line in main.css: muted, 55% of the way from the paper.
+  // Tints are the paper mixed with the accent (--accent on <html>, which
+  // main.css sets per section), the rule, and a little pink. The accents are
+  // text colours, dark on light paper, so there they are mixed in more
+  // lightly than on dark paper, where they are pale. The line is --arr-line
+  // in main.css: muted, 55% of the way from the paper.
   let tints, line;
   function colours() {
     const cs = getComputedStyle(document.documentElement);
     const paper = rgb(cs.getPropertyValue('--paper'));
+    const accent = rgb(cs.getPropertyValue('--accent'));
     const pink = rgb(cs.getPropertyValue('--pink'));
     const rule = rgb(cs.getPropertyValue('--rule'));
-    tints = [mix(paper, pink, .12), mix(paper, pink, .26), mix(paper, pink, .42),
-             mix(paper, rule, .6), mix(paper, rgb('#b9a7e6'), .28), mix(paper, rgb('#a9cf9f'), .25)];
+    const dark = paper[0] + paper[1] + paper[2] < 384;
+    const k = dark ? [.12, .26, .42] : [.07, .15, .25];
+    tints = [mix(paper, accent, k[0]), mix(paper, accent, k[1]), mix(paper, accent, k[2]),
+             mix(paper, rule, .6), mix(paper, pink, .2), mix(paper, accent, k[1])];
     line = hex(mix(paper, rgb(cs.getPropertyValue('--muted')), .55));
   }
 
@@ -597,8 +618,9 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   if (window.haileyjayTheme) window.haileyjayTheme.onChange(function () { colours(); paint(front); });
 
   const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-  document.addEventListener('sectionchange', function () {
-    if (still && still.matches) return;
+  document.addEventListener('accentchange', function (e) {
+    colours();
+    if (e.detail.first || (still && still.matches)) { paint(front); return; }
     roll(); measure();
     // The hidden canvas goes on top at opacity 0, then fades in.
     back.style.transition = 'none';
