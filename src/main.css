@@ -150,7 +150,7 @@
 
 html {
     accent-color: var(--pink-strong);
-    scrollbar-color: var(--pink) transparent;
+    scrollbar-color: var(--focus) transparent;   /* --focus clears 3:1 */
 }
 
 li::marker,
@@ -1250,7 +1250,7 @@ footer a {
     left: 0;
     font-family: var(--serif);
     font-size: .82rem;
-    color: rgba(249, 246, 241, .4);
+    color: rgba(249, 246, 241, .7);   /* about 7:1 on the overlay */
     font-style: italic;
     letter-spacing: .03em;
 }

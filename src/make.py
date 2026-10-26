@@ -231,7 +231,7 @@ def parse_about(raw, blog_images):
     # is its own block, so main.css can space the lines apart while a line
     # that wraps on a phone stays tight. Each • is wrapped to colour it.
     meta = "\n".join('<span class="about-line">'
-                     + line.replace("•", '<span class="about-sep">•</span>')
+                     + line.replace("•", '<span class="about-sep" aria-hidden="true">•</span>')
                      + "</span>"
                      for line in rows_of(data["META"]))
 
