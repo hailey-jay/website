@@ -349,15 +349,10 @@ hr {
     display: block;
 }
 
-.sidebar-name, .about-name {
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: .01em;
-    margin-bottom: .15em;
-}
-
 .about-name {
     font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .01em;
     margin-bottom: .5em;   /* the name heads the lines below */
 }
 
@@ -468,6 +463,33 @@ section.active {
     font-size: 1.5rem;
     font-weight: 500;
     letter-spacing: .01em;
+}
+
+/* A link beside a page title (the CV's PDF, the Blog's RSS) as a badge in
+   the section's colour, like the paper links. On the blog the colour can be
+   a post's mid-tone, so it is pulled 30% toward the ink to keep the text on
+   it above 4.5:1; the section accents already clear that unmixed. */
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3em;
+    padding: .05em .55em;
+    border-radius: 3px;
+    background: var(--accent);
+    color: var(--paper);
+    font-size: .85rem;
+    line-height: 1.55;
+    text-decoration: none;
+}
+
+#blog .header-badge {
+    background: color-mix(in srgb, var(--accent) 70%, var(--ink));
+}
+
+.header-badge:hover,
+.header-badge:focus {
+    color: var(--paper);
+    filter: brightness(1.1);
 }
 
 /* ── Section furniture ──────────────────────────────────────── */
@@ -614,23 +636,39 @@ kbd {
 }
 
 /* ── CV section ─────────────────────────────────────────────── */
-/* The CV's PDF link, beside the page title, as a badge in the CV's teal like
-   the paper links. The CV repo's build.py writes it into the header. */
-.cv-pdf {
-    display: inline-block;
-    padding: .05em .55em;
-    border-radius: 3px;
-    background: var(--accent);
-    color: var(--paper);
-    font-size: .85rem;
-    line-height: 1.55;
-    text-decoration: none;
+/* The CV's opening block, as on the PDF: name, affiliation, contact links,
+   and the last-updated date. The CV repo's build.py writes it. */
+.cv-head {
+    margin-bottom: 1.8rem;
+    font-size: .9rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--ink) 50%, var(--muted));
 }
 
-.cv-pdf:hover,
-.cv-pdf:focus {
-    color: var(--paper);
-    filter: brightness(1.1);
+.cv-head p {
+    margin: 0 0 .3em;
+}
+
+.cv-head .cv-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: .4em;
+}
+
+.cv-head a {
+    color: inherit;
+}
+
+.cv-sep {
+    margin: 0 .2em;
+    color: var(--pink-strong);
+}
+
+.cv-head .cv-updated {
+    margin-top: .6em;
+    color: var(--muted);
+    font-style: italic;
 }
 
 .cv-block {
@@ -1334,13 +1372,7 @@ footer a {
     margin-bottom: 0;
 }
 
-/* ── RSS link ─────────────────────────────────────────────── */
-.rss-link {
-    display: inline-flex;
-    align-items: center;
-    gap: .3em;
-}
-
+/* ── RSS icon ─────────────────────────────────────────────── */
 .rss-icon {
     width: .95em;
     height: .95em;
