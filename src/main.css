@@ -358,6 +358,7 @@ hr {
 
 .about-name {
     font-size: 1rem;
+    margin-bottom: .5em;   /* the name heads the lines below */
 }
 
 .about-pronoun {
@@ -367,10 +368,12 @@ hr {
     font-weight: 400;
 }
 
+/* Halfway between ink and muted: 9:1 on light paper and 11:1 on dark, a
+   clear step down from the name without going faint. */
 .about-meta {
-    font-size: .95rem;
+    font-size: .9rem;
     line-height: 1.45;
-    color: var(--ink);
+    color: color-mix(in srgb, var(--ink) 50%, var(--muted));
     margin-bottom: 1.4rem;
 }
 
