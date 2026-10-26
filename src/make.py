@@ -227,10 +227,10 @@ def parse_about(raw, blog_images):
     identity = parse_kv(data[""], "about",
                         ("name", "pronouns", "splash", "photo_alt", "photo_caption"))
 
-    meta = repeat(parts["META_ROW"], [
-        {"label": label, "value": value}
-        for label, value in (parse_fields(row, 2) for row in rows_of(data["META"]))
-    ], sep="\n")
+    # One printed line per META line: position, then contact. Each • is
+    # wrapped so main.css can colour it.
+    meta = "<br>\n".join(line.replace("•", '<span class="about-sep">•</span>')
+                         for line in rows_of(data["META"]))
 
     return render(parts[""], **identity,
         meta             = indent(meta, "    "),

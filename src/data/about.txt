@@ -6,11 +6,8 @@ photo_caption: Me in December&nbsp;’24.
 
 ---META---
 
-Position | Graduate Assistant, LSU
-Advisors | <a href="https://www.math.lsu.edu/~bibby/">Christin Bibby</a> and Galen Dorpalen-Barry
-Email    | <a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a>
-Office   | 363 Lockett Hall
-CV       | <a href="#cv">Web</a> · <a href="files/cv.pdf">PDF</a>
+Graduate Assistant at LSU. Advisors: <a href="https://www.math.lsu.edu/~bibby/">Christin Bibby</a> and Galen Dorpalen-Barry.
+<a href="mailto:jgarc86@lsu.edu">jgarc86@lsu.edu</a> • 363 Lockett Hall • CV: <a href="#cv">Web</a> · <a href="files/cv.pdf">PDF</a>
 
 ---BIO---
 

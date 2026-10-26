@@ -374,22 +374,23 @@ hr {
     margin-bottom: 1.4rem;
 }
 
+.about-sep {
+    margin: 0 .2em;
+    color: var(--pink-strong);
+}
+
 /* Labels in true small caps (see 'EB Garamond SC' above), not tracked
    uppercase. Sized up because small caps stand about x-height tall. */
-.sidebar-meta, .about-meta strong {
+.sidebar-meta {
     display: block;
     color: var(--ink);
     font-family: 'EB Garamond SC', var(--serif);
-    font-weight: 500;
+    font-weight: 600;
     font-size: 1.1rem;
     font-variant-caps: all-small-caps;
     letter-spacing: .05em;
     margin-top: .6em;
     margin-bottom: .1em;
-}
-
-.sidebar-meta {
-    font-weight: 600;
 }
 
 .about-meta a {

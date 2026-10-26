@@ -7,7 +7,7 @@ Built with a small Python script.
 + `src/shared.html`: sub-templates used by more than one section (the gallery card, the grid that holds cards, and the inline figure; the tutorial uses the last two as posts do)
 + `src/sagitta/`: the shell, partials, and stylesheet for the standalone Sagitta pages (see below)
 + `src/data/`: content data, kept separate from markup
-  + `about.txt`: the identity fields, meta pairs, bio, and Lately note
+  + `about.txt`: the identity fields, the meta lines under the name, bio, and Lately note
   + `comics.txt`: one `stem | caption | alt` row per comic
   + `sagitta/landing.txt`: the Sagitta landing page's copy
   + `sagitta/tutorial.html`: the Sagitta walkthrough, front matter then body, like a post
