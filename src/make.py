@@ -227,10 +227,13 @@ def parse_about(raw, blog_images):
     identity = parse_kv(data[""], "about",
                         ("name", "pronouns", "splash", "photo_alt", "photo_caption"))
 
-    # One printed line per META line: position, then contact. Each • is
-    # wrapped so main.css can colour it.
-    meta = "<br>\n".join(line.replace("•", '<span class="about-sep">•</span>')
-                         for line in rows_of(data["META"]))
+    # One printed line per META line: position, advisors, then contact. Each
+    # is its own block, so main.css can space the lines apart while a line
+    # that wraps on a phone stays tight. Each • is wrapped to colour it.
+    meta = "\n".join('<span class="about-line">'
+                     + line.replace("•", '<span class="about-sep">•</span>')
+                     + "</span>"
+                     for line in rows_of(data["META"]))
 
     return render(parts[""], **identity,
         meta             = indent(meta, "    "),
