@@ -1500,27 +1500,6 @@ footer a {
     image-rendering: pixelated;
 }
 
-/* A button for a friend without one, in the same 88x31 cell, in their site's
-   own colours and font: lightseagreen and lightblue, Verdana, black rules. */
-.friend-faux {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 88 / 31;
-    border: 1px solid #000;
-    box-shadow: inset 0 0 0 2px lightblue;
-    background: lightseagreen;
-    color: #000;
-    font: bold 11px/1 verdana, arial, helvetica, sans-serif;
-    text-decoration: none;
-}
-
-.friend-faux:hover,
-.friend-faux:focus {
-    color: #000;
-    filter: brightness(1.08);
-}
-
 /* My own button, under Personal, at double size like the friends' buttons,
    and the code to link to it */
 .my-button {
