@@ -194,9 +194,14 @@ class Pipeline:
         path = self.root / rel
         dims = None
         if HAVE_PILLOW:
+            # Image.open reads only the header; the size and the EXIF
+            # orientation tag are both there, so no pixel data is decoded.
+            # Orientations 5-8 turn the image a quarter, swapping its sides.
             try:
                 with Image.open(path) as im:
-                    dims = ImageOps.exif_transpose(im).size
+                    w, h = im.size
+                    turned = im.getexif().get(0x0112, 1) in (5, 6, 7, 8)
+                dims = (h, w) if turned else (w, h)
             except (OSError, ValueError):
                 dims = None
         else:
