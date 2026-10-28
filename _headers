@@ -1,0 +1,21 @@
+# Browser caching, read by Cloudflare when it serves the repo.
+# None of these filenames carry a content hash, so nothing is marked
+# immutable: a replaced file reaches a returning visitor once the max-age
+# below runs out. Rename a file instead to have it take effect at once.
+# Pages (index.html, the Sagitta pages), the CV PDF, the feed, and the
+# Sagitta editor keep Cloudflare's default, which re-checks on every visit.
+
+# Fonts and KaTeX change only on an upgrade: 30 days.
+/fonts/*
+  Cache-Control: public, max-age=2592000
+
+/katex/*
+  Cache-Control: public, max-age=2592000
+
+# Photos, thumbnails, buttons, logos, wireframe videos, and comics: a week,
+# then a day more of serving the cached copy while a fresh one is fetched.
+/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/comics/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

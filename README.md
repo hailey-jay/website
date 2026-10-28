@@ -68,6 +68,7 @@ They are committed alongside the other built output.
 + `scripts/app.py`: copies the Sagitta editor into `sagitta/app/`, behind `make app`
 + `index.html`, `sagitta/index.html`, `sagitta/tutorial/index.html`, `rss.xml`, `sitemap.xml`, `images/thumbs/`: built output
 + `sagitta/app/`: the Sagitta editor, copied in from its own repo and served as-is
++ `_headers`: how long browsers may cache fonts, KaTeX, images, and comics; Cloudflare reads it when serving the repo
 
 ## The Sagitta pages
 The site proper is one document whose sections are hash fragments, and the sidebar tabs are all facets of me.
