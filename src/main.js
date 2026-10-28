@@ -573,34 +573,54 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
 
   // Regions are filled per CSS pixel, then scaled up to the device's pixels;
   // the lines are stroked at full resolution on top, covering the seams.
-  let W = 0, H = 0, keys = null, noise = null;
+  // The grain and pixel buffer are kept between paints and remade only when
+  // the window changes size.
+  let W = 0, H = 0, noise = null, img = null;
   const off = document.createElement('canvas');
   const octx = off.getContext('2d');
+  const cuts = new Float64Array(LINES + 2);
 
   function measure() {
-    W = Math.max(1, Math.round(innerWidth)); H = Math.max(1, Math.round(innerHeight));
-    keys = new Uint32Array(W * H);
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      let k = 0;
-      for (let i = 0; i < LINES; i++) {
-        const l = lines[i];
-        if (l[0] * x + l[1] * y + l[2] > 0) k |= 1 << i;
-      }
-      keys[y * W + x] = k;
-    }
-    if (!noise || noise.length !== W * H) {
-      noise = new Int8Array(W * H);
-      for (let i = 0; i < noise.length; i++) noise[i] = Math.round((Math.random() * 2 - 1) * GRAIN);
-    }
+    const w = Math.max(1, Math.round(innerWidth)), h = Math.max(1, Math.round(innerHeight));
+    if (w === W && h === H && img) return;
+    W = w; H = h;
+    off.width = W; off.height = H;
+    img = octx.createImageData(W, H);
+    noise = new Int8Array(W * H);
+    for (let i = 0; i < noise.length; i++) noise[i] = Math.round((Math.random() * 2 - 1) * GRAIN);
   }
   const resized = function () { return Math.round(innerWidth) !== W || Math.round(innerHeight) !== H; };
 
+  // Each row is cut into spans where it crosses the lines; a span lies in
+  // one region, so its tint is looked up once rather than per pixel.
   function paint(canvas) {
-    off.width = W; off.height = H;
-    const img = octx.createImageData(W, H), d = img.data;
-    for (let p = 0; p < keys.length; p++) {
-      const c = tints[pick(keys[p])], n = noise[p];
-      d[p * 4] = c[0] + n; d[p * 4 + 1] = c[1] + n; d[p * 4 + 2] = c[2] + n; d[p * 4 + 3] = 255;
+    const d = img.data;
+    for (let y = 0; y < H; y++) {
+      let m = 0;
+      cuts[m++] = 0;
+      for (let i = 0; i < LINES; i++) {
+        const l = lines[i];
+        if (l[0] === 0) continue;
+        const x = Math.ceil(-(l[1] * y + l[2]) / l[0]);
+        if (x > 0 && x < W) cuts[m++] = x;
+      }
+      cuts[m++] = W;
+      const s = cuts.subarray(0, m).sort();
+      for (let j = 0; j + 1 < m; j++) {
+        const x0 = s[j], x1 = s[j + 1];
+        if (x1 <= x0) continue;
+        const xm = (x0 + x1) / 2;
+        let k = 0;
+        for (let i = 0; i < LINES; i++) {
+          const l = lines[i];
+          if (l[0] * xm + l[1] * y + l[2] > 0) k |= 1 << i;
+        }
+        const c = tints[pick(k)], r = c[0], g = c[1], b = c[2];
+        for (let p = y * W + x0, e = y * W + x1, q = p * 4; p < e; p++, q += 4) {
+          const n = noise[p];
+          d[q] = r + n; d[q + 1] = g + n; d[q + 2] = b + n; d[q + 3] = 255;
+        }
+      }
     }
     octx.putImageData(img, 0, 0);
 
@@ -630,9 +650,20 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   if (window.haileyjayTheme) window.haileyjayTheme.onChange(function () { colours(); paint(front); });
 
   const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  // After the first, a redraw waits until the new section has painted, so a
+  // click never waits on the backdrop. Clicks in quick succession share one.
+  let queued = false;
   document.addEventListener('accentchange', function (e) {
+    if (e.detail.first) { colours(); paint(front); return; }
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { setTimeout(redraw, 0); });
+  });
+
+  function redraw() {
+    queued = false;
     colours();
-    if (e.detail.first || (still && still.matches)) { paint(front); return; }
+    if (still && still.matches) { paint(front); return; }
     roll(); measure();
     // The hidden canvas goes on top at opacity 0, then fades in.
     back.style.transition = 'none';
@@ -643,5 +674,5 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
     back.style.transition = '';
     back.style.opacity = '1';
     const t = front; front = back; back = t;
-  });
+  }
 })();
