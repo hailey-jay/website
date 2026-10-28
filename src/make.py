@@ -11,6 +11,7 @@ directives among it, is in common.py.
 from common import (
     BASE_URL, DIRECTIVE_RE, GRID_SIZES, build_image, expand_directives,
     front_matter, load_shared, math_head, parse_row, photos, root, src,
+    thumb_for,
 )
 import sagitta_pages
 
@@ -197,7 +198,8 @@ def parse_blog(raw, raw_entries):
     def thumb_for_post(post):
         if not post.images:
             return ""
-        return (f'<img class="blog-entry-thumb" src="{post.images[0]["thumb"]}" alt="" '
+        icon = thumb_for(post.images[0]["src"], 160)
+        return (f'<img class="blog-entry-thumb" src="{icon}" alt="" '
                 f'width="56" height="56" loading="lazy" decoding="async">')
 
     entries = repeat(entry_template, [

@@ -28,18 +28,34 @@ from sitekit.text import parse_fields, parse_kv, render, rows_of, split_sections
 BASE_URL = "https://haileyjay.net"
 
 # ── Images ───────────────────────────────────────────────────
-# Gallery originals are 1024-1600px but are displayed at ~200px in a grid and
-# capped at 640px in the lightbox, so the grid was pulling half-megabyte photos
-# to fill a thumbnail. One 640px copy is derived per image and offered first;
-# the original stays in the srcset for wide viewports and remains what the
-# lightbox opens. Derivatives mirror the source tree under images/thumbs/,
-# minus a leading "images/" so blog photos land at images/thumbs/blog/...
-# rather than images/thumbs/images/blog/...
+# Gallery originals are 1024-1600px but are displayed at ~200px in a grid, so
+# the grid was pulling half-megabyte photos to fill a thumbnail. Copies are
+# derived per image and offered in the srcset ahead of the original, which
+# remains what the lightbox opens:
+#   160   the Blog list's 56px icon, at 2x
+#   440   the About carousel's 220px card and a grid card, at 2x
+#   640   a grid card on a phone, and the original single copy
+#   1280  a 420px inline figure at 2x and 3x, which otherwise skipped past
+#         640 to the multi-megabyte original
+# A source between rungs gets no copy at its own width: the original is
+# already in the srcset at that width, and the Sagitta screenshots stay
+# lossless PNGs.
+# Derivatives mirror the source tree under images/thumbs/, minus a leading
+# "images/" so blog photos land at images/thumbs/blog/... rather than
+# images/thumbs/images/blog/... The 640 copy keeps the unsuffixed name it had
+# when it was the only one; the others are suffixed with their width.
+_unsuffixed = mirrored("images/thumbs", strip="images/")
+_suffixed   = mirrored("images/thumbs", strip="images/", width_suffix=True)
+
+def thumb_path(rel, width):
+    return (_unsuffixed if width == 640 else _suffixed)(rel, width)
+
 photos = Pipeline(
     root      = root,
-    widths    = (640,),
-    out       = mirrored("images/thumbs", strip="images/"),
+    widths    = (160, 440, 640, 1280),
+    out       = thumb_path,
     min_width = 640,
+    own_width_rung = False,
 )
 
 # Grid cards sit in a ~640px main column at three-up, and go roughly
@@ -47,10 +63,13 @@ photos = Pipeline(
 GRID_SIZES   = "(max-width: 640px) 45vw, 210px"
 FIGURE_SIZES = "(max-width: 480px) 100vw, 420px"
 
-def thumb_for(path):
-    """The narrowest derivative of `path`, or `path` itself if it has none."""
+def thumb_for(path, width):
+    """The narrowest derivative of `path` at least `width` wide, the widest
+    if none is, or `path` itself if it has none."""
     derivatives = photos.derivatives(path)
-    return derivatives[0][0] if derivatives else path
+    if not derivatives:
+        return path
+    return next((p for p, w in derivatives if w >= width), derivatives[-1][0])
 
 def parse_row(row):
     """Split an `image | caption | alt` row.
@@ -114,7 +133,7 @@ def build_image(row, base, template, collected, sizes=None):
     # Recorded as raw text, in DOM order. The carousel assigns these to
     # img.alt as a property, so they must not be HTML-escaped. The
     # carousel wants the thumbnail; the lightbox wants the original.
-    collected.append({"src": img, "thumb": thumb_for(img), "alt": alt})
+    collected.append({"src": img, "thumb": thumb_for(img, 440), "alt": alt})
     return render(template,
         thumb_class = "gallery-thumb",
         label       = "View image",

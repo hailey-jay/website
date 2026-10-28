@@ -145,6 +145,11 @@ class Pipeline:
                 is a multi-megabyte archive copy nobody should be served.
     generate    False uses derivatives that already exist and never writes one,
                 for a site whose derivatives are made out of band.
+    own_width_rung  derive a rung at the source's own width when it falls
+                between rungs. False only alongside keep_original, where the
+                original already fills that width; a re-encoded near-copy of
+                it would only cost a file and, for a lossless screenshot,
+                sharpness.
     """
     root: Path
     widths: tuple = (640,)
@@ -156,6 +161,7 @@ class Pipeline:
     keep_original: bool = True
     generate: bool = True
     strict: bool = True
+    own_width_rung: bool = True
 
     _dims: dict = field(default_factory=dict, repr=False)
     _derivs: dict = field(default_factory=dict, repr=False)
@@ -163,6 +169,9 @@ class Pipeline:
 
     def __post_init__(self):
         self.root = Path(self.root)
+        need(self.own_width_rung or self.keep_original,
+             "own_width_rung=False needs keep_original, or a source between "
+             "rungs would have nothing at its own width.")
         if self.generate and self.out is not None:
             need(HAVE_PILLOW,
                  "Generating derivatives needs Pillow (pip install pillow). "
@@ -230,7 +239,10 @@ class Pipeline:
         """Ladder rungs this source can actually fill, plus one at its own
         width when it lands between rungs."""
         below = {w for w in self.widths if w < width}
-        return sorted(below | {min(width, max(self.widths))})
+        top = min(width, max(self.widths))
+        if top == width and not self.own_width_rung:
+            return sorted(below)
+        return sorted(below | {top})
 
     def _write(self, source, dst, width):
         if dst.exists() and dst.stat().st_mtime >= source.stat().st_mtime:
