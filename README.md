@@ -51,15 +51,16 @@ The build fails if an image is missing.
 
 Both forms open the lightbox, and the prev/next sequence is scoped to the post, so a post's gallery and its inline figures scroll together in DOM order.
 
-Anything wider than 640px also gets a 640px thumbnail written to `images/thumbs/`, mirroring the source path minus the leading `images/`.
-The thumbnail is what the grid, the blog index, and the homepage carousel load; the original stays in the `srcset` for wide viewports and is what the lightbox opens.
-Thumbnails are rebuilt only when the source is newer, so a no-op build is fast.
+Anything 640px or wider also gets copies at 160, 440, 640, and 1280px, as far as its own width allows, written to `images/thumbs/`, mirroring the source path minus the leading `images/`.
+The 640px copy is `name.webp`; the others are `name-160.webp` and so on.
+Every `srcset` offers the copies and the original; the blog index's icons load the 160px copy, the homepage carousel the 440px one, and the lightbox opens the original.
+Copies are rebuilt only when the source is newer, so a no-op build is fast.
 They are committed alongside the other built output.
 
 + `src/make.py`: builds `index.html`, `rss.xml`, `sitemap.xml`, and `images/thumbs/` from the source files, and calls `src/sagitta_pages.py` for the Sagitta pages
 + `src/common.py`: the parts both builds share (the repo-root anchoring, the image pipeline, the `[gallery]`/`[image]` directives, front matter, and the KaTeX head)
 + `src/sagitta_pages.py`: builds the Sagitta pages (see below)
-+ `sitekit/`: a vendored copy of the shared build library (upstream commit `fa89364`), used by all four of my site repos.
++ `sitekit/`: a vendored copy of the shared build library (upstream commit `3860244`), used by all four of my site repos.
   Text and data-format parsing, template filling, markup validation, the image pipeline, asset bundling, minification, and the post-build checker all live there.
   Everything that knows this site is haileyjay.net stays in `src/`: RSS, the `[gallery]`/`[image]` directives, draft-by-filename, comics, and the about page.
 + `katex/`: a vendored copy of KaTeX 0.19.0, served as-is; see `katex/README.md`
