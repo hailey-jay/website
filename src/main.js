@@ -354,21 +354,43 @@ document.addEventListener('DOMContentLoaded', function () {
     video.remove();
     return;
   }
-  // The footer rose stands in until now; the video takes its place.
-  const rose = video.parentNode.querySelector('img');
-  if (rose) rose.remove();
-  video.hidden = false;
+  // The footer sits far below the fold, so the video is fetched only once
+  // the footer comes within 200px of the screen, and pauses when it leaves.
+  // A theme switch while it is away waits until it is back, rather than
+  // fetching the other colour then. The footer rose stands in until the
+  // first frame arrives, and stays if the video never does.
+  const slot = video.parentNode;
+  const rose = slot.querySelector('img');
   const pick = wireframeShapes[Math.floor(Math.random() * wireframeShapes.length)];
+  let theme = window.haileyjayTheme ? window.haileyjayTheme.effective() : 'light';
+  let near = false, loaded = '';
 
-  function setVariant(theme) {
-    const suffix = theme === 'dark' ? '-dark' : '';
-    const time = video.currentTime;
-    video.src = 'images/wireframes/' + pick + suffix + '.mp4';
-    video.currentTime = time;
+  video.addEventListener('loadeddata', function () {
+    if (rose) rose.remove();
+    video.hidden = false;
+  }, { once: true });
+
+  function sync() {
+    if (!near) { video.pause(); return; }
+    const want = 'images/wireframes/' + pick + (theme === 'dark' ? '-dark' : '') + '.mp4';
+    if (want !== loaded) {
+      const time = video.currentTime;
+      video.src = want;
+      video.currentTime = time;
+      loaded = want;
+    }
+    video.play().catch(function () {});
   }
 
-  setVariant(window.haileyjayTheme ? window.haileyjayTheme.effective() : 'light');
-  if (window.haileyjayTheme) window.haileyjayTheme.onChange(setVariant);
+  new IntersectionObserver(function (entries) {
+    near = entries[entries.length - 1].isIntersecting;
+    sync();
+  }, { rootMargin: '200px' }).observe(slot);
+
+  if (window.haileyjayTheme) window.haileyjayTheme.onChange(function (t) {
+    theme = t;
+    if (near) sync();
+  });
 });
 
 // ── Blog image carousel (about page) ────────────────────────
@@ -436,16 +458,26 @@ function autoScroll(container) {
   container.addEventListener('focusin', function () { paused = true; });
   container.addEventListener('focusout', function () { paused = false; });
 
+  // The loop runs only while the carousel is on screen, so it costs nothing
+  // in other sections or scrolled away. The wrap point is read when the
+  // carousel changes size, not every frame.
+  let half = 0, visible = false, frame = 0;
+  new ResizeObserver(function () { half = container.scrollWidth / 2; }).observe(container);
+
   function step() {
-    if (!paused) {
-      const half = container.scrollWidth / 2;
-      offset += speed;
-      if (offset >= half) offset -= half;
+    frame = 0;
+    if (!visible) return;
+    if (!paused && half > 0) {
+      offset = (offset + speed) % half;
       container.scrollLeft = offset;
     }
-    requestAnimationFrame(step);
+    frame = requestAnimationFrame(step);
   }
-  requestAnimationFrame(step);
+
+  new IntersectionObserver(function (entries) {
+    visible = entries[entries.length - 1].isIntersecting;
+    if (visible && !frame) frame = requestAnimationFrame(step);
+  }).observe(container);
 }
 
 // ── Copy toggles (paper BibTeX, my button's code) ────────────
@@ -573,28 +605,33 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
 
   // Regions are filled per CSS pixel, then scaled up to the device's pixels;
   // the lines are stroked at full resolution on top, covering the seams.
-  // The grain and pixel buffer are kept between paints and remade only when
-  // the window changes size.
-  let W = 0, H = 0, noise = null, img = null;
+  // The grain is one 128px tile, repeated, so making it costs nothing and it
+  // stays put when the window resizes. The pixel buffer is made screen-sized
+  // once and only ever grows, so a phone's address bar sliding in and out
+  // costs a repaint of the visible part, not a new buffer.
+  const TILE = 128;
+  const grain = new Int8Array(TILE * TILE);
+  for (let i = 0; i < grain.length; i++) grain[i] = Math.round((Math.random() * 2 - 1) * GRAIN);
+  let W = 0, H = 0, img = null;
   const off = document.createElement('canvas');
   const octx = off.getContext('2d');
   const cuts = new Float64Array(LINES + 2);
 
   function measure() {
-    const w = Math.max(1, Math.round(innerWidth)), h = Math.max(1, Math.round(innerHeight));
-    if (w === W && h === H && img) return;
-    W = w; H = h;
-    off.width = W; off.height = H;
-    img = octx.createImageData(W, H);
-    noise = new Int8Array(W * H);
-    for (let i = 0; i < noise.length; i++) noise[i] = Math.round((Math.random() * 2 - 1) * GRAIN);
+    W = Math.max(1, Math.round(innerWidth)); H = Math.max(1, Math.round(innerHeight));
+    if (img && W <= img.width && H <= img.height) return;
+    const w = Math.max(W, screen.width || 0, img ? img.width : 0);
+    const h = Math.max(H, screen.height || 0, img ? img.height : 0);
+    off.width = w; off.height = h;
+    img = octx.createImageData(w, h);
   }
   const resized = function () { return Math.round(innerWidth) !== W || Math.round(innerHeight) !== H; };
 
   // Each row is cut into spans where it crosses the lines; a span lies in
   // one region, so its tint is looked up once rather than per pixel.
   function paint(canvas) {
-    const d = img.data;
+    if (!tints) return;   // a resize or theme change before the first paint
+    const d = img.data, stride = img.width;
     for (let y = 0; y < H; y++) {
       let m = 0;
       cuts[m++] = 0;
@@ -616,19 +653,22 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
           if (l[0] * xm + l[1] * y + l[2] > 0) k |= 1 << i;
         }
         const c = tints[pick(k)], r = c[0], g = c[1], b = c[2];
-        for (let p = y * W + x0, e = y * W + x1, q = p * 4; p < e; p++, q += 4) {
-          const n = noise[p];
+        const row = (y % TILE) * TILE;
+        for (let x = x0, q = (y * stride + x0) * 4; x < x1; x++, q += 4) {
+          const n = grain[row + x % TILE];
           d[q] = r + n; d[q + 1] = g + n; d[q + 2] = b + n; d[q + 3] = 255;
         }
       }
     }
-    octx.putImageData(img, 0, 0);
+    octx.putImageData(img, 0, 0, 0, 0, W, H);
 
+    // Resizing a canvas reallocates and clears it, so only when it changed.
     const ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    const cw = Math.round(W * dpr), ch = Math.round(H * dpr);
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(off, 0, 0, W, H, 0, 0, cw, ch);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.strokeStyle = line; ctx.lineWidth = 1;
     lines.forEach(function (l) {
@@ -640,7 +680,9 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
     });
   }
 
-  roll(); colours(); measure(); paint(front);
+  // The first paint waits for the router's first accentchange, which carries
+  // the opening section's accent; painting now as well would draw it twice.
+  roll(); measure();
 
   let timer = 0;
   addEventListener('resize', function () {
